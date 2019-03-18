@@ -48,7 +48,7 @@ $ ROS_NAMESPACE=my_camera rosrun image_proc image_proc
 
 ## Usage
 
-To launch everythhing:
+To launch everything:
 
 ```
 roslaunch pointgrey_camera_driver camera.launch packet_resend:=false
