@@ -1,6 +1,6 @@
 # Visual Perception of the road onboard the AtlasCar
 
-This is my Mechanical Engineering Masters Thesis Repo in the fielf of Artificial Vision applied to Auntonomous Driving.
+This is my Mechanical Engineering Masters Thesis Repo in the fielf of Artificial Vision applied to Autonomous Driving.
 
 ## Where and when was it made?
 
@@ -20,7 +20,7 @@ Aveiro, Portugal
 
 ### Prerequisites
 
-What things you need to install the software and how to install them:
+What things that are needed:
 
 * [ROS-melodic](http://wiki.ros.org/melodic/Installation/Ubuntu) - The ROS version used.
 * [FlyCapture 2.x](https://www.ptgrey.com/support/downloads)
@@ -38,7 +38,7 @@ After all of the prerequisites are installed, the first step is to calibrate the
 To run the camera_calibrator package: rosrun camera_calibration cameracalibrator.py --size 8*6 --square 0.108 image:=/camera/image_raw
 ```
 
-To get the undistorted imaage (this step is included on the my camera_driver launch file):
+To get the undistorted image (this step is already included on the my camera_driver launch file):
 
 ```
 $ ROS_NAMESPACE=my_camera rosrun image_proc image_proc
@@ -57,12 +57,11 @@ roslaunch pointgrey_camera_driver camera.launch packet_resend:=false
 ### Algorithms that were used
 
 In this project were used some algorithms:
- * [Nsteel/LaneDetectot](https://github.com/Nsteel/Lane_Detector)
+ * [Nsteel/LaneDetection](https://github.com/Nsteel/Lane_Detector)
 
 
 ## Author
 
-* **Tiago Almeida** - [Thesis Blog](https://tmralmeida.github.io/thesis_blog/)
+* **Tiago Almeida** - [My Thesis Blog](https://tmralmeida.github.io/thesis_blog/)
 
-See also the list of [contributors](https://github.com/your/project/contributors) who participated in this project.
 
