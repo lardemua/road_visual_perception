@@ -554,7 +554,7 @@ void mcvIntersectLineWithBB(const Line *inLine, const CvSize bbox,
     }
 
     //points of intersection
-    FLOAT_POINT2D pts[4] = {{xup, 0}, {xdown, bbox.height}, {0, yleft}, {bbox.width, yright}};
+    FLOAT_POINT2D pts[4] = {{xup, 0}, {xdown, (float)bbox.height}, {0, yleft}, {(float)bbox.width, yright}};
 
     //now decide which stays and which goes
     int i;
@@ -1101,7 +1101,7 @@ void mcvIntersectLineRThetaWithBB(FLOAT r, FLOAT theta, const CvSize bbox,
                                   Line *outLine)
 {
   //hold parameters
-  double xup, xdown, yleft, yright;
+  float xup, xdown, yleft, yright;
 
   //intersect with top and bottom borders: y=0 and y=bbox.height-1
   if (cos(theta) == 0) //horizontal line
@@ -1126,7 +1126,7 @@ void mcvIntersectLineRThetaWithBB(FLOAT r, FLOAT theta, const CvSize bbox,
   }
 
   //points of intersection
-  FLOAT_POINT2D pts[4] = {{xup, 0}, {xdown, bbox.height}, {0, yleft}, {bbox.width, yright}};
+  FLOAT_POINT2D pts[4] = {{xup, 0}, {xdown, (float)bbox.height}, {0, yleft}, {(float)bbox.width, yright}};
 
   //get the starting point
   int i;
