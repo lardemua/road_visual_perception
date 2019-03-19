@@ -59,16 +59,15 @@ void readCameraInfo(const sensor_msgs::CameraInfo::ConstPtr &cm, bool *done)
     cameraInfo.cameraHeight = dynConfig.camera_height;
     cameraInfo.pitch = dynConfig.camera_pitch * CV_PI / 180;
     cameraInfo.yaw = 0.0;
-    cout << "Debug1: li a info vindo da camara\n";
   }
   else
   {
-    cameraInfo.focalLength.x = 270.076996 * 3;
-    cameraInfo.focalLength.y = 300.836426 * 3;
-    cameraInfo.opticalCenter.x = 325.678818 * 3.0125;
-    cameraInfo.opticalCenter.y = 250.211312 * 3;
-    cameraInfo.imageWidth = 640 * 3.0125;
-    cameraInfo.imageHeight = 480 * 3;
+    cameraInfo.focalLength.x = 270.076996;
+    cameraInfo.focalLength.y = 300.836426;
+    cameraInfo.opticalCenter.x = 325.678818;
+    cameraInfo.opticalCenter.y = 250.211312;
+    cameraInfo.imageWidth = 640;
+    cameraInfo.imageHeight = 480;
     cameraInfo.cameraHeight = dynConfig.camera_height;
     cameraInfo.pitch = dynConfig.camera_pitch * CV_PI / 180;
     cameraInfo.yaw = 0.0;
@@ -231,7 +230,7 @@ int main(int argc, char **argv)
     ros::spinOnce();
     ROS_WARN("No information on topic camera_info received");
   }
-  cout<<"Debug 2: já adquiri information!\n";
+ 
 
   //Stop the Subscriber
   cameraInfo_sub.shutdown();
@@ -263,9 +262,7 @@ int main(int argc, char **argv)
          * driving direction
          */
   ros::Subscriber driving_orientation_sub = nh.subscribe<std_msgs::Int32>("lane_detector/driving_orientation", 1, drivingOrientationCB);
-  cout<<"Debug3: Já subscrevi a orientação!\n";
   image_transport::Subscriber image_sub = it.subscribe("/image", 1, readImg);
-  cout<<"Debug4: Já subscrevi a imagem!\n";
   resultImg_pub = it.advertise("lane_detector/result", 1);
   lane_pub = nh.advertise<lane_detector::Lane>("lane_detector/lane", 1);
 
@@ -274,8 +271,6 @@ int main(int argc, char **argv)
   if (loadFiles)
   {
     laneDetectionFromFiles(imagesPath); // Whether to load the images from a folder (data set) or from the kinect
-    cout<<"Debug5: Esta a ir buscar um file!\n";
-    printf("Debug6: Valor de loadFiles: %d\n",loadFiles);
   }
   //ros::MultiThreadedSpinner spinner(0); // Use one thread for core
   //spinner.spin(); // spin() will not return until the node has been shutdown
