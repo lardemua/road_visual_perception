@@ -64,4 +64,3 @@ In this project were used some algorithms:
 
 * **Tiago Almeida** - [My Thesis Blog](https://tmralmeida.github.io/thesis_blog/)
 
-
