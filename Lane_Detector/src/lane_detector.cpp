@@ -40,6 +40,8 @@ lane_detector::DetectorConfig dynConfig;
 LaneDetector::CameraInfo cameraInfo;
 LaneDetector::LaneDetectorConf lanesConf;
 
+ros::Publisher processed_pub;
+
 /**
  * readCameraInfo reads and sets the camera parameters if received on topic "camera_info".
  * Otherwise the parameters are set with some constant values related to the camera used
@@ -59,6 +61,14 @@ void readCameraInfo(const sensor_msgs::CameraInfo::ConstPtr &cm, bool *done)
     cameraInfo.cameraHeight = dynConfig.camera_height;
     cameraInfo.pitch = dynConfig.camera_pitch * CV_PI / 180;
     cameraInfo.yaw = 0.0;
+    cout << "focal length em x: " << cameraInfo.focalLength.x << "\n";
+    cout << "focal length em y: " << cameraInfo.focalLength.y << "\n";
+    cout << "Optical Center em x: " << cameraInfo.opticalCenter.x << "\n";
+    cout << "Optical Center em y: " << cameraInfo.opticalCenter.y << "\n";
+    cout << "Largura da imagem: " << cameraInfo.imageWidth << "\n";
+    cout << "Altura da imagem: " << cameraInfo.imageHeight << "\n";
+    cout << "Altura a que se encontra a camara: " << cameraInfo.cameraHeight << "\n";
+    
   }
   else
   {
@@ -109,13 +119,19 @@ void processImage(LaneDetector::CameraInfo &cameraInfo, LaneDetector::LaneDetect
     lane_detector::utils::scaleMat(processed_bgr, processed_bgr);
     if (processed_bgr.channels() == 1)
       cv::cvtColor(processed_bgr, processed_bgr, CV_GRAY2BGR);
+    
     extractor.extract(processed_bgr, preprocessed, boxes);
     lane_detector::Lane current_lane = fitting_phase.fitting(currentFrame_ptr->image, processed_bgr, preprocessed, ipmInfo, cameraInfo, boxes);
     lane_pub.publish(current_lane);
 
-    //cv::imshow("Out", processed_bgr);
-    //cv::waitKey(1);
+    processed_bgr.convertTo(processed_bgr, CV_8UC3);
 
+    auto processed_img = cv_bridge::CvImage{ currentFrame_ptr->header, "bgr8", processed_bgr };
+    
+    processed_pub.publish(processed_img);
+
+    // cv::imshow("Out", processed_bgr);
+    // cv::waitKey(1);
     //cv::line(currentFrame_ptr->image, cv::Point((currentFrame_ptr->image.cols-1)/2, 0), cv::Point((currentFrame_ptr->image.cols-1)/2, currentFrame_ptr->image.rows), cv::Scalar(0, 255, 239), 1);
   }
 }
@@ -230,7 +246,6 @@ int main(int argc, char **argv)
     ros::spinOnce();
     ROS_WARN("No information on topic camera_info received");
   }
- 
 
   //Stop the Subscriber
   cameraInfo_sub.shutdown();
@@ -262,9 +277,11 @@ int main(int argc, char **argv)
          * driving direction
          */
   ros::Subscriber driving_orientation_sub = nh.subscribe<std_msgs::Int32>("lane_detector/driving_orientation", 1, drivingOrientationCB);
-  image_transport::Subscriber image_sub = it.subscribe("/image", 1, readImg);
-  resultImg_pub = it.advertise("lane_detector/result", 1);
-  lane_pub = nh.advertise<lane_detector::Lane>("lane_detector/lane", 1);
+  image_transport::Subscriber image_sub = it.subscribe("/image", 10, readImg);
+  resultImg_pub = it.advertise("lane_detector/result", 10);
+  lane_pub = nh.advertise<lane_detector::Lane>("lane_detector/lane", 10);
+
+  processed_pub = nh.advertise<sensor_msgs::Image>("lane_detector/processed", 10);
 
   std::string imagesPath = "";
   ros::param::get("~images_path", imagesPath);

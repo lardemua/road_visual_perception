@@ -41,7 +41,7 @@ lane_detector::Lane Fitting::fitting(cv::Mat &original, cv::Mat &processed_bgr, 
 #pragma omp parallel shared(splines)
     {
       std::vector<cv::Point> spline_private;
-#pragma omp for nowait //fill splines_private in parallel
+#pragma omp for nowait // fill splines_private in parallel
       for (int i = 0; i < rects.size(); i++)
       {
         cv::Rect bounding_box = rects[i];
