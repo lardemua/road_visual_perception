@@ -252,7 +252,7 @@ inline void setMat(cv::Mat &inMat, cv::Rect mask)
      * This function scales the input image to have values 0->255
      *
      * \param inImage the input image
-     * \param outImage hte output iamge
+     * \param outImage the output iamge
      */
 inline void scaleMat(cv::Mat &inImage, cv::Mat &outImage)
 {

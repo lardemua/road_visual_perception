@@ -1,15 +1,11 @@
 #include <lane_detector/lane_tracker/Ctracker.h>
 
-//die folgenden Codeabschnitte sind open source und wurden aus https://github.com/Smorodov/Multitarget-tracker genommen
+// die folgenden Codeabschnitte sind open source und wurden aus https://github.com/Smorodov/Multitarget-tracker genommen
 
 // ---------------------------------------------------------------------------
-//param rects input/output bounding boxes
+// param rects input/output bounding boxes
 // ---------------------------------------------------------------------------
-void CTracker::Update(
-	const std::vector<Point_t>& detections,
-  const std::vector<cv::Rect>& rects,
-	DistType distType
-	)
+void CTracker::Update(const std::vector<Point_t>& detections, const std::vector<cv::Rect>& rects, DistType distType)
 {
 	assert(detections.size() == rects.size());
 
@@ -31,30 +27,29 @@ void CTracker::Update(
 
 	if (!tracks.empty())
 	{
-
 		distMatrix_t Cost(N * M);
 
 		switch (distType)
 		{
-		case CentersDist:
-			for (size_t i = 0; i < tracks.size(); i++)
-			{
-				for (size_t j = 0; j < detections.size(); j++)
+			case CentersDist:
+				for (size_t i = 0; i < tracks.size(); i++)
 				{
-					Cost[i + j * N] = tracks[i]->CalcDist(detections[j]);
+					for (size_t j = 0; j < detections.size(); j++)
+					{
+						Cost[i + j * N] = tracks[i]->CalcDist(detections[j]);
+					}
 				}
-			}
-			break;
+				break;
 
-		case RectsDist:
-			for (size_t i = 0; i < tracks.size(); i++)
-			{
-				for (size_t j = 0; j < detections.size(); j++)
+			case RectsDist:
+				for (size_t i = 0; i < tracks.size(); i++)
 				{
-					Cost[i + j * N] = tracks[i]->CalcDist(rects[j]);
+					for (size_t j = 0; j < detections.size(); j++)
+					{
+						Cost[i + j * N] = tracks[i]->CalcDist(rects[j]);
+					}
 				}
-			}
-			break;
+				break;
 		}
 
 		// -----------------------------------
@@ -70,7 +65,7 @@ void CTracker::Update(
 		{
 			if (assignment[i] != -1)
 			{
-				//std::cout << "Kalman cost: " << Cost[i + assignment[i] * N] << std::endl;
+				// std::cout << "Kalman cost: " << Cost[i + assignment[i] * N] << std::endl;
 				if (Cost[i + assignment[i] * N] > dist_thres)
 				{
 					assignment[i] = -1;
@@ -99,11 +94,11 @@ void CTracker::Update(
 	}
 
 	// -----------------------------------
-    // Search for unassigned detects and start new tracks for them.
+	// Search for unassigned detects and start new tracks for them.
 	// -----------------------------------
-    for (size_t i = 0; i < detections.size(); ++i)
+	for (size_t i = 0; i < detections.size(); ++i)
 	{
-        if (find(assignment.begin(), assignment.end(), i) == assignment.end())
+		if (find(assignment.begin(), assignment.end(), i) == assignment.end())
 		{
 			tracks.push_back(std::make_shared<CTrack>(detections[i], rects[i], dt, Accel_noise_mag, NextTrackID++));
 		}
@@ -111,33 +106,34 @@ void CTracker::Update(
 
 	// Update Kalman Filters state
 
-    for (size_t i = 0; i<assignment.size(); i++)
+	for (size_t i = 0; i < assignment.size(); i++)
 	{
 		// If track updated less than one time, than filter state is not correct.
 
-		if (assignment[i] != -1) // If we have assigned detect, then update using its coordinates,
+		if (assignment[i] != -1)	// If we have assigned detect, then update using its coordinates,
 		{
 			tracks[i]->skipped_frames = 0;
-      tracks[i]->seen_frames++;
+			tracks[i]->seen_frames++;
 			tracks[i]->Update(detections[assignment[i]], rects[assignment[i]], true, max_trace_length);
 		}
-		else				     // if not continue using predictions
+		else	// if not continue using predictions
 		{
 			tracks[i]->Update(Point_t(), cv::Rect(), false, max_trace_length);
 		}
 	}
-
 }
 
-std::vector<cv::Rect> CTracker::getLastRects() {
-  std::vector<cv::Rect> output_rects;
+std::vector<cv::Rect> CTracker::getLastRects()
+{
+	std::vector<cv::Rect> output_rects;
 
-  for (int i = 0; i < tracks.size(); i++)
-  {
-    if(tracks[i]->seen_frames >= minimum_seen_frames) {
-      output_rects.push_back(tracks[i]->GetLastRect());
-    }
-  }
+	for (int i = 0; i < tracks.size(); i++)
+	{
+		if (tracks[i]->seen_frames >= minimum_seen_frames)
+		{
+			output_rects.push_back(tracks[i]->GetLastRect());
+		}
+	}
 
-  return output_rects;
+	return output_rects;
 }

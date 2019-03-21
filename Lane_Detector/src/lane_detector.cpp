@@ -124,10 +124,9 @@ void processImage(LaneDetector::CameraInfo &cameraInfo, LaneDetector::LaneDetect
     lane_detector::Lane current_lane = fitting_phase.fitting(currentFrame_ptr->image, processed_bgr, preprocessed, ipmInfo, cameraInfo, boxes);
     lane_pub.publish(current_lane);
 
+    //Sending the processed image to a node 
     processed_bgr.convertTo(processed_bgr, CV_8UC3);
-
     auto processed_img = cv_bridge::CvImage{ currentFrame_ptr->header, "bgr8", processed_bgr };
-    
     processed_pub.publish(processed_img);
 
     // cv::imshow("Out", processed_bgr);
