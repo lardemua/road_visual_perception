@@ -51,9 +51,9 @@ void SHOW_IMAGE(const CvMat *pmat, const char str[], int wait)
     mcvScaleMat(mat, mat);
   //show it
   //cout << "in\n";
-  cvNamedWindow(str, CV_WINDOW_AUTOSIZE); //0 1
-  cvShowImage(str, mat);
-  cvWaitKey(wait);
+  //cvNamedWindow(str, CV_WINDOW_AUTOSIZE); //0 1
+  //cvShowImage(str, mat);
+  //cvWaitKey(wait);
   //cvDestroyWindow(str);
   //clear
   cvReleaseMat(&mat);
@@ -71,9 +71,9 @@ void SHOW_IMAGE(const IplImage *pmat, char str[])
   //    mcvScaleMat(mat, mat);
   //show it
   //cout << "in\n";
-  cvNamedWindow(str, 1);
-  cvShowImage(str, pmat);
-  cvWaitKey(0);
+  //cvNamedWindow(str, 1);
+  //cvShowImage(str, pmat);
+  //cvWaitKey(0);
   //cvDestroyWindow(str);
   //clear
   //cvReleaseMat(&mat);

@@ -219,7 +219,7 @@ void mcvGetHVLines(const CvMat *inImage, vector<Line> *lines, vector<FLOAT> *lin
       maxLineLoc = image->width - 1;
       break;
   }
-  // SHOW_MAT(&sumLines, "sumLines:");
+  //SHOW_MAT(&sumLines, "sumLines:");
 
   // smooth it
 
@@ -372,7 +372,7 @@ void mcvGetHVLines(const CvMat *inImage, vector<Line> *lines, vector<FLOAT> *lin
         sprintf(str, "%s", "Vertical Lines");
         break;
     }
-    SHOW_IMAGE(im, str, 10);
+    //SHOW_IMAGE(im, str, 10);
     cvReleaseMat(&im);
     cvReleaseMat(&im2);
   }
@@ -763,7 +763,7 @@ void mcvGetRansacLines(const CvMat *im, vector<Line> &lines, vector<float> &line
       // draw line
       if (lineRTheta[0] > 0)
         mcvDrawLine(subimageClr, line, CV_RGB(1, 0, 0), 1);
-      SHOW_IMAGE(subimageClr, str, 10);
+      //SHOW_IMAGE(subimageClr, str, 10);
       // clear
       cvReleaseMat(&subimageClr);
     }  //#endif
@@ -816,7 +816,7 @@ void mcvGetRansacLines(const CvMat *im, vector<Line> &lines, vector<float> &line
     // draw spline
     for (unsigned int j = 0; j < oldLines.size(); j++)
       mcvDrawLine(imClr2, oldLines[j], CV_RGB(1, 0, 0), 1);
-    SHOW_IMAGE(imClr2, "Input Lines", 10);
+    //SHOW_IMAGE(imClr2, "Input Lines", 10);
 
     // clear
     cvReleaseMat(&imClr);
@@ -1661,7 +1661,7 @@ void mcvFitRansacLine(const CvMat *image, int numSamples, int numIterations, flo
       sprintf(str, "scor=%.2f, best=%.2f", score, bestScore);
       mcvDrawText(imageClr, str, cvPoint(30, 30), .25, CV_RGB(255, 255, 255));
 
-      SHOW_IMAGE(imageClr, "Fit Ransac Line", 10);
+      //SHOW_IMAGE(imageClr, "Fit Ransac Line", 10);
 
       // clear
       cvReleaseMat(&im);
