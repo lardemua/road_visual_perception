@@ -25,22 +25,31 @@ inline float calcSlope(cv::Point& pt1, const cv::Point& pt2) {
 class SplineCombination {
 public:
         inline SplineCombination() { correct = false; num_absent_frames = 0; closest_points_set = false;};
-        inline SplineCombination(const lane_detector::DetectorConfig& config, const LaneDetector::IPMInfo& ipmInfo, const std::vector<cv::Point>& s1, const std::vector<cv::Point>& s2, const uint32_t& spline1_idx, const uint32_t& spline2_idx, const cv::Point2f& centroid_s1, const cv::Point2f& centroid_s2)
-        : config(config), ipmInfo(ipmInfo), spline1(s1), spline2(s2), spline1_idx(spline1_idx), spline2_idx(spline2_idx), centroid_spline1(centroid_s1), centroid_spline2(centroid_s2), lane_width(0), num_absent_frames(0)
+        inline SplineCombination(const lane_detector::DetectorConfig& config, const LaneDetector::IPMInfo& ipmInfo, const std::vector<cv::Point>& s1, const std::vector<cv::Point>& s2, const uint32_t& spline1_idx, const uint32_t& spline2_idx, const cv::Point2f& centroid_s1, const cv::Point2f& centroid_s2) : config(config), ipmInfo(ipmInfo), spline1(s1), spline2(s2), spline1_idx(spline1_idx), spline2_idx(spline2_idx), centroid_spline1(centroid_s1), centroid_spline2(centroid_s2), lane_width(0), num_absent_frames(0)
+        
         {
+          
           closest_points_set = false;
           calcLaneWidth();
+          
         };
 
         inline float calcCost(SplineCombination& last_lane) {
           float desired_width = config.width_between_lines * ipmInfo.xScale;
           float width_diff = (desired_width - lane_width);
           uint32_t width_weight = config.lane_width_weight;
+          // cout<<"lane_width ??????????????????????????????: "<<lane_width<<"\n"<<endl;
+          // cout << "desired width: " << desired_width <<"\n"<< endl;
+          // cout<< "ipmInfo.xScale= "<< ipmInfo.xScale << "\n" <<endl;
+          // cout << "width_diff: " << width_diff << endl;
+          // cout <<  "width_between_lines_threshold: " <<config.width_between_lines_threshold  <<endl;
           if(std::abs(width_diff) > config.width_between_lines_threshold) correct = false;
+           
+
+          
 
           std::array<float, 5> diff;
           if(correct) {
-
             if(centroid_spline1.x > centroid_spline2.x) {
                centroid_right = centroid_spline1;
                centroid_left = centroid_spline2;
@@ -74,20 +83,21 @@ public:
             {
               diff[0] = centroid_left.x - (config.ipmWidth - 1);
             }
+            // cout<< "Correct (antes dos diffs)?-- "<<last_lane.correct<<endl;
             diff[1] = std::min(length_spline1, length_spline2);
             diff[1] -= config.lineHeight * ipmInfo.yScale;
             diff[2] = width_weight*(desired_width - lane_width);
             diff[3] = last_lane.correct? cv::norm(centroid_left - last_lane.centroid_left) : 0;
             diff[4] = last_lane.correct? cv::norm(centroid_right - last_lane.centroid_right) : 0;
-            //std::cout << "left_diff: " << diff[3] << " right_diff: " << diff[4] << std::endl;
+            // std::cout << "left_diff: " << diff[3] << " right_diff: " << diff[4] << std::endl;
             if(diff[3] > config.line_dist_threshold) {
               diff[3] = 1000;
             }
             if(diff[4] > config.line_dist_threshold)  {
               diff[4] = 1000;
             }
-            //std::cout << ipmInfo.yScale << std::endl;
-            //std::cout << "x1: " << centroid_spline1.x << " x2: " << centroid_spline2.x << " width: " << lane_width <<" d0: "<< diff[0] << " d1: " << diff[1] << " d2: " << diff[2] << std::endl;
+            // std::cout << ipmInfo.yScale << std::endl;
+            // std::cout << "x1: " << centroid_spline1.x << " x2: " << centroid_spline2.x << " width: " << lane_width <<" d0: "<< diff[0] << " d1: " << diff[1] << " d2: " << diff[2] << std::endl;
 
             float dist = 0;
             for (float i = 0; i < diff.size(); ++i)
@@ -145,13 +155,20 @@ private:
               closest_point_s1 = closest_spline[i];
               closest_point_s2 = second_closest_spline[0];
               closest_points_set = true;
+              // cout << "Closest spline (x): " << closest_spline[i].x << endl;
+              // cout << "Second closet spline: "<< second_closest_spline[0].x<< endl;
               lane_width = std::abs(cvRound((closest_spline[i].x - second_closest_spline[0].x)));
+              // cout<<"Lane width: "<<lane_width<<endl;
+              
               break;
             }
           }
-
+          // cout<< "Correct (antes do calculo do lane width)?-- "<<correct<<endl;
+          //Isto está verificado
           if(lane_width == 0) correct = false;
           else correct = true;
+          // cout << correct << endl;
+          // cout<<"Correct (depois do calculo do lane width)?  "<<correct<<endl;
         };
 };
 

@@ -62,8 +62,7 @@ void mcvGet2DerivativeGaussianKernel(CvMat *kernel, unsigned char w, FLOAT sigma
   // get the kernel
   for (double i = -w; i <= w; i++)
   {
-    CV_MAT_ELEM(*kernel, FLOAT_MAT_ELEM_TYPE, int(i + w), 0) =
-        (FLOAT_MAT_ELEM_TYPE)(exp(-.5 * i * i) / sigma - (i * i) * exp(-(.5 / sigma) * i * i) / (sigma * sigma));
+    CV_MAT_ELEM(*kernel, FLOAT_MAT_ELEM_TYPE, int(i + w), 0) = (FLOAT_MAT_ELEM_TYPE)(exp(-.5 * i * i) / sigma - (i * i) * exp(-(.5 / sigma) * i * i) / (sigma * sigma));
   }
 }
 
@@ -811,7 +810,7 @@ void mcvGetRansacLines(const CvMat *im, vector<Line> &lines, vector<float> &line
     // draw spline
     for (unsigned int j = 0; j < lines.size(); j++)
       mcvDrawLine(imClr, lines[j], CV_RGB(0, 1, 0), 1);
-    SHOW_IMAGE(imClr, title, 10);
+    //SHOW_IMAGE(imClr, title, 10);
 
     // draw spline
     for (unsigned int j = 0; j < oldLines.size(); j++)

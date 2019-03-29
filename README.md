@@ -35,7 +35,7 @@ Hardware:
 After all of the prerequisites are installed, the first step is to calibrate the camera in order to get the intrinsics parameters. This was based in this [Tutorial](http://wiki.ros.org/camera_calibration).
 
 ```
-To run the camera_calibrator package: rosrun camera_calibration cameracalibrator.py --size 8*6 --square 0.108 image:=/camera/image_raw
+To run the camera_calibrator package: rosrun camera_calibration cameracalibrator.py --size 8x6 --square 0.108 image:=/camera/image_raw
 ```
 
 To get the undistorted image (this step is already included on the my camera_driver launch file):

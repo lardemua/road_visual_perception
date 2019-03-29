@@ -5,30 +5,30 @@
  *         Nicolas Acero
  */
 
-#include <ros/ros.h>
-#include <sensor_msgs/Image.h>
-#include <std_msgs/Int32.h>
-#include <image_transport/image_transport.h>
-#include <cv_bridge/cv_bridge.h>
-#include <sensor_msgs/image_encodings.h>
-#include <sensor_msgs/CameraInfo.h>
-#include <opencv2/imgproc/imgproc.hpp>
-#include <opencv2/highgui/highgui.hpp>
-#include <iostream>
-#include <lane_detector/preprocessor.h>
-#include <lane_detector/featureExtractor.h>
-#include <lane_detector/fitting.h>
 #include <cv.h>
-#include <sstream>
+#include <cv_bridge/cv_bridge.h>
 #include <dynamic_reconfigure/server.h>
-#include <lane_detector/DetectorConfig.h>
 #include <geometry_msgs/PointStamped.h>
 #include <geometry_msgs/PolygonStamped.h>
-#include <lane_detector/LaneDetector.hh>
-#include <lane_detector/mcv.hh>
+#include <image_transport/image_transport.h>
+#include <lane_detector/DetectorConfig.h>
+#include <lane_detector/featureExtractor.h>
+#include <lane_detector/fitting.h>
+#include <lane_detector/preprocessor.h>
 #include <lane_detector/utils.h>
 #include <ros/package.h>
+#include <ros/ros.h>
+#include <sensor_msgs/CameraInfo.h>
+#include <sensor_msgs/Image.h>
+#include <sensor_msgs/image_encodings.h>
+#include <std_msgs/Int32.h>
 #include <boost/filesystem.hpp>
+#include <iostream>
+#include <lane_detector/LaneDetector.hh>
+#include <lane_detector/mcv.hh>
+#include <opencv2/highgui/highgui.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
+#include <sstream>
 
 cv_bridge::CvImagePtr currentFrame_ptr;
 Preprocessor preproc;
@@ -49,7 +49,6 @@ ros::Publisher processed_pub;
  */
 void readCameraInfo(const sensor_msgs::CameraInfo::ConstPtr &cm, bool *done)
 {
-
   if (cm != NULL)
   {
     cameraInfo.focalLength.x = cm->P[0];
@@ -61,14 +60,14 @@ void readCameraInfo(const sensor_msgs::CameraInfo::ConstPtr &cm, bool *done)
     cameraInfo.cameraHeight = dynConfig.camera_height;
     cameraInfo.pitch = dynConfig.camera_pitch * CV_PI / 180;
     cameraInfo.yaw = 0.0;
-    cout << "focal length em x: " << cameraInfo.focalLength.x << "\n";
-    cout << "focal length em y: " << cameraInfo.focalLength.y << "\n";
-    cout << "Optical Center em x: " << cameraInfo.opticalCenter.x << "\n";
-    cout << "Optical Center em y: " << cameraInfo.opticalCenter.y << "\n";
-    cout << "Largura da imagem: " << cameraInfo.imageWidth << "\n";
-    cout << "Altura da imagem: " << cameraInfo.imageHeight << "\n";
-    cout << "Altura a que se encontra a camara: " << cameraInfo.cameraHeight << "\n";
-    
+    cout << "The camera parameters were already readen!\n" << endl;
+    // cout << "focal length em x: " << cameraInfo.focalLength.x << "\n";
+    // cout << "focal length em y: " << cameraInfo.focalLength.y << "\n";
+    // cout << "Optical Center em x: " << cameraInfo.opticalCenter.x << "\n";
+    // cout << "Optical Center em y: " << cameraInfo.opticalCenter.y << "\n";
+    // cout << "Largura da imagem: " << cameraInfo.imageWidth << "\n";
+    // cout << "Altura da imagem: " << cameraInfo.imageHeight << "\n";
+    // cout << "Altura a que se encontra a camara: " << cameraInfo.cameraHeight << "\n";
   }
   else
   {
@@ -86,7 +85,7 @@ void readCameraInfo(const sensor_msgs::CameraInfo::ConstPtr &cm, bool *done)
   *done = true;
 }
 
-//Callback function for Dynamic Reconfigre
+// Callback function for Dynamic Reconfigre
 void configCallback(lane_detector::DetectorConfig &config, uint32_t level)
 {
   preproc.setConfig(config);
@@ -96,7 +95,7 @@ void configCallback(lane_detector::DetectorConfig &config, uint32_t level)
   ROS_DEBUG("Config was set");
 }
 
-//Callback function for topic "lane_detector/driving_orientation"
+// Callback function for topic "lane_detector/driving_orientation"
 void drivingOrientationCB(const std_msgs::Int32::ConstPtr &driving_orientation)
 {
   if (driving_orientation->data == 0)
@@ -109,7 +108,7 @@ void processImage(LaneDetector::CameraInfo &cameraInfo, LaneDetector::LaneDetect
 {
   if (currentFrame_ptr)
   {
-    //information paramameters of the IPM transform
+    // information paramameters of the IPM transform
     LaneDetector::IPMInfo ipmInfo;
     // detect bounding boxes arround the lanes
     std::vector<LaneDetector::Box> boxes;
@@ -119,26 +118,26 @@ void processImage(LaneDetector::CameraInfo &cameraInfo, LaneDetector::LaneDetect
     lane_detector::utils::scaleMat(processed_bgr, processed_bgr);
     if (processed_bgr.channels() == 1)
       cv::cvtColor(processed_bgr, processed_bgr, CV_GRAY2BGR);
-    
+
     extractor.extract(processed_bgr, preprocessed, boxes);
     lane_detector::Lane current_lane = fitting_phase.fitting(currentFrame_ptr->image, processed_bgr, preprocessed, ipmInfo, cameraInfo, boxes);
     lane_pub.publish(current_lane);
 
-    //Sending the processed image to a node 
+    // Sending the processed image to a node
     processed_bgr.convertTo(processed_bgr, CV_8UC3);
     auto processed_img = cv_bridge::CvImage{ currentFrame_ptr->header, "bgr8", processed_bgr };
     processed_pub.publish(processed_img);
 
     // cv::imshow("Out", processed_bgr);
     // cv::waitKey(1);
-    //cv::line(currentFrame_ptr->image, cv::Point((currentFrame_ptr->image.cols-1)/2, 0), cv::Point((currentFrame_ptr->image.cols-1)/2, currentFrame_ptr->image.rows), cv::Scalar(0, 255, 239), 1);
+    // cv::line(currentFrame_ptr->image, cv::Point((currentFrame_ptr->image.cols-1)/2, 0),
+    // cv::Point((currentFrame_ptr->image.cols-1)/2, currentFrame_ptr->image.rows), cv::Scalar(0, 255, 239), 1);
   }
 }
 
-//Callback function for a new image on topic "image".
+// Callback function for a new image on topic "image".
 void readImg(const sensor_msgs::ImageConstPtr &img)
 {
-
   try
   {
     currentFrame_ptr = cv_bridge::toCvCopy(img, sensor_msgs::image_encodings::BGR8);
@@ -154,14 +153,15 @@ void readImg(const sensor_msgs::ImageConstPtr &img)
 
 void laneDetectionFromFiles(std::string &path)
 {
-
   std::vector<std::string> fileNames;
 
   if (boost::filesystem::is_directory(path))
   {
     for (boost::filesystem::directory_iterator itr(path); itr != boost::filesystem::directory_iterator(); ++itr)
     {
-      if (boost::filesystem::is_regular_file(itr->status()) && (itr->path().filename().string().find(".jpg") != std::string::npos || itr->path().filename().string().find(".png") != std::string::npos))
+      if (boost::filesystem::is_regular_file(itr->status()) &&
+          (itr->path().filename().string().find(".jpg") != std::string::npos ||
+           itr->path().filename().string().find(".png") != std::string::npos))
       {
         fileNames.push_back(itr->path().filename().string());
       }
@@ -176,10 +176,10 @@ void laneDetectionFromFiles(std::string &path)
     {
       cv::Mat img = cv::imread(path + "/" + fileNames.at(i));
       cv_bridge::CvImage img_bridge;
-      std_msgs::Header header;         // empty header
-      header.stamp = ros::Time::now(); // time
+      std_msgs::Header header;          // empty header
+      header.stamp = ros::Time::now();  // time
       img_bridge = cv_bridge::CvImage(header, sensor_msgs::image_encodings::BGR8, img);
-      currentFrame = *img_bridge.toImageMsg(); // from cv_bridge to sensor_msgs::Image
+      currentFrame = *img_bridge.toImageMsg();  // from cv_bridge to sensor_msgs::Image
       if (currentFrame.step == 0)
       {
         std::cout << "Error: No image with name " << fileNames.at(i) << " received" << std::endl;
@@ -212,14 +212,13 @@ void laneDetectionFromFiles(std::string &path)
 
 int main(int argc, char **argv)
 {
-
   ros::init(argc, argv, "lane_detector");
 
   /**
-         * NodeHandle is the main access point to communications with the ROS system.
-         * The first NodeHandle constructed will fully initialize this node, and the last
-         * NodeHandle destructed will close down the node.
-         */
+   * NodeHandle is the main access point to communications with the ROS system.
+   * The first NodeHandle constructed will fully initialize this node, and the last
+   * NodeHandle destructed will close down the node.
+   */
   ros::NodeHandle nh;
   image_transport::ImageTransport it(nh);
 
@@ -233,10 +232,10 @@ int main(int argc, char **argv)
   bool loadFiles = false;
   ros::param::get("~images_from_folder", loadFiles);
   /**
-        * Read camera information
-        * IMPORTANT: If images are loaded from a folder the camera parameters have to be set
-        * inside the function readCameraInfo (lane_detector.cpp::57)
-        */
+   * Read camera information
+   * IMPORTANT: If images are loaded from a folder the camera parameters have to be set
+   * inside the function readCameraInfo (lane_detector.cpp::57)
+   */
   ros::Subscriber cameraInfo_sub = nh.subscribe<sensor_msgs::CameraInfo>("camera_info", 1, std::bind(readCameraInfo, std::placeholders::_1, &info_set));
   if (loadFiles)
     readCameraInfo(NULL, &info_set);
@@ -246,35 +245,35 @@ int main(int argc, char **argv)
     ROS_WARN("No information on topic camera_info received");
   }
 
-  //Stop the Subscriber
+  // Stop the Subscriber
   cameraInfo_sub.shutdown();
 
-  //Set cameraInfo
+  // Set cameraInfo
   preproc.setCameraInfo(cameraInfo);
 
   /**
-         * The advertise() function is how you tell ROS that you want to
-         * publish on a given topic name. This invokes a call to the ROS
-         * master node, which keeps a registry of who is publishing and who
-         * is subscribing. After this advertise() call is made, the master
-         * node will notify anyone who is trying to subscribe to this topic name,
-         * and they will in turn negotiate a peer-to-peer connection with this
-         * node.  advertise() returns a Publisher object which allows you to
-         * publish messages on that topic through a call to publish().  Once
-         * all copies of the returned Publisher object are destroyed, the topic
-         * will be automatically unadvertised.
-         *
-         * The second parameter to advertise() is the size of the message queue
-         * used for publishing messages.  If messages are published more quickly
-         * than we can send them, the number here specifies how many messages to
-         * buffer up before throwing some away.
-         */
+   * The advertise() function is how you tell ROS that you want to
+   * publish on a given topic name. This invokes a call to the ROS
+   * master node, which keeps a registry of who is publishing and who
+   * is subscribing. After this advertise() call is made, the master
+   * node will notify anyone who is trying to subscribe to this topic name,
+   * and they will in turn negotiate a peer-to-peer connection with this
+   * node.  advertise() returns a Publisher object which allows you to
+   * publish messages on that topic through a call to publish().  Once
+   * all copies of the returned Publisher object are destroyed, the topic
+   * will be automatically unadvertised.
+   *
+   * The second parameter to advertise() is the size of the message queue
+   * used for publishing messages.  If messages are published more quickly
+   * than we can send them, the number here specifies how many messages to
+   * buffer up before throwing some away.
+   */
 
   /**
-         * Subscriber on topic "lane_detector/driving_orientation".
-         * This subscriber allows to change lane while driving and to select the desired
-         * driving direction
-         */
+   * Subscriber on topic "lane_detector/driving_orientation".
+   * This subscriber allows to change lane while driving and to select the desired
+   * driving direction
+   */
   ros::Subscriber driving_orientation_sub = nh.subscribe<std_msgs::Int32>("lane_detector/driving_orientation", 1, drivingOrientationCB);
   image_transport::Subscriber image_sub = it.subscribe("/image", 10, readImg);
   resultImg_pub = it.advertise("lane_detector/result", 10);
@@ -286,10 +285,10 @@ int main(int argc, char **argv)
   ros::param::get("~images_path", imagesPath);
   if (loadFiles)
   {
-    laneDetectionFromFiles(imagesPath); // Whether to load the images from a folder (data set) or from the kinect
+    laneDetectionFromFiles(imagesPath);  // Whether to load the images from a folder (data set) or from the kinect
   }
-  //ros::MultiThreadedSpinner spinner(0); // Use one thread for core
-  //spinner.spin(); // spin() will not return until the node has been shutdown
+  // ros::MultiThreadedSpinner spinner(0); // Use one thread for core
+  // spinner.spin(); // spin() will not return until the node has been shutdown
   ros::spin();
   return 0;
 }

@@ -52,6 +52,8 @@ void mcvGetIpmMap(const CvMat *inImage, CvMat *outImage, CvMat *uvGrid,
   v = inImage->height;
   u = inImage->width;
 
+  //Verified
+
   vp.y = MAX(0, vp.y);
 
   //get extent of the image in the xfyf plane
@@ -78,12 +80,20 @@ void mcvGetIpmMap(const CvMat *inImage, CvMat *outImage, CvMat *uvGrid,
   double xfMax, xfMin, yfMax, yfMin;
   cvMinMaxLoc(&row1, (double *)&xfMin, (double *)&xfMax, 0, 0, 0);
   cvMinMaxLoc(&row2, (double *)&yfMin, (double *)&yfMax, 0, 0, 0);
+  // printf("??????????????????????????????????????????????????????????????????????????????xfmax: %.7lf\n",xfMax);
+  //  printf("??????????????????????????????????????????????????????????????????????????????xfmin: %.7lf\n",xfMin);
 
   INT outRow = outImage->height;
   INT outCol = outImage->width;
 
+
+
   FLOAT_MAT_ELEM_TYPE stepRow = (yfMax - yfMin) / outRow;
   FLOAT_MAT_ELEM_TYPE stepCol = (xfMax - xfMin) / outCol;
+  //NÃO ESTÀ A DAR PRINTS-------------------------------------------------------------------------
+  // cout << "!!!!!!!!STEP COL!!!!!!!!!! " << stepCol <<endl;
+  // cout << "|xfmax| "<<xfMax <<" , "<<"|xfmin| "<<xfMin<<endl;
+  // cout << "Outcol" <<outCol<<endl;
 
   //construct the grid to sample
   CvMat *xyGrid = cvCreateMat(2, outRow * outCol, FLOAT_MAT_TYPE);
@@ -138,11 +148,9 @@ void mcvGetIpmMap(const CvMat *inImage, CvMat *outImage, CvMat *uvGrid,
   }
   //return the ipm info
   ipmInfo->xLimits[0] = CV_MAT_ELEM(*xyGrid, FLOAT_MAT_ELEM_TYPE, 0, 0);
-  ipmInfo->xLimits[1] =
-      CV_MAT_ELEM(*xyGrid, FLOAT_MAT_ELEM_TYPE, 0, (outRow - 1) * outCol + outCol - 1);
+  ipmInfo->xLimits[1] =CV_MAT_ELEM(*xyGrid, FLOAT_MAT_ELEM_TYPE, 0, (outRow - 1) * outCol + outCol - 1);
   ipmInfo->yLimits[1] = CV_MAT_ELEM(*xyGrid, FLOAT_MAT_ELEM_TYPE, 1, 0);
-  ipmInfo->yLimits[0] =
-      CV_MAT_ELEM(*xyGrid, FLOAT_MAT_ELEM_TYPE, 1, (outRow - 1) * outCol + outCol - 1);
+  ipmInfo->yLimits[0] =CV_MAT_ELEM(*xyGrid, FLOAT_MAT_ELEM_TYPE, 1, (outRow - 1) * outCol + outCol - 1);
   ipmInfo->xScale = 1 / stepCol;
   ipmInfo->yScale = 1 / stepRow;
   ipmInfo->width = outCol;
@@ -218,6 +226,7 @@ void mcvGetIPM(const CvMat *inImage, CvMat *outImage,
 
   INT outRow = outImage->height;
   INT outCol = outImage->width;
+
 
   FLOAT_MAT_ELEM_TYPE stepRow = (yfMax - yfMin) / outRow;
   FLOAT_MAT_ELEM_TYPE stepCol = (xfMax - xfMin) / outCol;
@@ -298,6 +307,7 @@ void mcvGetIPM(const CvMat *inImage, CvMat *outImage,
   ipmInfo->yLimits[0] =
       CV_MAT_ELEM(*xyGrid, FLOAT_MAT_ELEM_TYPE, 1, (outRow - 1) * outCol + outCol - 1);
   ipmInfo->xScale = 1 / stepCol;
+  // cout<<"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!Stepcol!!!!!!!!!!!!!!!!!!!!!!!!!: "<<stepCol<<endl;
   ipmInfo->yScale = 1 / stepRow;
   ipmInfo->width = outCol;
   ipmInfo->height = outRow;

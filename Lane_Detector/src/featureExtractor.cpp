@@ -12,6 +12,7 @@ void FeatureExtractor::extract(cv::Mat &original, cv::Mat &preprocessed, std::ve
   std::vector<LaneDetector::Line> lanes;
   //get the initial lines
   LaneDetector::getLines(preprocessed_ptr, LaneDetector::LINE_VERTICAL, lanes, lineScores, &lanesConf);
+ 
 
   for (unsigned int ind = 0; ind < lineScores.size(); ind++)
   {
@@ -32,7 +33,7 @@ void FeatureExtractor::extract(cv::Mat &original, cv::Mat &preprocessed, std::ve
   }
 
   mcvGroupBoundingBoxesVec(boxes, LaneDetector::LINE_VERTICAL, lanesConf.overlapThreshold);
-  ROS_DEBUG("Bounding boxes count:%lu", boxes.size());
+  ROS_DEBUG("Bounding boxes count:%lu", boxes.size());//Verificado
   if (boxes.size() > config.max_num_lanes)
   {
     std::sort(boxes.begin(), boxes.end(), lane_detector::utils::compareBoxes);

@@ -5,3 +5,12 @@ frame#00000003 has 0 splines
 frame#00000004 has 0 splines
 frame#00000005 has 0 splines
 frame#00000006 has 0 splines
+frame#00000007 has 0 splines
+frame#00000008 has 0 splines
+frame#00000009 has 0 splines
+frame#00000010 has 0 splines
+frame#00000011 has 0 splines
+frame#00000012 has 0 splines
+frame#00000013 has 0 splines
+frame#00000014 has 0 splines
+frame#00000015 has 0 splines
