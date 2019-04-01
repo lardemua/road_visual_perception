@@ -279,8 +279,8 @@ void Fitting::findCurrentLane(const std::vector<cv::Point2f> &centroids, const s
     }
     // cout<< "Current Lane(antes): "<<current_lane.correct<<endl;
     // cout<<"Best combination: "<<best_combination.correct<<endl;
-    cout<<"lane threshold: "<<config.lane_threshold<<endl;
-    cout<<"best_cost: "<<best_cost<<endl; 
+    // cout<<"lane threshold: "<<config.lane_threshold<<endl;
+    // cout<<"best_cost: "<<best_cost<<endl; 
     if (best_cost < config.lane_threshold) //É aqui que o current lane passa a um................................
       current_lane = best_combination; //Ao serem igualadas passa a um!!
     //  cout<< "Current Lane(depois): "<<current_lane.correct<<endl;

@@ -6,5 +6,14 @@
 	<node pkg="lane_detector" type="lane_detector" name="lane_detector" output="screen">
 		<param name="images_from_folder" value="$(arg load_images_from_folder)" />
 		<param name="images_path" value="$(find lane_detector)/data/second_set" />
+		<!--param name="lane_detector/_config1" value="/home/tiago/catkin_ws/src/thesis_atlas/Lane_Detector/cfg/Detector_imagens.cfg"/-->
 	</node>
+		<!-- <node pkg="lane_detector" type="lane_detector" name="lane_detector2" output="screen">
+		<param name="lane_detector2/images_from_folder" value="$(arg load_images_from_folder)" />
+		<param name="lane_detector2/images_path" value="$(find lane_detector)/data/second_set" />
+		<param name="lane_detector2/_config2" value="/home/tiago/catkin_ws/src/thesis_atlas/Lane_Detector/cfg/Detector_imagens2.cfg"/>
+		<remap from="lane_detector2/lane_detector/processed" to="lane_detector2/processed" />
+	</node> -->
+
+
 </launch>

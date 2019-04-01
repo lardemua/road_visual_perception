@@ -93,6 +93,7 @@ generate_messages(
 ##Generate dynamic reconfigure parameters in the 'cfg' folder
 generate_dynamic_reconfigure_options(
     cfg/Detector.cfg
+#    cfg/Detector_imagens2.cfg
 #   cfg/DynReconf2.cfg
 )
 
