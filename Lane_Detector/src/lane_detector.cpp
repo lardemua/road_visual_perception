@@ -60,7 +60,8 @@ void readCameraInfo(const sensor_msgs::CameraInfo::ConstPtr &cm, bool *done)
     cameraInfo.cameraHeight = dynConfig.camera_height;
     cameraInfo.pitch = dynConfig.camera_pitch * CV_PI / 180;
     cameraInfo.yaw = 0.0;
-    cout << "The camera parameters were already readen!\n" << endl;
+    cout << "The camera parameters were already readen!\n"
+         << endl;
     // cout << "focal length em x: " << cameraInfo.focalLength.x << "\n";
     // cout << "focal length em y: " << cameraInfo.focalLength.y << "\n";
     // cout << "Optical Center em x: " << cameraInfo.opticalCenter.x << "\n";
@@ -125,7 +126,7 @@ void processImage(LaneDetector::CameraInfo &cameraInfo, LaneDetector::LaneDetect
 
     // Sending the processed image to a node
     processed_bgr.convertTo(processed_bgr, CV_8UC3);
-    auto processed_img = cv_bridge::CvImage{ currentFrame_ptr->header, "bgr8", processed_bgr };
+    auto processed_img = cv_bridge::CvImage{currentFrame_ptr->header, "bgr8", processed_bgr};
     processed_pub.publish(processed_img);
 
     // cv::imshow("Out", processed_bgr);
@@ -176,10 +177,10 @@ void laneDetectionFromFiles(std::string &path)
     {
       cv::Mat img = cv::imread(path + "/" + fileNames.at(i));
       cv_bridge::CvImage img_bridge;
-      std_msgs::Header header;          // empty header
-      header.stamp = ros::Time::now();  // time
+      std_msgs::Header header;         // empty header
+      header.stamp = ros::Time::now(); // time
       img_bridge = cv_bridge::CvImage(header, sensor_msgs::image_encodings::BGR8, img);
-      currentFrame = *img_bridge.toImageMsg();  // from cv_bridge to sensor_msgs::Image
+      currentFrame = *img_bridge.toImageMsg(); // from cv_bridge to sensor_msgs::Image
       if (currentFrame.step == 0)
       {
         std::cout << "Error: No image with name " << fileNames.at(i) << " received" << std::endl;
@@ -285,7 +286,7 @@ int main(int argc, char **argv)
   ros::param::get("~images_path", imagesPath);
   if (loadFiles)
   {
-    laneDetectionFromFiles(imagesPath);  // Whether to load the images from a folder (data set) or from the kinect
+    laneDetectionFromFiles(imagesPath); // Whether to load the images from a folder (data set) or from the kinect
   }
   // ros::MultiThreadedSpinner spinner(0); // Use one thread for core
   // spinner.spin(); // spin() will not return until the node has been shutdown

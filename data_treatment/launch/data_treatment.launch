@@ -1,0 +1,9 @@
+<launch>
+
+    <node pkg="data_treatment" name="subscriber" type="data_treatment" output="screen"/>
+
+</launch>
+  
+
+
+

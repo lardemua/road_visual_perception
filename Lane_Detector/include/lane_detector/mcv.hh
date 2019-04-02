@@ -38,16 +38,16 @@ namespace LaneDetector
 #define SHORT_INT unsigned char
 
 //some helper functions for debugging
-void SHOW_MAT(const CvMat *pmat, char str[]="Matrix");
+void SHOW_MAT(const CvMat *pmat, char str[]=(char*)"Matrix");
 
 void SHOT_MAT_TYPE(const CvMat *pmat);
 
-void SHOW_IMAGE(const CvMat *pmat, const char str[]="Window", int wait=0);
-void SHOW_IMAGE(const IplImage *pmat, char str[]="Window");
+void SHOW_IMAGE(const CvMat *pmat, const char str[]=(char*)"Window", int wait=0);
+void SHOW_IMAGE(const IplImage *pmat, char str[]=(char*)"Window");
 
-void SHOW_POINT(const FLOAT_POINT2D pt, char str[]="Point:");
+void SHOW_POINT(const FLOAT_POINT2D pt, char str[]=(char*)"Point:");
 
-void SHOW_RECT(const CvRect rect, char str[]="Rect:");
+void SHOW_RECT(const CvRect rect, char str[]=(char*)"Rect:");
 
 /**
  * This function returns the original color
