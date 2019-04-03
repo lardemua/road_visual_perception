@@ -56,29 +56,64 @@ void processImage()
 {
   if (current_image)
   {
-    int i=0;
-    int j=0;
+    int i = 0;
+    int j = 0;
     cv::Mat image_bgr = current_image->image;
     cv::Mat image_rgb;
     cv::cvtColor(image_bgr, image_rgb, CV_BGR2RGB);
+    auto top = 0;
+    auto bottom = 0;
+    auto left = 0;
+    auto right = 0;
+    int borderType;
+    Scalar value;
 
-    for (i=0;i<image_rgb.rows;i++)
+    borderType = BORDER_CONSTANT;
+    value = Scalar(0, 0, 0);
+    copyMakeBorder(image_rgb, image_rgb, top, bottom, left, right, borderType, value);
+
+
+    for (i = 0; i < image_rgb.rows; i++)
     {
-      for (j=0;j<image_rgb.cols;j++)
+      for (j = 0; j < image_rgb.cols; j++)
       {
-        if ((image_rgb.at<Vec3b>(i,j)[1]==255) && (image_rgb.at<Vec3b>(i,j)[0]==0) && (image_rgb.at<Vec3b>(i,j)[2]==0) )
+        if ((image_rgb.at<Vec3b>(i, j)[1] == 255) && (image_rgb.at<Vec3b>(i, j)[0] == 0) && (image_rgb.at<Vec3b>(i, j)[2] == 0))
         {
-          image_rgb.at<Vec3b>(i,j)[0]=255;
-          image_rgb.at<Vec3b>(i,j)[1]=255; // green channel
-          image_rgb.at<Vec3b>(i,j)[2]=255;
+          image_rgb.at<Vec3b>(i, j)[0] = 255;
+          image_rgb.at<Vec3b>(i, j)[1] = 255; // green channel
+          image_rgb.at<Vec3b>(i, j)[2] = 255;
+        }
+
+        if (i > 30 && i < image_rgb.rows - 30 && j > 25 && j < image_rgb.cols - 40)
+        {
+          //Pintar a área dentro da estrada a verde
+          //Se eu for amarelo passo a verde
+          if ((image_rgb.at<Vec3b>(i, j)[0] == 255) && (image_rgb.at<Vec3b>(i, j)[1] == 255) && (image_rgb.at<Vec3b>(i, j)[2] == 0))
+          {
+            image_rgb.at<Vec3b>(i, j)[0] = 0;
+            image_rgb.at<Vec3b>(i, j)[1] = 255; // green channel
+            image_rgb.at<Vec3b>(i, j)[2] = 0;
+          }
+          //Se eu for nao branco e do meu lado esquerdo for branco entao passo a verde
+          if ((j < image_rgb.cols / 2) && ((image_rgb.at<Vec3b>(i, j)[0] != 255) && (image_rgb.at<Vec3b>(i, j)[1] != 255) && (image_rgb.at<Vec3b>(i, j)[2] != 255)) && ((image_rgb.at<Vec3b>(i, j - 1)[0] == 255) && (image_rgb.at<Vec3b>(i, j - 1)[1] == 255) && (image_rgb.at<Vec3b>(i, j - 1)[2] == 255)))
+          {
+            image_rgb.at<Vec3b>(i, j)[0] = 0;
+            image_rgb.at<Vec3b>(i, j)[1] = 255; // green channel
+            image_rgb.at<Vec3b>(i, j)[2] = 0;
+          }
+          //Se eu for diferente de branco e se do meu lado esquerdo e verde
+          if (((image_rgb.at<Vec3b>(i, j)[0] != 255) || (image_rgb.at<Vec3b>(i, j)[1] != 255) || (image_rgb.at<Vec3b>(i, j)[2] != 255)) && ((image_rgb.at<Vec3b>(i, j - 1)[0] == 0) && (image_rgb.at<Vec3b>(i, j - 1)[1] == 255) && (image_rgb.at<Vec3b>(i, j - 1)[2] == 0))) //&& ((image_rgb.at<Vec3b>(i, j + 1)[0] != 255) && (image_rgb.at<Vec3b>(i, j + 1)[1] != 255) && (image_rgb.at<Vec3b>(i, j + 1)[2] != 255)))
+          {
+            image_rgb.at<Vec3b>(i, j)[0] = 0;
+            image_rgb.at<Vec3b>(i, j)[1] = 255; // green channel
+            image_rgb.at<Vec3b>(i, j)[2] = 0;
+          }
         }
       }
     }
     cv::cvtColor(image_rgb, image_rgb, CV_RGB2BGR);
-
     auto processed_img = cv_bridge::CvImage{current_image->header, "bgr8", image_rgb};
     finalimage.publish(processed_img);
-    
   }
 }
 
@@ -114,7 +149,7 @@ int main(int argc, char **argv)
 
   lane_pub = n.advertise<lane_detector::Lane>("estou_publicar/lane_received", 10);
   initialimage = n.advertise<sensor_msgs::Image>("data_treatment/initial", 10);
-  finalimage=n.advertise<sensor_msgs::Image>("data_treatment/final", 10);
+  finalimage = n.advertise<sensor_msgs::Image>("data_treatment/final", 10);
 
   ros::spin();
   return 0;
