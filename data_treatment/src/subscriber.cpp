@@ -4,122 +4,232 @@
  * @brief The data received from the algorithms is treated here!
  * @version 0.1
  * @date 2019-04-02
- * 
+ *
  * @copyright Copyright (c) 2019
- * 
+ *
  */
 
-#include <geometry_msgs/Point32.h>
-#include <lane_detector/fitting.h>
-#include "ros/ros.h"
 #include <cv_bridge/cv_bridge.h>
+#include <geometry_msgs/Point32.h>
 #include <image_transport/image_transport.h>
-#include <sensor_msgs/Image.h>
-#include <sensor_msgs/image_encodings.h>
+#include <lane_detector/fitting.h>
 #include <opencv/cv.h>
 #include <opencv/highgui.h>
+#include <sensor_msgs/Image.h>
+#include <sensor_msgs/image_encodings.h>
+#include "ros/ros.h"
 
-using namespace std; // ja na e preciso usar o std
+using namespace std;  // ja na e preciso usar o std
 using namespace ros;
 using namespace cv;
-/**
- * @brief This callback is the one that receives the lanes
- * 
- */
-
-// lane_detector::Lane current_lane_msg;
-// std::vector<geometry_msgs::Point32::ConstPtr> point;
 
 ros::Publisher lane_pub;
 ros::Publisher initialimage;
 ros::Publisher finalimage;
 cv_bridge::CvImagePtr current_image;
 
+inline std::vector<cv::Point2f> ROS2CvPoint2f(std::vector<geometry_msgs::Point32> &input)
+{
+  std::vector<cv::Point2f> output;
+  for (geometry_msgs::Point32 point_32 : input)
+  {
+    cv::Point2f point;
+    point.x = -point_32.y;
+    point.y = point_32.x;
+    output.push_back(point);
+  }
+  return output;
+}
+
+inline std::vector<cv::Point> cvtCvPoint2f2CvPoint(const std::vector<cv::Point2f> &input)
+{
+  std::vector<cv::Point> output;
+  for (cv::Point2f p_float : input)
+  {
+    cv::Point p;
+    p.x = cvRound(p_float.x);
+    p.y = cvRound(p_float.y);
+    if (p.x > 0)
+      output.push_back(p);
+  }
+  return output;
+}
+
+tuple<int, int> getImageSize()
+{
+  if (current_image)
+  {
+    Mat image_cv = current_image->image;
+
+    float image_rows = image_cv.rows;
+    float image_cols = image_cv.cols;
+    return { image_rows, image_cols };
+  }
+  else
+  {
+    return { 0, 0 };
+  }
+}
+
+inline void drawSpline(cv::Mat inImage, const std::vector<cv::Point> &splinePoints, const uint32_t &thickness,
+                       const cv::Scalar &color)
+{
+  const cv::Point *pts = (const cv::Point *)cv::Mat(splinePoints).data;
+  int npts = cv::Mat(splinePoints).rows;
+
+  cv::polylines(inImage, &pts, &npts, 1,
+                false,     // draw open contour
+                color,     // colour RGB ordering (here = green)
+                thickness  // line thickness
+  );
+}
+
+/**
+ * @brief This callback is the one that receives the lanes
+ *
+ */
+
 void lanereceiveCallback(const lane_detector::Lane::ConstPtr &msg)
 {
   std::vector<geometry_msgs::Point32> left;
   std::vector<geometry_msgs::Point32> right;
   std::vector<geometry_msgs::Point32> guide;
-  // ROS_INFO_STREAM("Received pose: " << msg);
+  std::vector<geometry_msgs::Point32> left_pix;
+  std::vector<geometry_msgs::Point32> right_pix;
+  std::vector<geometry_msgs::Point32> guide_pix;
+  int row_image = 0;
+  int col_image = 0;
+  int n, k = 0;
+  int row_max_left_lane = 0;
+  int row_min_left_lane = 10000;
+  int row_max_right_lane = 0;
+  int row_min_right_lane = 10000;
+  int col_max_left_lane = 0;
+  int col_max_right_lane = 0;
+  int col_min_left_lane = 0;
+  int col_min_right_lane = 0;
+  CvPoint min_ll;
+  CvPoint min_rl;
+  CvPoint max_ll;
+  CvPoint max_rl;
+  CvPoint init_fill;
+
   left = msg->left_line;
   right = msg->right_line;
   guide = msg->guide_line;
-  lane_pub.publish(msg);
+  left_pix = msg->left_line_pix;
+  right_pix = msg->right_line_pix;
+  guide_pix = msg->guide_line_pix;
+
+  std::vector<cv::Point2f> left_spline_pix_float = ROS2CvPoint2f(left_pix);
+  std::vector<cv::Point2f> right_spline_pix_float = ROS2CvPoint2f(right_pix);
+  std::vector<cv::Point2f> guide_spline_pix_float = ROS2CvPoint2f(guide_pix);
+  std::vector<cv::Point> left_spline = cvtCvPoint2f2CvPoint(left_spline_pix_float);
+  std::vector<cv::Point> right_spline = cvtCvPoint2f2CvPoint(right_spline_pix_float);
+  std::vector<cv::Point> guide_spline = cvtCvPoint2f2CvPoint(guide_spline_pix_float);
+
+  std::tuple<float, float> imageSize = getImageSize();
+  row_image = get<0>(imageSize);
+  col_image = get<1>(imageSize);
+
+  if (current_image)
+  {
+    Mat processedImage = Mat::zeros(row_image, col_image, CV_8UC3);
+    drawSpline(processedImage, left_spline, 1, cv::Scalar(0, 255, 0));
+    drawSpline(processedImage, right_spline, 1, cv::Scalar(0, 255, 0));
+
+    for (n = 0; n < left_spline.size(); n++)
+    {
+      if (left_spline[n].y < row_min_left_lane)
+      {
+        row_min_left_lane = left_spline[n].y;
+        col_min_left_lane = left_spline[n].x;
+        min_ll = left_spline[n];
+      }
+      if (left_spline[n].y > row_max_left_lane)
+      {
+        row_max_left_lane = left_spline[n].y;
+        col_max_left_lane = left_spline[n].x;
+        max_ll = left_spline[n];
+      }
+    }
+
+    for (k = 0; k < right_spline.size(); k++)
+    {
+      if (right_spline[k].y < row_min_right_lane)
+      {
+        row_min_right_lane = right_spline[k].y;
+        col_min_right_lane = right_spline[k].x;
+        min_rl = right_spline[k];
+      }
+      if (right_spline[k].y > row_max_right_lane)
+      {
+        row_max_right_lane = right_spline[k].y;
+        col_max_right_lane = right_spline[k].x;
+        max_rl = right_spline[k];
+      }
+    }
+    init_fill.x=min_ll.x+1;
+    init_fill.y=min_ll.y+1;
+    // Debugger
+    // cout<< "Minimos:"<< endl;
+    // cout << "Left lane: (row_min,col_min)= " << row_min_left_lane << "," << col_min_left_lane << endl;
+    // cout << "Right lane: (row_min,col_min)= "<<row_min_right_lane<<","<<col_min_right_lane<<endl;
+
+    // cout << "Maximos:"<<endl,
+    // cout << "Left lane: (row_max,col_max)= "<<row_max_left_lane<<","<<col_max_left_lane<<endl;
+    // cout <<"Right lane: (row_max_col_max)= "<<row_max_right_lane<<","<<col_max_right_lane<<endl;
+
+    line(processedImage, min_ll, min_rl, Scalar(0, 255, 0), 1);
+    line(processedImage, max_ll, max_rl, Scalar(0, 255, 0), 1);
+    //processedImage.convertTo(processedImage, CV_8UC1);
+    //threshold(processedImage, processedImage, 128, 255, THRESH_BINARY_INV);
+    floodFill(processedImage,init_fill , Scalar(0,255,0));
+    //processedImage.convertTo(processedImage, CV_8UC3);
+
+    auto processed_img = cv_bridge::CvImage{ current_image->header, "bgr8", processedImage };
+    finalimage.publish(processed_img);
+  }
+  // lane_pub.publish(msg);
 }
 
 /**
  * @brief Function that shows the polygon  on the image;
- * 
+ *
  */
 
 void processImage()
 {
   if (current_image)
   {
-    int i = 0;
-    int j = 0;
-    cv::Mat image_bgr = current_image->image;
-    cv::Mat image_rgb;
-    cv::cvtColor(image_bgr, image_rgb, CV_BGR2RGB);
-    auto top = 0;
-    auto bottom = 0;
-    auto left = 0;
-    auto right = 0;
-    int borderType;
-    Scalar value;
-
-    borderType = BORDER_CONSTANT;
-    value = Scalar(0, 0, 0);
-    copyMakeBorder(image_rgb, image_rgb, top, bottom, left, right, borderType, value);
 
 
-    for (i = 0; i < image_rgb.rows; i++)
-    {
-      for (j = 0; j < image_rgb.cols; j++)
-      {
-        if ((image_rgb.at<Vec3b>(i, j)[1] == 255) && (image_rgb.at<Vec3b>(i, j)[0] == 0) && (image_rgb.at<Vec3b>(i, j)[2] == 0))
-        {
-          image_rgb.at<Vec3b>(i, j)[0] = 255;
-          image_rgb.at<Vec3b>(i, j)[1] = 255; // green channel
-          image_rgb.at<Vec3b>(i, j)[2] = 255;
-        }
+    // for (i = 0; i < image_rgb.rows; i++)
+    // {
+    //   for (j = 0; j < image_rgb.cols; j++)
+    //   {
+    //     if ((image_rgb.at<Vec3b>(i, j)[1] == 255) && (image_rgb.at<Vec3b>(i, j)[0] == 0) &&
+    //         (image_rgb.at<Vec3b>(i, j)[2] == 0))
+    //     {
+    //       image_rgb.at<Vec3b>(i, j)[0] = 0;
+    //       image_rgb.at<Vec3b>(i, j)[1] = 0;  // green channel
+    //       image_rgb.at<Vec3b>(i, j)[2] = 0;
+    //     }
+    //     else
+    //     {
+    //       image_rgb.at<Vec3b>(i, j)[0] = 0;
+    //       image_rgb.at<Vec3b>(i, j)[1] = 0;  // green channel
+    //       image_rgb.at<Vec3b>(i, j)[2] = 0;
+    //     }
+    //   }
+    // }
 
-        if (i > 30 && i < image_rgb.rows - 30 && j > 25 && j < image_rgb.cols - 40)
-        {
-          //Pintar a área dentro da estrada a verde
-          //Se eu for amarelo passo a verde
-          if ((image_rgb.at<Vec3b>(i, j)[0] == 255) && (image_rgb.at<Vec3b>(i, j)[1] == 255) && (image_rgb.at<Vec3b>(i, j)[2] == 0))
-          {
-            image_rgb.at<Vec3b>(i, j)[0] = 0;
-            image_rgb.at<Vec3b>(i, j)[1] = 255; // green channel
-            image_rgb.at<Vec3b>(i, j)[2] = 0;
-          }
-          //Se eu for nao branco e do meu lado esquerdo for branco entao passo a verde
-          if ((j < image_rgb.cols / 2) && ((image_rgb.at<Vec3b>(i, j)[0] != 255) && (image_rgb.at<Vec3b>(i, j)[1] != 255) && (image_rgb.at<Vec3b>(i, j)[2] != 255)) && ((image_rgb.at<Vec3b>(i, j - 1)[0] == 255) && (image_rgb.at<Vec3b>(i, j - 1)[1] == 255) && (image_rgb.at<Vec3b>(i, j - 1)[2] == 255)))
-          {
-            image_rgb.at<Vec3b>(i, j)[0] = 0;
-            image_rgb.at<Vec3b>(i, j)[1] = 255; // green channel
-            image_rgb.at<Vec3b>(i, j)[2] = 0;
-          }
-          //Se eu for diferente de branco e se do meu lado esquerdo e verde
-          if (((image_rgb.at<Vec3b>(i, j)[0] != 255) || (image_rgb.at<Vec3b>(i, j)[1] != 255) || (image_rgb.at<Vec3b>(i, j)[2] != 255)) && ((image_rgb.at<Vec3b>(i, j - 1)[0] == 0) && (image_rgb.at<Vec3b>(i, j - 1)[1] == 255) && (image_rgb.at<Vec3b>(i, j - 1)[2] == 0))) //&& ((image_rgb.at<Vec3b>(i, j + 1)[0] != 255) && (image_rgb.at<Vec3b>(i, j + 1)[1] != 255) && (image_rgb.at<Vec3b>(i, j + 1)[2] != 255)))
-          {
-            image_rgb.at<Vec3b>(i, j)[0] = 0;
-            image_rgb.at<Vec3b>(i, j)[1] = 255; // green channel
-            image_rgb.at<Vec3b>(i, j)[2] = 0;
-          }
-        }
-      }
-    }
-    cv::cvtColor(image_rgb, image_rgb, CV_RGB2BGR);
-    auto processed_img = cv_bridge::CvImage{current_image->header, "bgr8", image_rgb};
-    finalimage.publish(processed_img);
-  }
+  
 }
 
 /**
  * @brief This callback is the one that receives the processed image by the algorithms
- * 
+ *
  */
 
 void imagereceiveCallback(const sensor_msgs::ImageConstPtr &img)
