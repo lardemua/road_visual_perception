@@ -1,9 +1,23 @@
 <launch>
 
-    <node pkg="data_treatment" name="subscriber" type="data_treatment" output="screen"/>
+    <node pkg="data_treatment" name="subscriber" type="data_treatment" output="screen">
+        <param name="~R_channel" type= "int" value="0"/>
+        <param name="~G_channel" type= "int" value="255"/>
+        <param name="~B_channel" type= "int" value="0"/>
+    </node>
+
+    <node pkg="data_treatment" name="subscriber2" type="data_treatment" output="screen">
+        <remap from="lane_detector/processed" to="lane_detector2/processed" />
+        <remap from="lane_detector/lane" to="lane_detector2/lane" />
+        <remap from="data_treatment/initial" to="data_treatment2/initial"/>
+        <remap from="data_treatment/final" to="data_treatment2/final"/>
+        <param name="~R_channel" type= "int" value="0"/> 
+        <param name="~G_channel" type= "int" value="0"/>
+        <param name="~B_channel" type= "int" value="255"/>
+    </node>
 
 </launch>
-  
+
 
 
 
