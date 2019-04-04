@@ -28,6 +28,15 @@ ros::Publisher initialimage;
 ros::Publisher finalimage;
 cv_bridge::CvImagePtr current_image;
 
+
+/**
+ * @brief Function that converts ROS points in cv float Points 
+ * 
+ * @param input ROS points
+ * @return std::vector<cv::Point2f> 
+ */
+
+
 inline std::vector<cv::Point2f> ROS2CvPoint2f(std::vector<geometry_msgs::Point32> &input)
 {
   std::vector<cv::Point2f> output;
@@ -40,6 +49,13 @@ inline std::vector<cv::Point2f> ROS2CvPoint2f(std::vector<geometry_msgs::Point32
   }
   return output;
 }
+
+/**
+ * @brief Function thar converts cv float Points in cv Points
+ * 
+ * @param input cv float points
+ * @return std::vector<cv::Point> 
+ */
 
 inline std::vector<cv::Point> cvtCvPoint2f2CvPoint(const std::vector<cv::Point2f> &input)
 {
@@ -54,6 +70,12 @@ inline std::vector<cv::Point> cvtCvPoint2f2CvPoint(const std::vector<cv::Point2f
   }
   return output;
 }
+
+/**
+ * @brief Get the Image Size object
+ * 
+ * @return tuple<rows, columns> 
+ */
 
 tuple<int, int> getImageSize()
 {
@@ -71,6 +93,17 @@ tuple<int, int> getImageSize()
   }
 }
 
+
+/**
+ * @brief Image that draw a spline into an image 
+ * 
+ * @param inImage- the image inpout
+ * @param splinePoints - the spline points 
+ * @param thickness - the drawn line thickness 
+ * @param color - the color line
+ */
+
+
 inline void drawSpline(cv::Mat inImage, const std::vector<cv::Point> &splinePoints, const uint32_t &thickness,
                        const cv::Scalar &color)
 {
@@ -85,11 +118,11 @@ inline void drawSpline(cv::Mat inImage, const std::vector<cv::Point> &splinePoin
 }
 
 /**
- * @brief This callback is the one that receives the lanes
+ * @brief This callback is the one that receives the lanes and show images with the filled area
  *
  */
 
-void lanereceiveCallback(const lane_detector::Lane::ConstPtr &msg)
+void lanereceive_showimageCallback(const lane_detector::Lane::ConstPtr &msg)
 {
   std::vector<geometry_msgs::Point32> left;
   std::vector<geometry_msgs::Point32> right;
@@ -169,8 +202,6 @@ void lanereceiveCallback(const lane_detector::Lane::ConstPtr &msg)
         max_rl = right_spline[k];
       }
     }
-    init_fill.x=min_ll.x+1;
-    init_fill.y=min_ll.y+1;
     // Debugger
     // cout<< "Minimos:"<< endl;
     // cout << "Left lane: (row_min,col_min)= " << row_min_left_lane << "," << col_min_left_lane << endl;
@@ -179,13 +210,15 @@ void lanereceiveCallback(const lane_detector::Lane::ConstPtr &msg)
     // cout << "Maximos:"<<endl,
     // cout << "Left lane: (row_max,col_max)= "<<row_max_left_lane<<","<<col_max_left_lane<<endl;
     // cout <<"Right lane: (row_max_col_max)= "<<row_max_right_lane<<","<<col_max_right_lane<<endl;
+    init_fill.x = min_ll.x + 1;
+    init_fill.y = min_ll.y + 1;
 
     line(processedImage, min_ll, min_rl, Scalar(0, 255, 0), 1);
     line(processedImage, max_ll, max_rl, Scalar(0, 255, 0), 1);
-    //processedImage.convertTo(processedImage, CV_8UC1);
-    //threshold(processedImage, processedImage, 128, 255, THRESH_BINARY_INV);
-    floodFill(processedImage,init_fill , Scalar(0,255,0));
-    //processedImage.convertTo(processedImage, CV_8UC3);
+    // processedImage.convertTo(processedImage, CV_8UC1);
+    // threshold(processedImage, processedImage, 128, 255, THRESH_BINARY_INV);
+    floodFill(processedImage, init_fill, Scalar(0, 255, 0));
+    // processedImage.convertTo(processedImage, CV_8UC3);
 
     auto processed_img = cv_bridge::CvImage{ current_image->header, "bgr8", processedImage };
     finalimage.publish(processed_img);
@@ -194,7 +227,7 @@ void lanereceiveCallback(const lane_detector::Lane::ConstPtr &msg)
 }
 
 /**
- * @brief Function that shows the polygon  on the image;
+ * @brief Function that shows the result
  *
  */
 
@@ -202,8 +235,6 @@ void processImage()
 {
   if (current_image)
   {
-
-
     // for (i = 0; i < image_rgb.rows; i++)
     // {
     //   for (j = 0; j < image_rgb.cols; j++)
@@ -223,8 +254,7 @@ void processImage()
     //     }
     //   }
     // }
-
-  
+  }
 }
 
 /**
@@ -254,7 +284,7 @@ int main(int argc, char **argv)
 
   ros::NodeHandle n;
   image_transport::ImageTransport it(n);
-  ros::Subscriber sub_lanes = n.subscribe("lane_detector/lane", 1000, lanereceiveCallback);
+  ros::Subscriber sub_lanes = n.subscribe("lane_detector/lane", 1000, lanereceive_showimageCallback);
   image_transport::Subscriber sub = it.subscribe("lane_detector/processed", 10, imagereceiveCallback);
 
   lane_pub = n.advertise<lane_detector::Lane>("estou_publicar/lane_received", 10);
