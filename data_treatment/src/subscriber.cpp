@@ -1,7 +1,7 @@
 /**
  * @file subscriber.cpp
  * @author Tiago Almeida (tm.almeida@ua.pt)
- * @brief The data received from the algorithms is treated here!
+ * @brief The data received from each algorithms is treated here!
  * @version 0.1
  * @date 2019-04-02
  *
@@ -164,7 +164,7 @@ void lanereceive_showimageCallback(const lane_detector::Lane::ConstPtr &msg)
   row_image = get<0>(imageSize);
   col_image = get<1>(imageSize);
 
-  if (current_image && (left_spline.size() > 0) && (right_spline.size() > 0) and (guide_spline.size() > 0))
+  if (current_image && (left_spline.size() > 0) && (right_spline.size() > 0) && (guide_spline.size() > 0))
   {
     ros::param::get("~R_channel", R_channel);
     ros::param::get("~G_channel", G_channel);
@@ -217,8 +217,6 @@ void lanereceive_showimageCallback(const lane_detector::Lane::ConstPtr &msg)
 
     line(processedImage, min_ll, min_rl, Scalar(B_channel, G_channel, R_channel), 1);
     line(processedImage, max_ll, max_rl, Scalar(B_channel, G_channel, R_channel), 1);
-    // processedImage.convertTo(processedImage, CV_8UC1);
-    // threshold(processedImage, processedImage, 128, 255, THRESH_BINARY_INV);
     floodFill(processedImage, init_fill, Scalar(B_channel, G_channel, R_channel));
     // processedImage.convertTo(processedImage, CV_8UC3);
 
@@ -286,7 +284,7 @@ int main(int argc, char **argv)
 
   ros::NodeHandle n;
   image_transport::ImageTransport it(n);
-  ros::Subscriber sub_lanes = n.subscribe("lane_detector/lane", 1000, lanereceive_showimageCallback);
+  ros::Subscriber sub_lanes = n.subscribe("lane_detector/lane", 10, lanereceive_showimageCallback);
   image_transport::Subscriber sub = it.subscribe("lane_detector/processed", 10, imagereceiveCallback);
 
   // lane_pub = n.advertise<lane_detector::Lane>("estou_publicar/lane_received", 10);

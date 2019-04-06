@@ -140,7 +140,9 @@ include_directories(
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
 # add_executable(${PROJECT_NAME}_node src/data_treatment_node.cpp)
-add_executable(data_treatment src/subscriber.cpp)
+add_executable(subscriber src/subscriber.cpp)
+add_executable(subscriber2 src/subscriber.cpp)
+add_executable(junction_data src/junction_data.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -156,7 +158,9 @@ add_executable(data_treatment src/subscriber.cpp)
 # target_link_libraries(${PROJECT_NAME}_node
 #   ${catkin_LIBRARIES}
 # )
-target_link_libraries(data_treatment ${catkin_LIBRARIES} ${OpenCV_LIBRARIES})
+target_link_libraries(subscriber ${catkin_LIBRARIES} ${OpenCV_LIBRARIES})
+target_link_libraries(subscriber2 ${catkin_LIBRARIES} ${OpenCV_LIBRARIES})
+target_link_libraries(junction_data ${catkin_LIBRARIES} ${OpenCV_LIBRARIES})
 #############
 ## Install ##
 #############
