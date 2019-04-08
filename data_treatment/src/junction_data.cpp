@@ -65,8 +65,7 @@ public:
       Mat img_alg2 = current_image_alg2->image;
       Mat img_summed;
 
-      addWeighted(img_alg1, 0.5, img_alg2, 0.5, 0.0, img_summed);
-
+      add(img_alg1,img_alg2,img_summed);
       auto img_final = cv_bridge::CvImage{ current_image_alg1->header, "bgr8", img_summed };
       merged_image.publish(img_final);
     }
