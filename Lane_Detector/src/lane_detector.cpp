@@ -60,8 +60,7 @@ void readCameraInfo(const sensor_msgs::CameraInfo::ConstPtr &cm, bool *done)
     cameraInfo.cameraHeight = dynConfig.camera_height;
     cameraInfo.pitch = dynConfig.camera_pitch * CV_PI / 180;
     cameraInfo.yaw = 0.0;
-    cout << "The camera parameters were already readen!\n"
-         << endl;
+    // cout << "The camera parameters were already readen!\n" << endl;
     // cout << "focal length em x: " << cameraInfo.focalLength.x << "\n";
     // cout << "focal length em y: " << cameraInfo.focalLength.y << "\n";
     // cout << "Optical Center em x: " << cameraInfo.opticalCenter.x << "\n";
@@ -121,12 +120,13 @@ void processImage(LaneDetector::CameraInfo &cameraInfo, LaneDetector::LaneDetect
       cv::cvtColor(processed_bgr, processed_bgr, CV_GRAY2BGR);
 
     extractor.extract(processed_bgr, preprocessed, boxes);
-    lane_detector::Lane current_lane = fitting_phase.fitting(currentFrame_ptr->image, processed_bgr, preprocessed, ipmInfo, cameraInfo, boxes);
+    lane_detector::Lane current_lane =
+        fitting_phase.fitting(currentFrame_ptr->image, processed_bgr, preprocessed, ipmInfo, cameraInfo, boxes);
     lane_pub.publish(current_lane);
 
     // Sending the processed image to a node
     processed_bgr.convertTo(processed_bgr, CV_8UC3);
-    auto processed_img = cv_bridge::CvImage{currentFrame_ptr->header, "bgr8", processed_bgr};
+    auto processed_img = cv_bridge::CvImage{ currentFrame_ptr->header, "bgr8", processed_bgr };
     processed_pub.publish(processed_img);
 
     // cv::imshow("Out", processed_bgr);
@@ -177,10 +177,10 @@ void laneDetectionFromFiles(std::string &path)
     {
       cv::Mat img = cv::imread(path + "/" + fileNames.at(i));
       cv_bridge::CvImage img_bridge;
-      std_msgs::Header header;         // empty header
-      header.stamp = ros::Time::now(); // time
+      std_msgs::Header header;          // empty header
+      header.stamp = ros::Time::now();  // time
       img_bridge = cv_bridge::CvImage(header, sensor_msgs::image_encodings::BGR8, img);
-      currentFrame = *img_bridge.toImageMsg(); // from cv_bridge to sensor_msgs::Image
+      currentFrame = *img_bridge.toImageMsg();  // from cv_bridge to sensor_msgs::Image
       if (currentFrame.step == 0)
       {
         std::cout << "Error: No image with name " << fileNames.at(i) << " received" << std::endl;
@@ -237,7 +237,8 @@ int main(int argc, char **argv)
    * IMPORTANT: If images are loaded from a folder the camera parameters have to be set
    * inside the function readCameraInfo (lane_detector.cpp::57)
    */
-  ros::Subscriber cameraInfo_sub = nh.subscribe<sensor_msgs::CameraInfo>("camera_info", 1, std::bind(readCameraInfo, std::placeholders::_1, &info_set));
+  ros::Subscriber cameraInfo_sub = nh.subscribe<sensor_msgs::CameraInfo>(
+      "camera_info", 1, std::bind(readCameraInfo, std::placeholders::_1, &info_set));
   if (loadFiles)
     readCameraInfo(NULL, &info_set);
   while (!info_set)
@@ -275,7 +276,8 @@ int main(int argc, char **argv)
    * This subscriber allows to change lane while driving and to select the desired
    * driving direction
    */
-  ros::Subscriber driving_orientation_sub = nh.subscribe<std_msgs::Int32>("lane_detector/driving_orientation", 1, drivingOrientationCB);
+  ros::Subscriber driving_orientation_sub =
+      nh.subscribe<std_msgs::Int32>("lane_detector/driving_orientation", 1, drivingOrientationCB);
   image_transport::Subscriber image_sub = it.subscribe("/image", 10, readImg);
   resultImg_pub = it.advertise("lane_detector/result", 10);
   lane_pub = nh.advertise<lane_detector::Lane>("lane_detector/lane", 10);
@@ -286,7 +288,7 @@ int main(int argc, char **argv)
   ros::param::get("~images_path", imagesPath);
   if (loadFiles)
   {
-    laneDetectionFromFiles(imagesPath); // Whether to load the images from a folder (data set) or from the kinect
+    laneDetectionFromFiles(imagesPath);  // Whether to load the images from a folder (data set) or from the kinect
   }
   // ros::MultiThreadedSpinner spinner(0); // Use one thread for core
   // spinner.spin(); // spin() will not return until the node has been shutdown

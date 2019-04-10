@@ -6,9 +6,9 @@
 
 #include <lane_detector/InversePerspectiveMapping.hh>
 
-#include <iostream>
-#include <math.h>
 #include <assert.h>
+#include <math.h>
+#include <iostream>
 #include <list>
 
 using namespace std;
@@ -17,7 +17,6 @@ using namespace std;
 
 namespace LaneDetector
 {
-
 #define VP_PORTION 0.05
 
 /*
@@ -36,44 +35,51 @@ namespace LaneDetector
  the tip of the first pixel is (0,0)
 */
 
-void mcvGetIpmMap(const CvMat *inImage, CvMat *outImage, CvMat *uvGrid,
-                  IPMInfo *ipmInfo, const CameraInfo *cameraInfo, FLOAT_POINT2D vp,
-                  list<CvPoint> *outPoints, list<CvPoint> *inPoints, list<CvPoint> *ipm_out_of_area)
+void mcvGetIpmMap(const CvMat *inImage, CvMat *outImage, CvMat *uvGrid, IPMInfo *ipmInfo, const CameraInfo *cameraInfo,
+                  FLOAT_POINT2D vp, list<CvPoint> *outPoints, list<CvPoint> *inPoints, list<CvPoint> *ipm_out_of_area)
 {
-  //check input images types
-  if (!(CV_ARE_TYPES_EQ(inImage, outImage) && (CV_MAT_TYPE(inImage->type) == CV_MAT_TYPE(FLOAT_MAT_TYPE) || (CV_MAT_TYPE(inImage->type) == CV_MAT_TYPE(INT_MAT_TYPE)))))
+  // check input images types
+  if (!(CV_ARE_TYPES_EQ(inImage, outImage) && (CV_MAT_TYPE(inImage->type) == CV_MAT_TYPE(FLOAT_MAT_TYPE) ||
+                                               (CV_MAT_TYPE(inImage->type) == CV_MAT_TYPE(INT_MAT_TYPE)))))
   {
     cerr << "Unsupported image types in mcvGetIPM";
     exit(1);
   }
 
-  //get size of input image
+  // get size of input image
   FLOAT u, v;
   v = inImage->height;
   u = inImage->width;
 
-  //Verified
+  // Verified
 
   vp.y = MAX(0, vp.y);
 
-  //get extent of the image in the xfyf plane
-  FLOAT_MAT_ELEM_TYPE eps = ipmInfo->vpPortion * v; //VP_PORTION*v;
+  // get extent of the image in the xfyf plane
+  FLOAT_MAT_ELEM_TYPE eps = ipmInfo->vpPortion * v;  // VP_PORTION*v;
   ipmInfo->ipmLeft = MAX(0, ipmInfo->ipmLeft);
   ipmInfo->ipmRight = MIN(u - 1, ipmInfo->ipmRight);
   ipmInfo->ipmTop = MAX(vp.y + eps, ipmInfo->ipmTop);
   ipmInfo->ipmBottom = MIN(v - 1, ipmInfo->ipmBottom);
-  FLOAT_MAT_ELEM_TYPE uvLimitsp[] = {vp.x, ipmInfo->ipmRight, ipmInfo->ipmLeft, vp.x, ipmInfo->ipmTop, ipmInfo->ipmTop, ipmInfo->ipmTop, ipmInfo->ipmBottom};
+  FLOAT_MAT_ELEM_TYPE uvLimitsp[] = { vp.x,
+                                      ipmInfo->ipmRight,
+                                      ipmInfo->ipmLeft,
+                                      vp.x,
+                                      ipmInfo->ipmTop,
+                                      ipmInfo->ipmTop,
+                                      ipmInfo->ipmTop,
+                                      ipmInfo->ipmBottom };
   //{vp.x, u, 0, vp.x,
-  //vp.y+eps, vp.y+eps, vp.y+eps, v};
+  // vp.y+eps, vp.y+eps, vp.y+eps, v};
   CvMat uvLimits = cvMat(2, 4, FLOAT_MAT_TYPE, uvLimitsp);
 
-  //get these points on the ground plane
+  // get these points on the ground plane
   CvMat *xyLimitsp = cvCreateMat(2, 4, FLOAT_MAT_TYPE);
   CvMat xyLimits = *xyLimitsp;
   mcvTransformImage2Ground(&uvLimits, &xyLimits, cameraInfo);
-  //SHOW_MAT(xyLimitsp, "xyLImits");
+  // SHOW_MAT(xyLimitsp, "xyLImits");
 
-  //get extent on the ground plane
+  // get extent on the ground plane
   CvMat row1, row2;
   cvGetRow(&xyLimits, &row1, 0);
   cvGetRow(&xyLimits, &row2, 1);
@@ -86,57 +92,53 @@ void mcvGetIpmMap(const CvMat *inImage, CvMat *outImage, CvMat *uvGrid,
   INT outRow = outImage->height;
   INT outCol = outImage->width;
 
-
-
   FLOAT_MAT_ELEM_TYPE stepRow = (yfMax - yfMin) / outRow;
   FLOAT_MAT_ELEM_TYPE stepCol = (xfMax - xfMin) / outCol;
-  //NÃO ESTÀ A DAR PRINTS-------------------------------------------------------------------------
+  // NÃO ESTÀ A DAR PRINTS-------------------------------------------------------------------------
   // cout << "!!!!!!!!STEP COL!!!!!!!!!! " << stepCol <<endl;
   // cout << "|xfmax| "<<xfMax <<" , "<<"|xfmin| "<<xfMin<<endl;
   // cout << "Outcol" <<outCol<<endl;
 
-  //construct the grid to sample
+  // construct the grid to sample
   CvMat *xyGrid = cvCreateMat(2, outRow * outCol, FLOAT_MAT_TYPE);
   INT i, j;
   FLOAT_MAT_ELEM_TYPE x, y;
-  //fill it with x-y values on the ground plane in world frame
+  // fill it with x-y values on the ground plane in world frame
   for (i = 0, y = yfMax - .5 * stepRow; i < outRow; i++, y -= stepRow)
     for (j = 0, x = xfMin + .5 * stepCol; j < outCol; j++, x += stepCol)
     {
       CV_MAT_ELEM(*xyGrid, FLOAT_MAT_ELEM_TYPE, 0, i * outCol + j) = x;
       CV_MAT_ELEM(*xyGrid, FLOAT_MAT_ELEM_TYPE, 1, i * outCol + j) = y;
     }
-  //get their pixel values in image frame
+  // get their pixel values in image frame
   mcvTransformGround2Image(xyGrid, uvGrid, cameraInfo);
-  //now loop and find the nearest pixel value for each position
-  //that's inside the image, otherwise put it zero
+  // now loop and find the nearest pixel value for each position
+  // that's inside the image, otherwise put it zero
   FLOAT_MAT_ELEM_TYPE ui, vi;
-//generic loop to work for both float and int matrix types
-#define MCV_GET_IPM(type)                                                \
-  for (i = 0; i < outRow; i++)                                           \
-  {                                                                      \
-    for (j = 0; j < outCol; j++)                                         \
-    {                                                                    \
-      /*get pixel coordiantes*/                                          \
-      ui = CV_MAT_ELEM(*uvGrid, FLOAT_MAT_ELEM_TYPE, 0, i * outCol + j); \
-      vi = CV_MAT_ELEM(*uvGrid, FLOAT_MAT_ELEM_TYPE, 1, i * outCol + j); \
-      /*check if out-of-bounds*/                                         \
-      /*if (ui<0 || ui>u-1 || vi<0 || vi>v-1) \*/                        \
-      if (ui < ipmInfo->ipmLeft || ui > ipmInfo->ipmRight ||             \
-          vi < ipmInfo->ipmTop || vi > ipmInfo->ipmBottom)               \
-      {                                                                  \
-        outPoints->push_back(cvPoint(j, i));                             \
-      }                                                                  \
-      /*not out of bounds, then store mapped point*/                     \
-      else                                                               \
-      {                                                                  \
-        inPoints->push_back(cvPoint(j, i));                              \
-      }                                                                  \
-      if (outPoints &&                                                   \
-          (ui < ipmInfo->ipmLeft + 10 || ui > ipmInfo->ipmRight - 10 ||  \
-           vi < ipmInfo->ipmTop || vi > ipmInfo->ipmBottom - 2))         \
-        ipm_out_of_area->push_back(cvPoint(j, i));                       \
-    }                                                                    \
+// generic loop to work for both float and int matrix types
+#define MCV_GET_IPM(type)                                                                                              \
+  for (i = 0; i < outRow; i++)                                                                                         \
+  {                                                                                                                    \
+    for (j = 0; j < outCol; j++)                                                                                       \
+    {                                                                                                                  \
+      /*get pixel coordiantes*/                                                                                        \
+      ui = CV_MAT_ELEM(*uvGrid, FLOAT_MAT_ELEM_TYPE, 0, i * outCol + j);                                               \
+      vi = CV_MAT_ELEM(*uvGrid, FLOAT_MAT_ELEM_TYPE, 1, i * outCol + j);                                               \
+      /*check if out-of-bounds*/                                                                                       \
+      /*if (ui<0 || ui>u-1 || vi<0 || vi>v-1) \*/                                                                      \
+      if (ui < ipmInfo->ipmLeft || ui > ipmInfo->ipmRight || vi < ipmInfo->ipmTop || vi > ipmInfo->ipmBottom)          \
+      {                                                                                                                \
+        outPoints->push_back(cvPoint(j, i));                                                                           \
+      }                                                                                                                \
+      /*not out of bounds, then store mapped point*/                                                                   \
+      else                                                                                                             \
+      {                                                                                                                \
+        inPoints->push_back(cvPoint(j, i));                                                                            \
+      }                                                                                                                \
+      if (outPoints && (ui < ipmInfo->ipmLeft + 10 || ui > ipmInfo->ipmRight - 10 || vi < ipmInfo->ipmTop ||           \
+                        vi > ipmInfo->ipmBottom - 2))                                                                  \
+        ipm_out_of_area->push_back(cvPoint(j, i));                                                                     \
+    }                                                                                                                  \
   }
   if (CV_MAT_TYPE(inImage->type) == FLOAT_MAT_TYPE)
   {
@@ -146,17 +148,17 @@ void mcvGetIpmMap(const CvMat *inImage, CvMat *outImage, CvMat *uvGrid,
   {
     MCV_GET_IPM(INT_MAT_ELEM_TYPE)
   }
-  //return the ipm info
+  // return the ipm info
   ipmInfo->xLimits[0] = CV_MAT_ELEM(*xyGrid, FLOAT_MAT_ELEM_TYPE, 0, 0);
-  ipmInfo->xLimits[1] =CV_MAT_ELEM(*xyGrid, FLOAT_MAT_ELEM_TYPE, 0, (outRow - 1) * outCol + outCol - 1);
+  ipmInfo->xLimits[1] = CV_MAT_ELEM(*xyGrid, FLOAT_MAT_ELEM_TYPE, 0, (outRow - 1) * outCol + outCol - 1);
   ipmInfo->yLimits[1] = CV_MAT_ELEM(*xyGrid, FLOAT_MAT_ELEM_TYPE, 1, 0);
-  ipmInfo->yLimits[0] =CV_MAT_ELEM(*xyGrid, FLOAT_MAT_ELEM_TYPE, 1, (outRow - 1) * outCol + outCol - 1);
+  ipmInfo->yLimits[0] = CV_MAT_ELEM(*xyGrid, FLOAT_MAT_ELEM_TYPE, 1, (outRow - 1) * outCol + outCol - 1);
   ipmInfo->xScale = 1 / stepCol;
   ipmInfo->yScale = 1 / stepRow;
   ipmInfo->width = outCol;
   ipmInfo->height = outRow;
 
-  //clean
+  // clean
   cvReleaseMat(&xyLimitsp);
   cvReleaseMat(&xyGrid);
 }
@@ -173,50 +175,54 @@ void mcvGetIpmMap(const CvMat *inImage, CvMat *outImage, CvMat *uvGrid,
  * \param vp vanishing point
  * \param outPoints indices of points outside the image
  */
-void mcvGetIPM(const CvMat *inImage, CvMat *outImage,
-               IPMInfo *ipmInfo, const CameraInfo *cameraInfo, FLOAT_POINT2D vp,
+void mcvGetIPM(const CvMat *inImage, CvMat *outImage, IPMInfo *ipmInfo, const CameraInfo *cameraInfo, FLOAT_POINT2D vp,
                list<CvPoint> *outPoints)
 {
-  //check input images types
-  //CvMat inMat, outMat;
-  //cvGetMat(inImage, &inMat);
-  //cvGetMat(outImage, &outMat);
-  //cout << CV_MAT_TYPE(inImage->type) << " " << CV_MAT_TYPE(FLOAT_MAT_TYPE) <<  " " << CV_MAT_TYPE(INT_MAT_TYPE)<<"\n";
-  if (!(CV_ARE_TYPES_EQ(inImage, outImage) &&
-        (CV_MAT_TYPE(inImage->type) == CV_MAT_TYPE(FLOAT_MAT_TYPE) ||
-         (CV_MAT_TYPE(inImage->type) == CV_MAT_TYPE(INT_MAT_TYPE)))))
+  // check input images types
+  // CvMat inMat, outMat;
+  // cvGetMat(inImage, &inMat);
+  // cvGetMat(outImage, &outMat);
+  // cout << CV_MAT_TYPE(inImage->type) << " " << CV_MAT_TYPE(FLOAT_MAT_TYPE) <<  " " <<
+  // CV_MAT_TYPE(INT_MAT_TYPE)<<"\n";
+  if (!(CV_ARE_TYPES_EQ(inImage, outImage) && (CV_MAT_TYPE(inImage->type) == CV_MAT_TYPE(FLOAT_MAT_TYPE) ||
+                                               (CV_MAT_TYPE(inImage->type) == CV_MAT_TYPE(INT_MAT_TYPE)))))
   {
     cerr << "Unsupported image types in mcvGetIPM";
     exit(1);
   }
 
-  //get size of input image
+  // get size of input image
   FLOAT u, v;
   v = inImage->height;
   u = inImage->width;
 
   vp.y = MAX(0, vp.y);
 
-  //get extent of the image in the xfyf plane
-  FLOAT_MAT_ELEM_TYPE eps = ipmInfo->vpPortion * v; //VP_PORTION*v;
+  // get extent of the image in the xfyf plane
+  FLOAT_MAT_ELEM_TYPE eps = ipmInfo->vpPortion * v;  // VP_PORTION*v;
   ipmInfo->ipmLeft = MAX(0, ipmInfo->ipmLeft);
   ipmInfo->ipmRight = MIN(u - 1, ipmInfo->ipmRight);
   ipmInfo->ipmTop = MAX(vp.y + eps, ipmInfo->ipmTop);
   ipmInfo->ipmBottom = MIN(v - 1, ipmInfo->ipmBottom);
-  FLOAT_MAT_ELEM_TYPE uvLimitsp[] = {vp.x,
-                                     ipmInfo->ipmRight, ipmInfo->ipmLeft, vp.x,
-                                     ipmInfo->ipmTop, ipmInfo->ipmTop, ipmInfo->ipmTop, ipmInfo->ipmBottom};
+  FLOAT_MAT_ELEM_TYPE uvLimitsp[] = { vp.x,
+                                      ipmInfo->ipmRight,
+                                      ipmInfo->ipmLeft,
+                                      vp.x,
+                                      ipmInfo->ipmTop,
+                                      ipmInfo->ipmTop,
+                                      ipmInfo->ipmTop,
+                                      ipmInfo->ipmBottom };
   //{vp.x, u, 0, vp.x,
-  //vp.y+eps, vp.y+eps, vp.y+eps, v};
+  // vp.y+eps, vp.y+eps, vp.y+eps, v};
   CvMat uvLimits = cvMat(2, 4, FLOAT_MAT_TYPE, uvLimitsp);
 
-  //get these points on the ground plane
+  // get these points on the ground plane
   CvMat *xyLimitsp = cvCreateMat(2, 4, FLOAT_MAT_TYPE);
   CvMat xyLimits = *xyLimitsp;
   mcvTransformImage2Ground(&uvLimits, &xyLimits, cameraInfo);
-  //SHOW_MAT(xyLimitsp, "xyLImits");
+  // SHOW_MAT(xyLimitsp, "xyLImits");
 
-  //get extent on the ground plane
+  // get extent on the ground plane
   CvMat row1, row2;
   cvGetRow(&xyLimits, &row1, 0);
   cvGetRow(&xyLimits, &row2, 1);
@@ -227,69 +233,64 @@ void mcvGetIPM(const CvMat *inImage, CvMat *outImage,
   INT outRow = outImage->height;
   INT outCol = outImage->width;
 
-
   FLOAT_MAT_ELEM_TYPE stepRow = (yfMax - yfMin) / outRow;
   FLOAT_MAT_ELEM_TYPE stepCol = (xfMax - xfMin) / outCol;
 
-  //construct the grid to sample
+  // construct the grid to sample
   CvMat *xyGrid = cvCreateMat(2, outRow * outCol, FLOAT_MAT_TYPE);
   INT i, j;
   FLOAT_MAT_ELEM_TYPE x, y;
-  //fill it with x-y values on the ground plane in world frame
+  // fill it with x-y values on the ground plane in world frame
   for (i = 0, y = yfMax - .5 * stepRow; i < outRow; i++, y -= stepRow)
     for (j = 0, x = xfMin + .5 * stepCol; j < outCol; j++, x += stepCol)
     {
       CV_MAT_ELEM(*xyGrid, FLOAT_MAT_ELEM_TYPE, 0, i * outCol + j) = x;
       CV_MAT_ELEM(*xyGrid, FLOAT_MAT_ELEM_TYPE, 1, i * outCol + j) = y;
     }
-  //get their pixel values in image frame
+  // get their pixel values in image frame
   CvMat *uvGrid = cvCreateMat(2, outRow * outCol, FLOAT_MAT_TYPE);
   mcvTransformGround2Image(xyGrid, uvGrid, cameraInfo);
-  //now loop and find the nearest pixel value for each position
-  //that's inside the image, otherwise put it zero
+  // now loop and find the nearest pixel value for each position
+  // that's inside the image, otherwise put it zero
   FLOAT_MAT_ELEM_TYPE ui, vi;
-  //get mean of the input image
+  // get mean of the input image
   CvScalar means = cvAvg(inImage);
   double mean = means.val[0];
-//generic loop to work for both float and int matrix types
-#define MCV_GET_IPM_(type)                                                      \
-  for (i = 0; i < outRow; i++)                                                  \
-    for (j = 0; j < outCol; j++)                                                \
-    {                                                                           \
-      /*get pixel coordiantes*/                                                 \
-      ui = CV_MAT_ELEM(*uvGrid, FLOAT_MAT_ELEM_TYPE, 0, i * outCol + j);        \
-      vi = CV_MAT_ELEM(*uvGrid, FLOAT_MAT_ELEM_TYPE, 1, i * outCol + j);        \
-      /*check if out-of-bounds*/                                                \
-      /*if (ui<0 || ui>u-1 || vi<0 || vi>v-1) \*/                               \
-      if (ui < ipmInfo->ipmLeft || ui > ipmInfo->ipmRight ||                    \
-          vi < ipmInfo->ipmTop || vi > ipmInfo->ipmBottom)                      \
-      {                                                                         \
-        CV_MAT_ELEM(*outImage, type, i, j) = (type)mean;                        \
-      }                                                                         \
-      /*not out of bounds, then get nearest neighbor*/                          \
-      else                                                                      \
-      {                                                                         \
-        /*Bilinear interpolation*/                                              \
-        if (ipmInfo->ipmInterpolation == 0)                                     \
-        {                                                                       \
-          int x1 = int(ui), x2 = int(ui + 1);                                   \
-          int y1 = int(vi), y2 = int(vi + 1);                                   \
-          float x = ui - x1, y = vi - y1;                                       \
-          float val = CV_MAT_ELEM(*inImage, type, y1, x1) * (1 - x) * (1 - y) + \
-                      CV_MAT_ELEM(*inImage, type, y1, x2) * x * (1 - y) +       \
-                      CV_MAT_ELEM(*inImage, type, y2, x1) * (1 - x) * y +       \
-                      CV_MAT_ELEM(*inImage, type, y2, x2) * x * y;              \
-          CV_MAT_ELEM(*outImage, type, i, j) = (type)val;                       \
-        }                                                                       \
-        /*nearest-neighbor interpolation*/                                      \
-        else                                                                    \
-          CV_MAT_ELEM(*outImage, type, i, j) =                                  \
-              CV_MAT_ELEM(*inImage, type, int(vi + .5), int(ui + .5));          \
-      }                                                                         \
-      if (outPoints &&                                                          \
-          (ui < ipmInfo->ipmLeft + 10 || ui > ipmInfo->ipmRight - 10 ||         \
-           vi < ipmInfo->ipmTop || vi > ipmInfo->ipmBottom - 2))                \
-        outPoints->push_back(cvPoint(j, i));                                    \
+// generic loop to work for both float and int matrix types
+#define MCV_GET_IPM_(type)                                                                                             \
+  for (i = 0; i < outRow; i++)                                                                                         \
+    for (j = 0; j < outCol; j++)                                                                                       \
+    {                                                                                                                  \
+      /*get pixel coordiantes*/                                                                                        \
+      ui = CV_MAT_ELEM(*uvGrid, FLOAT_MAT_ELEM_TYPE, 0, i * outCol + j);                                               \
+      vi = CV_MAT_ELEM(*uvGrid, FLOAT_MAT_ELEM_TYPE, 1, i * outCol + j);                                               \
+      /*check if out-of-bounds*/                                                                                       \
+      /*if (ui<0 || ui>u-1 || vi<0 || vi>v-1) \*/                                                                      \
+      if (ui < ipmInfo->ipmLeft || ui > ipmInfo->ipmRight || vi < ipmInfo->ipmTop || vi > ipmInfo->ipmBottom)          \
+      {                                                                                                                \
+        CV_MAT_ELEM(*outImage, type, i, j) = (type)mean;                                                               \
+      }                                                                                                                \
+      /*not out of bounds, then get nearest neighbor*/                                                                 \
+      else                                                                                                             \
+      {                                                                                                                \
+        /*Bilinear interpolation*/                                                                                     \
+        if (ipmInfo->ipmInterpolation == 0)                                                                            \
+        {                                                                                                              \
+          int x1 = int(ui), x2 = int(ui + 1);                                                                          \
+          int y1 = int(vi), y2 = int(vi + 1);                                                                          \
+          float x = ui - x1, y = vi - y1;                                                                              \
+          float val = CV_MAT_ELEM(*inImage, type, y1, x1) * (1 - x) * (1 - y) +                                        \
+                      CV_MAT_ELEM(*inImage, type, y1, x2) * x * (1 - y) +                                              \
+                      CV_MAT_ELEM(*inImage, type, y2, x1) * (1 - x) * y + CV_MAT_ELEM(*inImage, type, y2, x2) * x * y; \
+          CV_MAT_ELEM(*outImage, type, i, j) = (type)val;                                                              \
+        }                                                                                                              \
+        /*nearest-neighbor interpolation*/                                                                             \
+        else                                                                                                           \
+          CV_MAT_ELEM(*outImage, type, i, j) = CV_MAT_ELEM(*inImage, type, int(vi + .5), int(ui + .5));                \
+      }                                                                                                                \
+      if (outPoints && (ui < ipmInfo->ipmLeft + 10 || ui > ipmInfo->ipmRight - 10 || vi < ipmInfo->ipmTop ||           \
+                        vi > ipmInfo->ipmBottom - 2))                                                                  \
+        outPoints->push_back(cvPoint(j, i));                                                                           \
     }
   if (CV_MAT_TYPE(inImage->type) == FLOAT_MAT_TYPE)
   {
@@ -299,20 +300,18 @@ void mcvGetIPM(const CvMat *inImage, CvMat *outImage,
   {
     MCV_GET_IPM_(INT_MAT_ELEM_TYPE)
   }
-  //return the ipm info
+  // return the ipm info
   ipmInfo->xLimits[0] = CV_MAT_ELEM(*xyGrid, FLOAT_MAT_ELEM_TYPE, 0, 0);
-  ipmInfo->xLimits[1] =
-      CV_MAT_ELEM(*xyGrid, FLOAT_MAT_ELEM_TYPE, 0, (outRow - 1) * outCol + outCol - 1);
+  ipmInfo->xLimits[1] = CV_MAT_ELEM(*xyGrid, FLOAT_MAT_ELEM_TYPE, 0, (outRow - 1) * outCol + outCol - 1);
   ipmInfo->yLimits[1] = CV_MAT_ELEM(*xyGrid, FLOAT_MAT_ELEM_TYPE, 1, 0);
-  ipmInfo->yLimits[0] =
-      CV_MAT_ELEM(*xyGrid, FLOAT_MAT_ELEM_TYPE, 1, (outRow - 1) * outCol + outCol - 1);
+  ipmInfo->yLimits[0] = CV_MAT_ELEM(*xyGrid, FLOAT_MAT_ELEM_TYPE, 1, (outRow - 1) * outCol + outCol - 1);
   ipmInfo->xScale = 1 / stepCol;
   // cout<<"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!Stepcol!!!!!!!!!!!!!!!!!!!!!!!!!: "<<stepCol<<endl;
   ipmInfo->yScale = 1 / stepRow;
   ipmInfo->width = outCol;
   ipmInfo->height = outRow;
 
-  //clean
+  // clean
   cvReleaseMat(&xyLimitsp);
   cvReleaseMat(&xyGrid);
   cvReleaseMat(&uvGrid);
@@ -328,15 +327,12 @@ void mcvGetIPM(const CvMat *inImage, CvMat *outImage,
  * \param cemaraInfo the input camera parameters
  *
  */
-void mcvTransformImage2Ground(const CvMat *inPoints,
-                              CvMat *outPoints, const CameraInfo *cameraInfo)
+void mcvTransformImage2Ground(const CvMat *inPoints, CvMat *outPoints, const CameraInfo *cameraInfo)
 {
+  // add two rows to the input points
+  CvMat *inPoints4 = cvCreateMat(inPoints->rows + 2, inPoints->cols, cvGetElemType(inPoints));
 
-  //add two rows to the input points
-  CvMat *inPoints4 = cvCreateMat(inPoints->rows + 2, inPoints->cols,
-                                 cvGetElemType(inPoints));
-
-  //copy inPoints to first two rows
+  // copy inPoints to first two rows
   CvMat inPoints2, inPoints3, inPointsr4, inPointsr3;
   cvGetRows(inPoints4, &inPoints2, 0, 2);
   cvGetRows(inPoints4, &inPoints3, 0, 3);
@@ -344,50 +340,46 @@ void mcvTransformImage2Ground(const CvMat *inPoints,
   cvGetRow(inPoints4, &inPointsr4, 3);
   cvSet(&inPointsr3, cvRealScalar(1));
   cvCopy(inPoints, &inPoints2);
-  //create the transformation matrix
+  // create the transformation matrix
   float c1 = cos(cameraInfo->pitch);
   float s1 = sin(cameraInfo->pitch);
   float c2 = cos(cameraInfo->yaw);
   float s2 = sin(cameraInfo->yaw);
   float matp[] = {
-      -cameraInfo->cameraHeight * c2 / cameraInfo->focalLength.x,
-      cameraInfo->cameraHeight * s1 * s2 / cameraInfo->focalLength.y,
-      (cameraInfo->cameraHeight * c2 * cameraInfo->opticalCenter.x /
-       cameraInfo->focalLength.x) -
-          (cameraInfo->cameraHeight * s1 * s2 * cameraInfo->opticalCenter.y /
-           cameraInfo->focalLength.y) -
-          cameraInfo->cameraHeight * c1 * s2,
+    -cameraInfo->cameraHeight * c2 / cameraInfo->focalLength.x,
+    cameraInfo->cameraHeight * s1 * s2 / cameraInfo->focalLength.y,
+    (cameraInfo->cameraHeight * c2 * cameraInfo->opticalCenter.x / cameraInfo->focalLength.x) -
+        (cameraInfo->cameraHeight * s1 * s2 * cameraInfo->opticalCenter.y / cameraInfo->focalLength.y) -
+        cameraInfo->cameraHeight * c1 * s2,
 
-      cameraInfo->cameraHeight * s2 / cameraInfo->focalLength.x,
-      cameraInfo->cameraHeight * s1 * c2 / cameraInfo->focalLength.y,
-      (-cameraInfo->cameraHeight * s2 * cameraInfo->opticalCenter.x / cameraInfo->focalLength.x) - (cameraInfo->cameraHeight * s1 * c2 * cameraInfo->opticalCenter.y / cameraInfo->focalLength.y) -
-          cameraInfo->cameraHeight * c1 * c2,
+    cameraInfo->cameraHeight * s2 / cameraInfo->focalLength.x,
+    cameraInfo->cameraHeight * s1 * c2 / cameraInfo->focalLength.y,
+    (-cameraInfo->cameraHeight * s2 * cameraInfo->opticalCenter.x / cameraInfo->focalLength.x) -
+        (cameraInfo->cameraHeight * s1 * c2 * cameraInfo->opticalCenter.y / cameraInfo->focalLength.y) -
+        cameraInfo->cameraHeight * c1 * c2,
 
-      0,
-      cameraInfo->cameraHeight * c1 / cameraInfo->focalLength.y,
-      (-cameraInfo->cameraHeight * c1 * cameraInfo->opticalCenter.y /
-       cameraInfo->focalLength.y) +
-          cameraInfo->cameraHeight * s1,
+    0,
+    cameraInfo->cameraHeight * c1 / cameraInfo->focalLength.y,
+    (-cameraInfo->cameraHeight * c1 * cameraInfo->opticalCenter.y / cameraInfo->focalLength.y) +
+        cameraInfo->cameraHeight * s1,
 
-      0,
-      -c1 / cameraInfo->focalLength.y,
-      (c1 * cameraInfo->opticalCenter.y / cameraInfo->focalLength.y) - s1,
+    0,
+    -c1 / cameraInfo->focalLength.y,
+    (c1 * cameraInfo->opticalCenter.y / cameraInfo->focalLength.y) - s1,
   };
   CvMat mat = cvMat(4, 3, CV_32FC1, matp);
-  //multiply
+  // multiply
   cvMatMul(&mat, &inPoints3, inPoints4);
-  //divide by last row of inPoints4
+  // divide by last row of inPoints4
   for (int i = 0; i < inPoints->cols; i++)
   {
     float div = CV_MAT_ELEM(inPointsr4, float, 0, i);
-    CV_MAT_ELEM(*inPoints4, float, 0, i) =
-        CV_MAT_ELEM(*inPoints4, float, 0, i) / div;
-    CV_MAT_ELEM(*inPoints4, float, 1, i) =
-        CV_MAT_ELEM(*inPoints4, float, 1, i) / div;
+    CV_MAT_ELEM(*inPoints4, float, 0, i) = CV_MAT_ELEM(*inPoints4, float, 0, i) / div;
+    CV_MAT_ELEM(*inPoints4, float, 1, i) = CV_MAT_ELEM(*inPoints4, float, 1, i) / div;
   }
-  //put back the result into outPoints
+  // put back the result into outPoints
   cvCopy(&inPoints2, outPoints);
-  //clear
+  // clear
   cvReleaseMat(&inPoints4);
 }
 
@@ -400,51 +392,46 @@ void mcvTransformImage2Ground(const CvMat *inPoints,
  * \param cameraInfo the camera parameters
  *
  */
-void mcvTransformGround2Image(const CvMat *inPoints,
-                              CvMat *outPoints, const CameraInfo *cameraInfo)
+void mcvTransformGround2Image(const CvMat *inPoints, CvMat *outPoints, const CameraInfo *cameraInfo)
 {
-  //add two rows to the input points
-  CvMat *inPoints3 = cvCreateMat(inPoints->rows + 1, inPoints->cols,
-                                 cvGetElemType(inPoints));
+  // add two rows to the input points
+  CvMat *inPoints3 = cvCreateMat(inPoints->rows + 1, inPoints->cols, cvGetElemType(inPoints));
 
-  //copy inPoints to first two rows
+  // copy inPoints to first two rows
   CvMat inPoints2, inPointsr3;
   cvGetRows(inPoints3, &inPoints2, 0, 2);
   cvGetRow(inPoints3, &inPointsr3, 2);
   cvSet(&inPointsr3, cvRealScalar(-cameraInfo->cameraHeight));
   cvCopy(inPoints, &inPoints2);
-  //create the transformation matrix
+  // create the transformation matrix
   float c1 = cos(cameraInfo->pitch);
   float s1 = sin(cameraInfo->pitch);
   float c2 = cos(cameraInfo->yaw);
   float s2 = sin(cameraInfo->yaw);
-  float matp[] = {
-      cameraInfo->focalLength.x * c2 + c1 * s2 * cameraInfo->opticalCenter.x,
-      -cameraInfo->focalLength.x * s2 + c1 * c2 * cameraInfo->opticalCenter.x,
-      -s1 * cameraInfo->opticalCenter.x,
+  float matp[] = { cameraInfo->focalLength.x * c2 + c1 * s2 * cameraInfo->opticalCenter.x,
+                   -cameraInfo->focalLength.x * s2 + c1 * c2 * cameraInfo->opticalCenter.x,
+                   -s1 * cameraInfo->opticalCenter.x,
 
-      s2 * (-cameraInfo->focalLength.y * s1 + c1 * cameraInfo->opticalCenter.y),
-      c2 * (-cameraInfo->focalLength.y * s1 + c1 * cameraInfo->opticalCenter.y),
-      -cameraInfo->focalLength.y * c1 - s1 * cameraInfo->opticalCenter.y,
+                   s2 * (-cameraInfo->focalLength.y * s1 + c1 * cameraInfo->opticalCenter.y),
+                   c2 * (-cameraInfo->focalLength.y * s1 + c1 * cameraInfo->opticalCenter.y),
+                   -cameraInfo->focalLength.y * c1 - s1 * cameraInfo->opticalCenter.y,
 
-      c1 * s2,
-      c1 * c2,
-      -s1};
+                   c1 * s2,
+                   c1 * c2,
+                   -s1 };
   CvMat mat = cvMat(3, 3, CV_32FC1, matp);
-  //multiply
+  // multiply
   cvMatMul(&mat, inPoints3, inPoints3);
-  //divide by last row of inPoints4
+  // divide by last row of inPoints4
   for (int i = 0; i < inPoints->cols; i++)
   {
     float div = CV_MAT_ELEM(inPointsr3, float, 0, i);
-    CV_MAT_ELEM(*inPoints3, float, 0, i) =
-        CV_MAT_ELEM(*inPoints3, float, 0, i) / div;
-    CV_MAT_ELEM(*inPoints3, float, 1, i) =
-        CV_MAT_ELEM(*inPoints3, float, 1, i) / div;
+    CV_MAT_ELEM(*inPoints3, float, 0, i) = CV_MAT_ELEM(*inPoints3, float, 0, i) / div;
+    CV_MAT_ELEM(*inPoints3, float, 1, i) = CV_MAT_ELEM(*inPoints3, float, 1, i) / div;
   }
-  //put back the result into outPoints
+  // put back the result into outPoints
   cvCopy(&inPoints2, outPoints);
-  //clear
+  // clear
   cvReleaseMat(&inPoints3);
 }
 
@@ -461,45 +448,48 @@ void mcvTransformGround2Image(const CvMat *inPoints,
  */
 FLOAT_POINT2D mcvGetVanishingPoint(const CameraInfo *cameraInfo)
 {
-  //get the vp in world coordinates
-  FLOAT_MAT_ELEM_TYPE vpp[] = {sin(cameraInfo->yaw) / cos(cameraInfo->pitch),
-                               cos(cameraInfo->yaw) / cos(cameraInfo->pitch), 0};
+  // get the vp in world coordinates
+  FLOAT_MAT_ELEM_TYPE vpp[] = { sin(cameraInfo->yaw) / cos(cameraInfo->pitch),
+                                cos(cameraInfo->yaw) / cos(cameraInfo->pitch), 0 };
   CvMat vp = cvMat(3, 1, FLOAT_MAT_TYPE, vpp);
 
-  //transform from world to camera coordinates
+  // transform from world to camera coordinates
   //
-  //rotation matrix for yaw
-  FLOAT_MAT_ELEM_TYPE tyawp[] = {cos(cameraInfo->yaw), -sin(cameraInfo->yaw), 0,
-                                 sin(cameraInfo->yaw), cos(cameraInfo->yaw), 0,
-                                 0, 0, 1};
+  // rotation matrix for yaw
+  FLOAT_MAT_ELEM_TYPE tyawp[] = {
+    cos(cameraInfo->yaw), -sin(cameraInfo->yaw), 0, sin(cameraInfo->yaw), cos(cameraInfo->yaw), 0, 0, 0, 1
+  };
   CvMat tyaw = cvMat(3, 3, FLOAT_MAT_TYPE, tyawp);
-  //rotation matrix for pitch
-  FLOAT_MAT_ELEM_TYPE tpitchp[] = {1, 0, 0,
-                                   0, -sin(cameraInfo->pitch), -cos(cameraInfo->pitch),
-                                   0, cos(cameraInfo->pitch), -sin(cameraInfo->pitch)};
+  // rotation matrix for pitch
+  FLOAT_MAT_ELEM_TYPE tpitchp[] = {
+    1, 0, 0, 0, -sin(cameraInfo->pitch), -cos(cameraInfo->pitch), 0, cos(cameraInfo->pitch), -sin(cameraInfo->pitch)
+  };
   CvMat transform = cvMat(3, 3, FLOAT_MAT_TYPE, tpitchp);
-  //combined transform
+  // combined transform
   cvMatMul(&transform, &tyaw, &transform);
 
   //
-  //transformation from (xc, yc) in camra coordinates
+  // transformation from (xc, yc) in camra coordinates
   // to (u,v) in image frame
   //
-  //matrix to shift optical center and focal length
-  FLOAT_MAT_ELEM_TYPE t1p[] = {
-      cameraInfo->focalLength.x, 0,
-      cameraInfo->opticalCenter.x,
-      0, cameraInfo->focalLength.y,
-      cameraInfo->opticalCenter.y,
-      0, 0, 1};
+  // matrix to shift optical center and focal length
+  FLOAT_MAT_ELEM_TYPE t1p[] = { cameraInfo->focalLength.x,
+                                0,
+                                cameraInfo->opticalCenter.x,
+                                0,
+                                cameraInfo->focalLength.y,
+                                cameraInfo->opticalCenter.y,
+                                0,
+                                0,
+                                1 };
   CvMat t1 = cvMat(3, 3, FLOAT_MAT_TYPE, t1p);
-  //combine transform
+  // combine transform
   cvMatMul(&t1, &transform, &transform);
-  //transform
+  // transform
   cvMatMul(&transform, &vp, &vp);
 
   //
-  //clean and return
+  // clean and return
   //
   FLOAT_POINT2D ret;
   ret.x = cvGetReal1D(&vp, 0);
@@ -516,10 +506,10 @@ FLOAT_POINT2D mcvGetVanishingPoint(const CameraInfo *cameraInfo)
  */
 void mcvPointImIPM2World(FLOAT_POINT2D *point, const IPMInfo *ipmInfo)
 {
-  //x-direction
+  // x-direction
   point->x /= ipmInfo->xScale;
   point->x += ipmInfo->xLimits[0];
-  //y-direction
+  // y-direction
   point->y /= ipmInfo->yScale;
   point->y = ipmInfo->yLimits[1] - point->y;
 }
@@ -541,12 +531,12 @@ void mcvTransformImIPM2Ground(const CvMat *inMat, CvMat *outMat, const IPMInfo *
     cvCopy(inMat, mat);
   }
 
-  //work on the x-direction i.e. first row
+  // work on the x-direction i.e. first row
   CvMat row;
   cvGetRow(mat, &row, 0);
   cvConvertScale(&row, &row, 1. / ipmInfo->xScale, ipmInfo->xLimits[0]);
 
-  //work on y-direction
+  // work on y-direction
   cvGetRow(mat, &row, 1);
   cvConvertScale(&row, &row, -1. / ipmInfo->yScale, ipmInfo->yLimits[1]);
 }
@@ -560,13 +550,12 @@ void mcvTransformImIPM2Ground(const CvMat *inMat, CvMat *outMat, const IPMInfo *
  * \param cameraInfo the camera info
  *
  */
-void mcvTransformImIPM2Im(const CvMat *inMat, CvMat *outMat, const IPMInfo *ipmInfo,
-                          const CameraInfo *cameraInfo)
+void mcvTransformImIPM2Im(const CvMat *inMat, CvMat *outMat, const IPMInfo *ipmInfo, const CameraInfo *cameraInfo)
 {
-  //convert to world coordinates
+  // convert to world coordinates
   mcvTransformImIPM2Ground(inMat, outMat, ipmInfo);
 
-  //convert to image coordinates
+  // convert to image coordinates
   mcvTransformGround2Image(outMat, outMat, cameraInfo);
 }
 
@@ -579,10 +568,10 @@ void mcvTransformImIPM2Im(const CvMat *inMat, CvMat *outMat, const IPMInfo *ipmI
  */
 void mcvScaleCameraInfo(CameraInfo *cameraInfo, CvSize size)
 {
-  //compute the scale factor
+  // compute the scale factor
   double scaleX = size.width / cameraInfo->imageWidth;
   double scaleY = size.height / cameraInfo->imageHeight;
-  //scale
+  // scale
   cameraInfo->imageWidth = size.width;
   cameraInfo->imageHeight = size.height;
   cameraInfo->focalLength.x *= scaleX;
@@ -591,4 +580,4 @@ void mcvScaleCameraInfo(CameraInfo *cameraInfo, CvSize size)
   cameraInfo->opticalCenter.y *= scaleY;
 }
 
-} // namespace LaneDetector
+}  // namespace LaneDetector

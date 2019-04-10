@@ -14,8 +14,11 @@ find_package(catkin REQUIRED COMPONENTS
   lane_detector
   cv_bridge
   image_transport
+  grid_map_ros
+  grid_map_cv
 )
 
+# find_package(Eigen REQUIRED)
 find_package(OpenCV 3.2.0 REQUIRED)
 
 ## System dependencies are found with CMake's conventions
@@ -110,8 +113,9 @@ find_package(OpenCV 3.2.0 REQUIRED)
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES data_treatment
- CATKIN_DEPENDS roscpp rospy std_msgs lane_detector 
+  CATKIN_DEPENDS roscpp rospy std_msgs lane_detector 
 #  DEPENDS system_lib
+
 )
 
 ###########
@@ -158,9 +162,9 @@ add_executable(junction_data src/junction_data.cpp)
 # target_link_libraries(${PROJECT_NAME}_node
 #   ${catkin_LIBRARIES}
 # )
-target_link_libraries(subscriber ${catkin_LIBRARIES} ${OpenCV_LIBRARIES})
-target_link_libraries(subscriber2 ${catkin_LIBRARIES} ${OpenCV_LIBRARIES})
-target_link_libraries(junction_data ${catkin_LIBRARIES} ${OpenCV_LIBRARIES})
+target_link_libraries(subscriber ${catkin_LIBRARIES} ${OpenCV_LIBRARIES}) 
+target_link_libraries(subscriber2 ${catkin_LIBRARIES} ${OpenCV_LIBRARIES}) 
+target_link_libraries(junction_data ${catkin_LIBRARIES} ${OpenCV_LIBRARIES}) 
 #############
 ## Install ##
 #############

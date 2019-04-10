@@ -11,12 +11,16 @@
         <remap from="lane_detector/lane" to="lane_detector2/lane" />
         <remap from="data_treatment/initial" to="data_treatment2/initial"/>
         <remap from="data_treatment/final" to="data_treatment2/final"/>
-        <param name="~R_channel" type= "int" value="0"/> 
+        <param name="~R_channel" type= "int" value="0"/>
         <param name="~G_channel" type= "int" value="0"/>
         <param name="~B_channel" type= "int" value="255"/>
     </node>
 
-    <node pkg="data_treatment" name="junction_data" type="junction_data" output="screen"/>
+    <node pkg="data_treatment" name="junction_data" type="junction_data" output="screen">
+        <remap from="~camera" to="world"/>
+    </node>
+   
+
 
 </launch>
 
