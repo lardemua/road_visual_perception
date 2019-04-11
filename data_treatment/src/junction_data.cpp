@@ -44,7 +44,7 @@ public:
   /*Images pointers reveive*/
   cv_bridge::CvImagePtr current_image_alg1;
   cv_bridge::CvImagePtr current_image_alg2;
-  double pace = 0.005;  // cada lado da celula correponde a este valor
+  double pace = 0.05;  // cada lado da celula correponde a este valor em m
 
   /**
    * @brief Callback to receive the image that cames from the algorithm 1
@@ -200,24 +200,33 @@ public:
       img_filt.convertTo(img_filt, CV_8UC1);
       auto img_final_map = cv_bridge::CvImage{ current_image_alg1->header, "mono8", img_filt }.toImageMsg();
       prob_map_image.publish(img_final_map);
-      // info.height = input.rows;
-      // info.width = input.cols;
-      // info.resolution = pace;
-      // info.origin.position.x = 0;
-      // info.origin.position.y = pace*input.cols/2;
-      // info.origin.position.z =  0;
+      info.height = input.cols;
+      info.width = input.rows;
+      info.resolution = pace;
+      info.origin.position.x = 0;
+      info.origin.position.y = -info.resolution*info.width/2;
+      info.origin.position.z =  0;
       // cout<<info<<endl;
       // cout << current_image_alg1->header << endl;
-
-      // header.frame_id = "world";
 
       grid_map::GridMapRosConverter::initializeFromImage(*img_final_map, pace, grid_road_GridMap);
       grid_map::GridMapRosConverter::addLayerFromImage(*img_final_map, "road probability map", grid_road_GridMap, 0,255, 255);
       grid_map::GridMapRosConverter::toOccupancyGrid(grid_road_GridMap, "road probability map", 0, 255, roadmapGrid);
-      // roadmapGrid.info = info;
+      // cout << "resolution " << roadmapGrid.info.resolution << endl;
+      // cout<<"rows,cols: "<< roadmapGrid.info.height << ", "<<roadmapGrid.info.width<<endl;
+      // cout<<"origin: " << roadmapGrid.info.origin.position.x << ", "<< roadmapGrid.info.origin.position.y << ", " << roadmapGrid.info.origin.position.z << endl;
+
+
+
+
+
+
+
+
+      roadmapGrid.info = info;
       roadmapGrid.header = current_image_alg1->header;
       roadmapGrid.header.frame_id = "/world";
-      //cout << "Header: " << roadmapGrid.header << endl;
+      // cout << "Header: " << roadmapGrid.header << endl;
       grid_road_map_pub.publish(roadmapGrid);
     }
   }

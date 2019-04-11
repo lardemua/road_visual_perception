@@ -7,7 +7,7 @@
     </node>
 
     <node pkg="data_treatment" name="subscriber2" type="subscriber2" output="screen">
-        <remap from="lane_detector/processed" to="lane_detector2/processed" />
+        <remap from="lane_detector/processed" to="lane_detector2/result" />
         <remap from="lane_detector/lane" to="lane_detector2/lane" />
         <remap from="data_treatment/initial" to="data_treatment2/initial"/>
         <remap from="data_treatment/final" to="data_treatment2/final"/>

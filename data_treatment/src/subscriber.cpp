@@ -125,7 +125,7 @@ void lanereceive_showimageCallback(const lane_detector::Lane::ConstPtr &msg)
   std::vector<geometry_msgs::Point32> guide;
   std::vector<geometry_msgs::Point32> left_pix;
   std::vector<geometry_msgs::Point32> right_pix;
-  std::vector<geometry_msgs::Point32> guide_pix;
+  // std::vector<geometry_msgs::Point32> guide_pix;
   int row_image = 0;
   int col_image = 0;
   int n, k = 0;
@@ -151,20 +151,20 @@ void lanereceive_showimageCallback(const lane_detector::Lane::ConstPtr &msg)
   guide = msg->guide_line;
   left_pix = msg->left_line_pix;
   right_pix = msg->right_line_pix;
-  guide_pix = msg->guide_line_pix;
+  // guide_pix = msg->guide_line_pix;
 
   std::vector<cv::Point2f> left_spline_pix_float = ROS2CvPoint2f(left_pix);
   std::vector<cv::Point2f> right_spline_pix_float = ROS2CvPoint2f(right_pix);
-  std::vector<cv::Point2f> guide_spline_pix_float = ROS2CvPoint2f(guide_pix);
+  // std::vector<cv::Point2f> guide_spline_pix_float = ROS2CvPoint2f(guide_pix);
   std::vector<cv::Point> left_spline = cvtCvPoint2f2CvPoint(left_spline_pix_float);
   std::vector<cv::Point> right_spline = cvtCvPoint2f2CvPoint(right_spline_pix_float);
-  std::vector<cv::Point> guide_spline = cvtCvPoint2f2CvPoint(guide_spline_pix_float);
+  // std::vector<cv::Point> guide_spline = cvtCvPoint2f2CvPoint(guide_spline_pix_float);
 
   std::tuple<float, float> imageSize = getImageSize();
   row_image = get<0>(imageSize);
   col_image = get<1>(imageSize);
 
-  if (current_image && (left_spline.size() > 0) && (right_spline.size() > 0) && (guide_spline.size() > 0))
+  if (current_image && (left_spline.size() > 0) && (right_spline.size() > 0)) //&& (guide_spline.size() > 0))
   {
     ros::param::get("~R_channel", R_channel);
     ros::param::get("~G_channel", G_channel);
@@ -285,7 +285,7 @@ int main(int argc, char **argv)
   ros::NodeHandle n;
   image_transport::ImageTransport it(n);
   ros::Subscriber sub_lanes = n.subscribe("lane_detector/lane", 10, lanereceive_showimageCallback);
-  image_transport::Subscriber sub = it.subscribe("lane_detector/processed", 10, imagereceiveCallback);
+  image_transport::Subscriber sub = it.subscribe("lane_detector/result", 10, imagereceiveCallback);
 
   // lane_pub = n.advertise<lane_detector::Lane>("estou_publicar/lane_received", 10);
   initialimage = n.advertise<sensor_msgs::Image>("data_treatment/initial", 10);

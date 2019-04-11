@@ -43,6 +43,7 @@
     <param name="images_path" value="$(find lane_detector)/data/first_set" />
     <remap from="lane_detector/processed" to="lane_detector2/processed" />
     <remap from="lane_detector/lane" to="lane_detector2/lane" />
+    <remap from="lane_detector/result" to="lane_detector2/result"/>
     <rosparam command="load" file="$(find lane_detector)/params/Detector2.yaml"/>
   </node>
 

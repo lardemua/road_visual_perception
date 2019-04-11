@@ -1,15 +1,17 @@
 #include <lane_detector/fitting.h>
-#include <opencv2/highgui/highgui.hpp>
-#include <algorithm>
-#include <vector>
 #include <omp.h>
+#include <algorithm>
+#include <opencv2/highgui/highgui.hpp>
+#include <vector>
 
 float Fitting::calcCost(SplineCombination &combination)
 {
   return combination.calcCost(last_lane);
 }
 
-lane_detector::Lane Fitting::fitting(cv::Mat &original, cv::Mat &processed_bgr, cv::Mat &preprocessed, LaneDetector::IPMInfo &ipmInfo, LaneDetector::CameraInfo &cameraInfo, std::vector<LaneDetector::Box> &ipmBoxes)
+lane_detector::Lane Fitting::fitting(cv::Mat &original, cv::Mat &processed_bgr, cv::Mat &preprocessed,
+                                     LaneDetector::IPMInfo &ipmInfo, LaneDetector::CameraInfo &cameraInfo,
+                                     std::vector<LaneDetector::Box> &ipmBoxes)
 {
   this->ipmInfo = ipmInfo;
   this->cameraInfo = cameraInfo;
@@ -20,7 +22,9 @@ lane_detector::Lane Fitting::fitting(cv::Mat &original, cv::Mat &processed_bgr, 
   {
     last_lane = SplineCombination();
   }
-  cv::Scalar Colors[] = {cv::Scalar(255, 0, 0), cv::Scalar(0, 255, 0), cv::Scalar(0, 0, 255), cv::Scalar(255, 255, 0), cv::Scalar(0, 255, 255), cv::Scalar(255, 0, 255), cv::Scalar(255, 127, 255), cv::Scalar(127, 0, 255), cv::Scalar(127, 0, 127)};
+  cv::Scalar Colors[] = { cv::Scalar(255, 0, 0),     cv::Scalar(0, 255, 0),   cv::Scalar(0, 0, 255),
+                          cv::Scalar(255, 255, 0),   cv::Scalar(0, 255, 255), cv::Scalar(255, 0, 255),
+                          cv::Scalar(255, 127, 255), cv::Scalar(127, 0, 255), cv::Scalar(127, 0, 127) };
   std::vector<cv::Point> splinePoints;
   std::vector<cv::Point2f> centroids;
   std::vector<cv::Rect> rects;
@@ -30,13 +34,13 @@ lane_detector::Lane Fitting::fitting(cv::Mat &original, cv::Mat &processed_bgr, 
   lane_detector::utils::getRectsCentroids(rects, centroids);
   tracker.Update(centroids, rects, CTracker::RectsDist);
   rects = tracker.getLastRects();
-  //std::cout << "rects_size: " << rects.size() << std::endl;
+  // std::cout << "rects_size: " << rects.size() << std::endl;
   std::vector<CvRect> rectsAux(rects.begin(), rects.end());
   LaneDetector::mcvGroupBoundingBoxes(rectsAux, LaneDetector::LINE_VERTICAL, lanesConf.groupThreshold);
   rects = std::vector<cv::Rect>(rectsAux.begin(), rectsAux.end());
   lane_detector::utils::getRectsCentroids(rects, centroids);
   std::vector<std::vector<cv::Point>> splines(rects.size());
-  ROS_DEBUG("Lanes detected: %lu", rects.size()); //Verificado
+  ROS_DEBUG("Lanes detected: %lu", rects.size());  // Verificado
   // current_lane.correct=true;
 
   if (rects.size() > 0)
@@ -45,7 +49,7 @@ lane_detector::Lane Fitting::fitting(cv::Mat &original, cv::Mat &processed_bgr, 
 #pragma omp parallel shared(splines)
     {
       std::vector<cv::Point> spline_private;
-#pragma omp for nowait // fill splines_private in parallel
+#pragma omp for nowait  // fill splines_private in parallel
       for (int i = 0; i < rects.size(); i++)
       {
         cv::Rect bounding_box = rects[i];
@@ -62,7 +66,7 @@ lane_detector::Lane Fitting::fitting(cv::Mat &original, cv::Mat &processed_bgr, 
   // draw the spline
   if (config.draw_splines)
     drawSplines(processed_bgr, splines);
-  //draw the bounding boxes
+  // draw the bounding boxes
   if (config.draw_boxes)
     drawBoxes(processed_bgr, rects);
 
@@ -70,7 +74,9 @@ lane_detector::Lane Fitting::fitting(cv::Mat &original, cv::Mat &processed_bgr, 
   if (centroids.size() >= 2)
   {
     // cout<< "Current Lane antes:------------------------------ "<<current_lane.correct <<endl;
-    findCurrentLane(centroids, splines, current_lane, processed_bgr); //-----------------------------------------------------------------------É aqui que a correct passa a 1
+    findCurrentLane(centroids, splines, current_lane,
+                    processed_bgr);  //-----------------------------------------------------------------------É
+                                     // aqui que a correct passa a 1
     // cout<< "Current Lane depois:------------------------------ "<<current_lane.correct <<endl;
     if (current_lane.correct)
       last_lane = current_lane;
@@ -85,20 +91,26 @@ lane_detector::Lane Fitting::fitting(cv::Mat &original, cv::Mat &processed_bgr, 
     current_lane = last_lane;
     last_lane.num_absent_frames++;
   }
-  //std::cout << "splines size: " << splines.size() << std::endl;
-  //if(splines.size() == 3) {
-  //std::cout << "1: " << splines[0].size() << " 2: " << splines[1].size() << " 3: " << splines[2].size() << std::endl;
+  // std::cout << "splines size: " << splines.size() << std::endl;
+  // if(splines.size() == 3) {
+  // std::cout << "1: " << splines[0].size() << " 2: " << splines[1].size() << " 3: " << splines[2].size() << std::endl;
   //}
   // cout<< "current lane correct?"<<current_lane.correct<<"\n" <<endl;
   if (current_lane.correct && config.draw_splines)
   {
-    //std::cout << "lane_width: " << current_lane.lane_width << std::endl;
+    // std::cout << "lane_width: " << current_lane.lane_width << std::endl;
     cv::circle(processed_bgr, current_lane.centroid_spline1, 5, cv::Scalar(0, 255, 0), -1);
     cv::circle(processed_bgr, current_lane.centroid_spline2, 5, cv::Scalar(0, 255, 0), -1);
     if (config.draw_splines)
-      lane_detector::utils::drawSpline(processed_bgr, current_lane.spline1, 2, cv::Scalar(0, 255, 0)); //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!Linha da esquerda
+      lane_detector::utils::drawSpline(
+          processed_bgr, current_lane.spline1, 2,
+          cv::Scalar(0, 255, 0));  //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!Linha
+                                   //! da esquerda
     if (config.draw_splines)
-      lane_detector::utils::drawSpline(processed_bgr, current_lane.spline2, 2, cv::Scalar(0, 255, 0)); //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!Linha da da direita
+      lane_detector::utils::drawSpline(
+          processed_bgr, current_lane.spline2, 2,
+          cv::Scalar(0, 255, 0));  //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!Linha
+                                   //! da da direita
   }
   if (config.draw_tracked_centroids)
   {
@@ -119,9 +131,10 @@ lane_detector::Lane Fitting::fitting(cv::Mat &original, cv::Mat &processed_bgr, 
 
   // cout<< "Current Lane??"<<current_lane.correct <<endl;
 
-  if (current_lane.correct) ///ERRO É AQUIIIIIIIIIIIIIIIIIIIIIIIIIIIII!------------------------------------------------------------------------------------------------
+  if (current_lane
+          .correct)  /// ERRO É
+                     /// AQUIIIIIIIIIIIIIIIIIIIIIIIIIIIII!------------------------------------------------------------------------------------------------
   {
-
     longest_spline = current_lane.longest_spline;
     right_spline = current_lane.right_spline;
     left_spline = current_lane.left_spline;
@@ -138,7 +151,7 @@ lane_detector::Lane Fitting::fitting(cv::Mat &original, cv::Mat &processed_bgr, 
                 p = longest_spline[i];
                 p.x += current_lane.lane_width/2;
               }*/
-        //else { //longest_spline == right_spline
+        // else { //longest_spline == right_spline
         p = right_spline[i];
         p.x -= current_lane.lane_width / 2;
 //}
@@ -153,7 +166,7 @@ lane_detector::Lane Fitting::fitting(cv::Mat &original, cv::Mat &processed_bgr, 
     {
       lane_detector::utils::drawSpline(processed_bgr, guide_spline, 1, cv::Scalar(0, 255, 255));
     }
-    //Convert cv::Point to cv::Point2f
+    // Convert cv::Point to cv::Point2f
     std::vector<cv::Point2f> left_spline_float = lane_detector::utils::cvtCvPoint2CvPoint2f(left_spline);
     std::vector<cv::Point2f> right_spline_float = lane_detector::utils::cvtCvPoint2CvPoint2f(right_spline);
     std::vector<cv::Point2f> guide_spline_float = lane_detector::utils::cvtCvPoint2CvPoint2f(guide_spline);
@@ -161,7 +174,7 @@ lane_detector::Lane Fitting::fitting(cv::Mat &original, cv::Mat &processed_bgr, 
     std::vector<cv::Point2f> right_spline_pix_float = lane_detector::utils::cvtCvPoint2CvPoint2f(right_spline);
     std::vector<cv::Point2f> guide_spline_pix_float = lane_detector::utils::cvtCvPoint2CvPoint2f(guide_spline);
 
-    //Transform splines to wolrd coordinates (in m)
+    // Transform splines to wolrd coordinates (in m)
     lane_detector::utils::ipmPoints2World(guide_spline_float, guide_spline_float, ipmInfo);
     lane_detector::utils::ipmPoints2World(right_spline_float, right_spline_float, ipmInfo);
     lane_detector::utils::ipmPoints2World(left_spline_float, left_spline_float, ipmInfo);
@@ -173,32 +186,26 @@ lane_detector::Lane Fitting::fitting(cv::Mat &original, cv::Mat &processed_bgr, 
     std::vector<geometry_msgs::Point32> right_spline_pix_ros;
     std::vector<geometry_msgs::Point32> guide_spline_pix_ros;
 
-    //Convert Cv-Points to ROS-points (geometry_msgs::Point32)
+    // Convert Cv-Points to ROS-points (geometry_msgs::Point32)
     lane_detector::utils::cvtCvPoints2ROSPoints(guide_spline_float, guide_spline_ros);
     lane_detector::utils::cvtCvPoints2ROSPoints(right_spline_float, right_spline_ros);
     lane_detector::utils::cvtCvPoints2ROSPoints(left_spline_float, left_spline_ros);
-    lane_detector::utils::cvtCvPoints2ROSPoints(guide_spline_pix_float, guide_spline_pix_ros);
-    lane_detector::utils::cvtCvPoints2ROSPoints(right_spline_pix_float, right_spline_pix_ros);
-    lane_detector::utils::cvtCvPoints2ROSPoints(left_spline_pix_float, left_spline_pix_ros);
+    // lane_detector::utils::cvtCvPoints2ROSPoints(guide_spline_pix_float, guide_spline_pix_ros);
+
     // cout << "Guide_spline_float: " << guide_spline_float <<"\n"<<endl;
     // cout << "right_spline_float: "<< right_spline_float <<"\n"<<endl;
     // cout << "left_spline_float: "<< left_spline_float<<"\n"<<endl;
-    current_lane_msg.guide_line = guide_spline_ros;
-    current_lane_msg.right_line = right_spline_ros;
-    current_lane_msg.left_line = left_spline_ros;
-    current_lane_msg.guide_line_pix = guide_spline_pix_ros;
-    current_lane_msg.right_line_pix = right_spline_pix_ros;
-    current_lane_msg.left_line_pix = left_spline_pix_ros;
 
-    if (config.transform_back)
-    {
+  // current_lane_msg.guide_line_pix = guide_spline_pix_ros;
 
+    // if (config.transform_back)
+    // {
       cv::Mat left_spline_mat(2, left_spline_float.size(), CV_32FC1);
       cv::Mat right_spline_mat(2, right_spline_float.size(), CV_32FC1);
       lane_detector::utils::spline2Mat(left_spline_float, left_spline_mat);
       lane_detector::utils::spline2Mat(right_spline_float, right_spline_mat);
-      left_spline_mat = left_spline_mat * 1000.0;   //convert to mm
-      right_spline_mat = right_spline_mat * 1000.0; //convert to mm
+      left_spline_mat = left_spline_mat * 1000.0;    // convert to mm
+      right_spline_mat = right_spline_mat * 1000.0;  // convert to mm
       CvMat left_spline_mat_ = left_spline_mat;
       CvMat right_spline_mat_ = right_spline_mat;
       LaneDetector::mcvTransformGround2Image(&left_spline_mat_, &left_spline_mat_, &cameraInfo);
@@ -207,9 +214,16 @@ lane_detector::Lane Fitting::fitting(cv::Mat &original, cv::Mat &processed_bgr, 
       right_spline_mat = cv::cvarrToMat(&right_spline_mat_, false);
       lane_detector::utils::mat2Spline(left_spline_mat, left_spline_float);
       lane_detector::utils::mat2Spline(right_spline_mat, right_spline_float);
+      lane_detector::utils::cvtCvPoints2ROSPoints(right_spline_float, right_spline_pix_ros);
+      lane_detector::utils::cvtCvPoints2ROSPoints(left_spline_float, left_spline_pix_ros);
+      current_lane_msg.guide_line = guide_spline_ros;
+      current_lane_msg.right_line = right_spline_ros;
+      current_lane_msg.left_line = left_spline_ros;
+      current_lane_msg.right_line_pix = right_spline_pix_ros;
+      current_lane_msg.left_line_pix = left_spline_pix_ros;
       left_spline = lane_detector::utils::cvtCvPoint2f2CvPoint(left_spline_float);
       right_spline = lane_detector::utils::cvtCvPoint2f2CvPoint(right_spline_float);
-      if (config.draw_splines)
+      if (config.draw_splines && config.transform_back)
       {
         lane_detector::utils::drawSpline(original, left_spline, 6, cv::Scalar(0, 255, 0));
         lane_detector::utils::drawSpline(original, right_spline, 6, cv::Scalar(0, 255, 0));
@@ -219,7 +233,7 @@ lane_detector::Lane Fitting::fitting(cv::Mat &original, cv::Mat &processed_bgr, 
       splines.clear();
       splines.push_back(left_spline);
       splines.push_back(right_spline);
-    }
+    // }
   }
   else
   {
@@ -240,10 +254,12 @@ lane_detector::Lane Fitting::fitting(cv::Mat &original, cv::Mat &processed_bgr, 
   return current_lane_msg;
 }
 
-//---------------------------------------------Aqui reside o problema:-----------------------------------------------------------------------------------------------------------------
-void Fitting::findCurrentLane(const std::vector<cv::Point2f> &centroids, const std::vector<std::vector<cv::Point>> &splines, SplineCombination &current_lane, cv::Mat &image)
+//---------------------------------------------Aqui reside o
+// problema:-----------------------------------------------------------------------------------------------------------------
+void Fitting::findCurrentLane(const std::vector<cv::Point2f> &centroids,
+                              const std::vector<std::vector<cv::Point>> &splines, SplineCombination &current_lane,
+                              cv::Mat &image)
 {
-
   std::vector<SplineCombination> spline_combinations;
 
   SplineCombination best_combination;
@@ -253,17 +269,16 @@ void Fitting::findCurrentLane(const std::vector<cv::Point2f> &centroids, const s
 
   std::vector<float> costs(spline_combinations.size());
 
-  //std::cout << "Combis: " << spline_combinations.size() << std::endl;
+  // std::cout << "Combis: " << spline_combinations.size() << std::endl;
 
   if (spline_combinations.size() > 1)
   {
-
     for (int i = 0; i < spline_combinations.size(); i++)
     {
-      costs.at(i) = calcCost(spline_combinations[i]); //Não é aqui que a variável passa a um
-      //if(spline_combinations[i].closest_points_set)
-      //cv::line(image, spline_combinations[i].closest_point_s1, spline_combinations[i].closest_point_s2, cv::Scalar(255, 255, 0), 1);
-      //std::cout << "Cost: " << costs[i] << std::endl;
+      costs.at(i) = calcCost(spline_combinations[i]);  // Não é aqui que a variável passa a um
+      // if(spline_combinations[i].closest_points_set)
+      // cv::line(image, spline_combinations[i].closest_point_s1, spline_combinations[i].closest_point_s2,
+      // cv::Scalar(255, 255, 0), 1); std::cout << "Cost: " << costs[i] << std::endl;
     }
 
     best_combination = spline_combinations.at(0);
@@ -281,8 +296,8 @@ void Fitting::findCurrentLane(const std::vector<cv::Point2f> &centroids, const s
     // cout<<"Best combination: "<<best_combination.correct<<endl;
     // cout<<"lane threshold: "<<config.lane_threshold<<endl;
     // cout<<"best_cost: "<<best_cost<<endl;
-    if (best_cost < config.lane_threshold) //É aqui que o current lane passa a um................................
-      current_lane = best_combination;     //Ao serem igualadas passa a um!!
+    if (best_cost < config.lane_threshold)  //É aqui que o current lane passa a um................................
+      current_lane = best_combination;      // Ao serem igualadas passa a um!!
     //  cout<< "Current Lane(depois): "<<current_lane.correct<<endl;
   }
 
@@ -291,9 +306,9 @@ void Fitting::findCurrentLane(const std::vector<cv::Point2f> &centroids, const s
     float cost = spline_combinations[0].calcCost(last_lane);
     if (cost < config.lane_threshold)
       current_lane = spline_combinations[0];
-    //if(spline_combinations[0].closest_points_set)
-    //cv::line(image, spline_combinations[0].closest_point_s1, spline_combinations[0].closest_point_s2, cv::Scalar(255, 255, 0), 1);
-    //std::cout << "single cost:" << cost << std::endl;
+    // if(spline_combinations[0].closest_points_set)
+    // cv::line(image, spline_combinations[0].closest_point_s1, spline_combinations[0].closest_point_s2, cv::Scalar(255,
+    // 255, 0), 1); std::cout << "single cost:" << cost << std::endl;
   }
 }
 
