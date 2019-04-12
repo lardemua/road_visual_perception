@@ -1,1713 +1,435 @@
 frame#00000000 has 0 splines
 frame#00000001 has 0 splines
 frame#00000002 has 2 splines
+	spline#1 has 4 points and score 1000
+		269, 444
+		256, 530
+		245, 583
+		237, 637
+	spline#2 has 4 points and score 1000
+		610, 370
+		637, 464
+		660, 534
+		684, 607
 frame#00000003 has 2 splines
 	spline#1 has 4 points and score 1000
-		226, 365
-		219, 400
-		211, 426
-		230, 673
+		284, 367
+		271, 443
+		256, 526
+		242, 614
 	spline#2 has 4 points and score 1000
-		606, 363
-		63frame#00000003 has 2 splines
+		616, 389
+		642, 473
+		666, 557
+		707, 678
 frame#00000004 has 2 splines
 	spline#1 has 4 points and score 1000
-		266, 455
-		260, 513
-		252, 561
-		242, 611
+		278, 386
+		261, 498
+		246, 576
+		232, 659
 	spline#2 has 4 points and score 1000
-		614, 387
-		64frame#00000004 has 2 splines
+		608, 370
+		642, 472
+		668, 547
+		703, 658
 frame#00000005 has 2 splines
 	spline#1 has 4 points and score 1000
-		285, 357
-		267, 468
-		258, 528
-		246, 592
-	spline#2 has 4 points and score 1000
-		623, 410
-		64frame#00000005 has 2 splines
-	spline#1 has 4 points and score 1000
-		285, 366
-		267, 465
-		258, 514
-		250, 565
-	spline#2 has 4 points and score 1000
-		552, 366
-		573, 458
-		590, 532
-		608, 612
-frame#00000006 has 2 splines
-	spline#1 has 4 points and score 1000
-		281, 376
-		266, 472
-		257, 531
-		245, 594
-	spline#2 has 4 points and score 1000
-		555, 375
-		573, 469
-		596, 558
-		618, 655
-frame#00000007 has 2 splines
-	spline#1 has 4 points and score 1000
-		285, 359
-		263, 490
-		252, 560
-		239, 635
-	spline#2 has 4 points and score 1000
-		559, 390
-		586, 514
-		597, 566
-		610, 620
-frame#00000008 has 2 splines
-	spline#1 has 4 points and scframe#00000010 has 0 splines
-frame#00000011 has 2 splines
-	spline#1 has 4 points and score 1000
-		228, 365
-		212, 419
-		204, 449
-		181, 550
-	spline#2 has 4 points and score 1000
-		554, 374
-		580, 487
-		593, 547
-		610, 610
-frame#00000012 has 2 splines
-	spline#1 has 4 points and score 1000
-		226, 364
-		218, 406
-		208, 433
-		235, 655
-	spline#2 has 4 points and score 1000
-		605, 355
-		629, 434
-		651, 499
-		674, 567
-frame#00000013 has 2 splines
-	spline#1 has 4 points and score 1000
-		272, 436
-		256, 524
-		246, 579
-		237, 637
-	spline#2 has 4 points and score 1000
-		610, 367
-		640, 467
-		654, 516
-		672, 567
-frame#00000014 has 2 splines
-	spline#1 has 4 points and score 1000
-		272, 436
-		256, 524
-		246, 579
-		237, 637
-	spline#2 has 4 points and score 1000
-		610, 367
-		640, 467
-		654, 516
-		672, 567
-frame#00000015 has 2 splines
-	spline#1 has 4 points and score 1000
-		272, 436
-		256, 524
-		246, 579
-		237,frame#00000013 has 2 splines
-	spline#1 has 4 points and score 1000
-		286, 355
-		275, 43frame#00000016 has 2 splines
-	spline#1 has 4 points and score 1000
-		272, 436
-		256, 524
-		246, 579
-		237,frame#00000014 has 2 splines
-	spline#1 has 4 points and score 1000
-		282, 378
-		264, 48frame#00000017 has 2 splines
-	spline#1 has 4 points and score 1000
-		225, 369
-		204, 449
-		193, 495
-		180,frame#00000015 has 2 splines
-	spline#1 has 4 points and score 1000
-		284, 371
-		264, 47frame#00000018 has 2 splines
-	spline#1 has 4 points and score 1000
-		225, 369
-		204, 449
-		193, 495
-		180,frame#00000016 has 2 splines
-	spline#1 has 4 points and score 1000
-		284, 371
-		264, 47frame#00000019 has 2 splines
-	spline#1 has 4 points and score 1000
-		225, 369
-		204, 449
-		193, 495
-		180,frame#00000017 has 2 splines
-	spline#1 has 4 points and score 1000
-		284, 358
-		271, 45frame#00000020 has 2 splines
-	spline#1 has 4 points and score 1000
+		276, 398
 		263, 483
-		251, 553
-		247, 584
-		231,frame#00000018 has 2 splines
-	spline#1 has 4 points and score 1000
-		283, 365
-		271, 444
-		262, 495
-		253, 547
-	spline#2 has 4 points and score 1000
-		551, 362
-		577, 476
-		590, 531
-		603, 589
-frame#00000019 has 2 splines
-	spline#1 has 4 points and score 1000
-		282, 375
-		264, 479
-		252, 545
-		243, 614
-	spline#2 has 4 points and score 1000
-		550, 359
-		572, 449
-		584, 508
-		603, 589
-frame#00000020 has 2 splines
-	spline#1 has 4 points and score 1000
-		274, 422
-		260, 515
-		248, 581
-		235, 650
-	spline#2 has 4 points and score 1000
-		552, 365
-		568, 438
-		582, 497
-		597, 558
-frame#00000021 has 2 splines
-	spline#1 has 4 points and score 1000
-		274, 422
-		260, 515
-		248, 581
-		235, 650
-	spline#2 has 4 points and score 1000
-		552, 365
-		568, 438
-		582, 497
-		597, 558
-frame#00000022 has 2 splines
-	spline#1 has 4 points and score 1000
-		286, 357
-		267, 464
-		253, 536
-		243, 612
-	spline#2 has 4 points and score 1000
-		552, 368
-		571, 454
-		584, 513
-		600, 575
-frame#00000023 has 2 splines
-	spline#1 has 4 points and score 1000
-		284, 373
-		270, 446
-		261, 509
-		250, 574
-	spline#2 has 4 points and score 1000
-		554, 373
-		578, 478
-		590, 537
-		604, 598
-frame#00000024 has 2 splines
-	spline#1 has 4 points and score 1000
-		284, 371
-		270, 447
-		264, 493
-		256, 540
-	spline#2 has 4 points and score 1000
-		551, 361
-		576, 474
-		589, 528
-		603, 585
-frame#00000025 has 2 splines
-	spline#1 has 4 points and score 1000
-		272, 433
-		264, 493
-		252, 556
-		242, 621
-	spline#2 has 4 points and score 1000
-		553, 364
-		576, 471
-		592, 540
-		608, 613
-frame#00000026 has 2 splines
-	spline#1 has 4 points and score 1000
-		272, 433
-		264, 493
-		252, 556
-		242, 621
-	spline#2 has 4 points and score 1000
-		553, 364
-		576, 471
-		592, 540
-		608, 613
-frame#00000027 has 2 splines
-	spline#1 has 4 points and score 1000
-		285, 362
-		258, 518
-		248, 576
-		240, 636
-	spline#2 has 4 points and score 1000
-		552, 359
-		571, 446
-		588, 524
-		606, 606
-frame#00000028 has 2 splines
-	spline#1 has 4 points and score 1000
-		283, 367
-		272, 443
-		258, 517
-		245, 596
-	spline#2 has 4 points and score 1000
-		554, 369
-		575, 471
-		594, 556
-		616, 647
-frame#00000029 has 2 splines
-	spline#1 has 4 points and score 1000
-		284, 369
-		272, 442
-		262, 497
-		252, 555
-	spline#2 has 4 points and score 1000
-		551, 362
-		571, 452
-		586, 511
-		599, 571
-frame#00000030 has 2 splines
-	spline#1 has 4 points and score 1000
-		277, 408
-		261, 500
-		252, 555
-		243, 612
-	spline#2 has 4 points and score 1000
-		554, 366
-		579, 491
-		596, 561
-		614, 636
-frame#00000031 has 2 splines
-	spline#1 has 4 points and score 1000
-		280, 385
-		263, 488
-		256, 536
-		248, 584
-	spline#2 has 4 points and score 1000
-		562, 411
-		584, 513
-		598, 578
-		615, 647
-frame#00000032 has 2 splines
-	spline#1 has 4 points and score 1000
-		280, 386
-		261, 495
-		249, 571
-		237, 653
-	spline#2 has 4 points and score 1000
-		554, 368
-		564, 420
-		573, 465
-		584, 512
-frame#00000033 has 2 splines
-	spline#1 has 4 points and score 1000
-		279, 391
-		270, 462
-		256, 534
-		243, 610
-	spline#2 has 4 points and score 1000
-		555, 375
-		574, 460
-		590, 534
-		612, 630
-frame#00000034 has 2 splines
-	spline#1 has 4 points and score 1000
-		279, 397
-		255, 536
-		245, 592
-		237, 650
-	spline#2 has 4 points and score 1000
-		550, 355
-		575, 468
-		590, 547
-		612, 632
-frame#00000035 has 2 splines
-	spline#1 has 4 points and score 1000
-		278, 398
-		261, 508
-		251, 569
-		240, 635
-	spline#2 has 4 points and score 1000
-		557, 392
-		574, 463
-		588, 526
-		604, 592
-frame#00000036 has 2 splines
-	spline#1 has 4 points and score 1000
-		280, 383
-		268, 471
-		255, 542
-		242, 619
-	spline#2 has 4 points and score 1000
-		562, 410
-		582, 494
-		594, 555
-		608, 618
-frame#00000037 has 2 splines
-	spline#1 has 4 points and score 1000
-		279, 391
-		259, 511
-		247, 578
-		237, 650
-	spline#2 has 4 points and score 1000
-		551, 361
-		569, 433
-		582, 498
-		597, 566
-frame#00000038 has 2 splines
-	spline#1 has 4 points and score 1000
-		284, 355
-		265, 480
-		250, 560
-		237, 647
-	spline#2 has 4 points and score 1000
-		554, 374
-		570, 450
-		586, 513
-		601, 579
-frame#00000039 has 2 splines
-	spline#1 has 4 points and score 1000
-		285, 359
-		270, 448
-		259, 519
-		246, 594
-	spline#2 has 4 points and score 1000
-		557, 384
-		582, 506
-		596, 564
-		610, 623
-frame#00000040 has 2 splines
-	spline#1 has 4 points and score 1000
-		274, 423
-		261, 509
-		250, 579
-		236, 655
-	spline#2 has 4 points and score 1000
-		554, 367
-		575, 466
-		592, 548
-		612, 636
-frame#00000041 has 2 splines
-	spline#1 has 4 points and score 1000
-		283, 365
-		269, 455
-		259, 512
-		249, 571
-	spline#2 has 4 points and score 1000
-		550, 355
-		571, 456
-		588, 529
-		608, 607
-frame#00000042 has 2 splines
-	spline#1 has 4 points and score 1000
-		284, 373
-		266, 471
-		254, 542
-		242, 618
-	spline#2 has 4 points and score 1000
-		554, 368
-		582, 499
-		595, 557
-		610, 617
-frame#00000043 has 2 splines
-	spline#1 has 4 points and score 1000
-		280, 387
-		263, 487
-		250, 565
-		237, 647
-	spline#2 has 4 points and score 1000
-		551, 363
-		571, 444
-		588, 519
-		625, 688
-frame#00000044 has 2 splines
-	spline#1 has 4 points and score 1000
-		282, 379
-		266, 473
-		252, 549
-		241, 631
-	spline#2 has 4 points and score 1000
-		559, 392
-		576, 475
-		588, 537
-		604, 603
-frame#00000045 has 2 splines
-	spline#1 has 4 points and score 1000
-		280, 388
-		261, 504
-		252, 560
-		242, 618
-	spline#2 has 4 points and score 1000
-		552, 358
-		569, 447
-		586, 514
-		602, 584
-frame#00000046 has 2 splines
-	spline#1 has 4 points and score 1000
-		286, 355
-		262, 494
-		252, 560
-		239, 630
-	spline#2 has 4 points and score 1000
-		554, 370
-		582, 500
-		600, 577
-		618, 659
-frame#00000047 has 2 splines
-	spline#1 has 4 points and score 1000
-		285, 364
-		267, 462
-		255, 528
-		246, 598
-	spline#2 has 4 points and score 1000
-		552, 369
-		578, 480
-		592, 543
-		608, 610
-frame#00000048 has 2 splines
-	spline#1 has 4 points and score 1000
-		279, 392
-		265, 478
-		256, 539
-		244, 603
-	spline#2 has 4 points and score 1000
-		552, 358
-		573, 462
-		588, 527
-		604, 597
-frame#00000049 has 2 splines
-	spline#1 has 4 points and score 1000
-		286, 358
-		271, 441
-		258, 517
-		246, 598
-	spline#2 has 4 points and score 1000
-		557, 386
-		569, 445
-		582, 499
-		595, 555
-frame#00000050 has 2 splines
-	spline#1 has 4 points and score 1000
-		286, 358
-		271, 441
-		258, 517
-		246, 598
-	spline#2 has 4 points and score 1000
-		557, 386
-		569, 445
-		582, 499
-		595, 555
-frame#00000051 has 2 splines
-	spline#1 has 4 points and score 1000
-		272, 426
-		260, 515
-		248, 583
-		237, 654
-	spline#2 has 4 points and score 1000
-		552, 361
-		568, 436
-		578, 479
-		608, 616
-frame#00000052 has 2 splines
-	spline#1 has 4 points and score 1000
-		284, 371
-		270, 447
-		258, 516
-		247, 589
-	spline#2 has 4 points and score 1000
-		555, 381
-		582, 497
-		599, 574
-		621, 675
-frame#00000053 has 2 splines
-	spline#1 has 4 points and score 1000
-		284, 355
-		275, 428
-		263, 497
-		251, 569
-	spline#2 has 4 points and score 1000
-		553, 365
-		575, 476
-		594, 553
-		614, 637
-frame#00000054 has 2 splines
-	spline#1 has 4 points and score 1000
-		283, 370
-		263, 485
-		247, 576
-		233, 674
-	spline#2 has 4 points and score 1000
-		550, 359
-		588, 528
-		602, 587
-		616, 649
-frame#00000055 has 2 splines
-	spline#1 has 4 points and score 1000
-		284, 360
-		266, 475
-		255, 548
-		241, 626
-	spline#2 has 4 points and score 1000
-		551, 360
-		573, 458
-		588, 527
-		620, 665
-frame#00000056 has 2 splines
-	spline#1 has 4 points and score 1000
-		278, 406
-		263, 490
-		253, 548
-		243, 608
-	spline#2 has 4 points and score 1000
-		554, 379
-		582, 504
-		598, 570
-		614, 639
-frame#00000057 has 2 splines
-	spline#1 has 4 points and score 1000
-		283, 373
-		262, 499
-		252, 559
-		240, 623
-	spline#2 has 4 points and score 1000
-		557, 388
-		578, 476
-		595, 556
-		614, 641
-frame#00000058 has 2 splines
-	spline#1 has 4 points and score 1000
-		272, 429
-		255, 543
-		246, 599
-		235, 657
-	spline#2 has 4 points and score 1000
-		559, 389
-		576, 475
-		594, 559
-		615, 649
-frame#00000059 has 2 splines
-	spline#1 has 4 points and score 1000
-		284, 362
-		264, 492
-		253, 567
-		237, 647
-	spline#2 has 4 points and score 1000
-		555, 375
-		573, 457
-		587, 518
-		601, 582
-frame#00000060 has 2 splines
-	spline#1 has 4 points and score 1000
-		276, 409
-		263, 499
-		250, 566
-		238, 637
-	spline#2 has 4 points and score 1000
-		559, 397
-		586, 514
-		600, 578
-		616, 646
-frame#00000061 has 2 splines
-	spline#1 has 4 points and score 1000
-		281, 376
-		266, 470
-		258, 531
-		246, 596
-	spline#2 has 4 points and score 1000
-		554, 366
-		571, 452
-		584, 511
-		598, 571
-frame#00000062 has 2 splines
-	spline#1 has 4 points and score 1000
-		275, 419
-		263, 499
-		249, 575
-		236, 655
-	spline#2 has 4 points and score 1000
-		555, 380
-		574, 463
-		590, 537
-		608, 616
-frame#00000063 has 2 splines
-	spline#1 has 4 points and score 1000
-		286, 356
-		270, 453
-		261, 505
-		252, 559
-	spline#2 has 4 points and score 1000
-		556, 384
-		579, 492
-		592, 548
-		607, 606
-frame#00000064 has 2 splines
-	spline#1 has 4 points and score 1000
-		283, 369
-		266, 475
-		255, 529
-		247, 585
-	spline#2 has 4 points and score 1000
-		560, 403
-		586, 520
-		598, 575
-		612, 631
-frame#00000065 has 2 splines
-	spline#1 has 4 points and score 1000
-		284, 359
-		269, 455
-		256, 535
-		242, 620
-	spline#2 has 4 points and score 1000
-		554, 371
-		580, 497
-		596, 562
-		612, 631
-frame#00000066 has 2 splines
-	spline#1 has 4 points and score 1000
-		281, 378
-		268, 468
-		256, 536
-		243, 608
-	spline#2 has 4 points and score 1000
-		554, 375
-		578, 471
-		594, 550
-		612, 635
-frame#00000067 has 2 splines
-	spline#1 has 4 points and score 1000
-		278, 398
-		262, 495
-		251, 569
-		237, 648
-	spline#2 has 4 points and score 1000
-		554, 374
-		569, 436
-		580, 490
-		592, 545
-frame#00000068 has 2 splines
-	spline#1 has 4 points and score 1000
-		279, 396
-		267, 466
-		259, 520
-		250, 578
-	spline#2 has 4 points and score 1000
-		551, 360
-		582, 502
-		596, 566
-		612, 632
-frame#00000069 has 2 splines
-	spline#1 has 4 points and score 1000
-		283, 366
-		270, 453
-		259, 523
-		246, 597
-	spline#2 has 4 points and score 1000
-		552, 362
-		582, 496
-		592, 545
-		604, 594
-frame#00000070 has 2 splines
-	spline#1 has 4 points and score 1000
-		280, 395
-		259, 510
-		249, 571
-		239, 636
-	spline#2 has 4 points and score 1000
-		552, 372
-		580, 486
-		599, 570
-		620, 660
-frame#00000071 has 2 splines
-	spline#1 has 4 points and score 1000
-		284, 356
-		272, 443
-		258, 517
-		245, 596
-	spline#2 has 4 points and score 1000
-		554, 372
-		568, 448
-		584, 519
-		604, 596
-frame#00000072 has 2 splines
-	spline#1 has 4 points and score 1000
-		280, 386
-		263, 483
-		254, 545
-		243, 608
-	spline#2 has 4 points and score 1000
-		554, 371
-		575, 466
-		590, 536
-		606, 610
-frame#00000073 has 2 splines
-	spline#1 has 4 points and score 1000
-		284, 357
-		263, 497
-		250, 574
-		236, 657
-	spline#2 has 4 points and score 1000
-		559, 402
-		582, 506
-		600, 575
-		616, 647
-frame#00000074 has 2 splines
-	spline#1 has 4 points and score 1000
-		276, 404
-		252, 555
-		243, 612
-		234, 673
-	spline#2 has 4 points and score 1000
-		559, 399
-		575, 464
-		586, 517
-		599, 574
-frame#00000075 has 2 splines
-	spline#1 has 4 points and score 1000
-		284, 363
-		269, 447
-		259, 513
-		248, 583
-	spline#2 has 4 points and score 1000
-		567, 434
-		586, 518
-		598, 576
-		612, 637
-frame#00000076 has 2 splines
-	spline#1 has 4 points and score 1000
-		284, 361
-		274, 423
-		263, 488
-		251, 557
-	spline#2 has 4 points and score 1000
-		554, 378
-		576, 475
-		591, 538
-		607, 605
-frame#00000077 has 2 splines
-	spline#1 has 4 points and score 1000
-		285, 366
-		271, 436
-		262, 498
-		251, 564
-	spline#2 has 4 points and score 1000
-		557, 387
-		575, 473
-		591, 537
-		607, 604
-frame#00000078 has 2 splines
-	spline#1 has 4 points and score 1000
-		285, 359
-		272, 441
-		262, 509
-		250, 579
-	spline#2 has 4 points and score 1000
-		562, 415
-		589, 528
-		602, 587
-		616, 649
-frame#00000079 has 2 splines
-	spline#1 has 4 points and score 1000
-		277, 401
-		264, 490
-		256, 538
-		247, 589
-	spline#2 has 4 points and score 1000
-		555, 375
-		580, 494
-		596, 562
-		614, 635
-frame#00000080 has 2 splines
-	spline#1 has 4 points and score 1000
-		277, 401
-		264, 490
-		256, 538
-		247, 589
-	spline#2 has 4 points and score 1000
-		555, 375
-		580, 494
-		596, 562
-		614, 635
-frame#00000081 has 2 splines
-	spline#1 has 4 points and score 1000
-		281, 378
-		270, 451
-		256, 524
-		244, 600
-	spline#2 has 4 points and score 1000
-		560, 400
-		578, 482
-		594, 549
-		610, 619
-frame#00000082 has 2 splines
-	spline#1 has 4 points and score 1000
-		276, 404
-		264, 486
-		252, 560
-		238, 638
-	spline#2 has 4 points and score 1000
-		552, 358
-		566, 427
-		580, 493
-		597, 562
-frame#00000083 has 2 splines
-	spline#1 has 4 points and score 1000
-		286, 356
-		269, 446
-		260, 511
-		250, 579
-	spline#2 has 4 points and score 1000
-		557, 386
-		580, 488
-		594, 549
-		608, 612
-frame#00000084 has 2 splines
-	spline#1 has 4 points and score 1000
-		285, 359
-		266, 473
-		248, 565
-		234, 664
-	spline#2 has 4 points and score 1000
-		551, 360
-		576, 475
-		588, 530
-		602, 589
-frame#00000085 has 2 splines
-	spline#1 has 4 points and score 1000
-		275, 417
-		263, 499
-		249, 574
-		235, 654
-	spline#2 has 4 points and score 1000
-		554, 374
-		573, 455
-		586, 520
-		602, 590
-frame#00000086 has 2 splines
-	spline#1 has 4 points and score 1000
-		283, 370
-		270, 451
-		260, 510
-		251, 570
-	spline#2 has 4 points and score 1000
-		552, 358
-		564, 426
-		580, 486
-		595, 550
-frame#00000087 has 2 splines
-	spline#1 has 4 points and score 1000
-		283, 370
-		270, 451
-		260, 510
-		251, 570
-	spline#2 has 4 points and score 1000
-		552, 358
-		564, 426
-		580, 486
-		595, 550
-frame#00000088 has 2 splines
-	spline#1 has 4 points and score 1000
-		277, 402
-		263, 486
-		252, 555
-		241, 626
-	spline#2 has 4 points and score 1000
-		550, 359
-		567, 427
-		580, 485
-		593, 546
-frame#00000089 has 2 splines
-	spline#1 has 4 points and score 1000
-		285, 360
-		271, 442
-		260, 510
-		250, 581
-	spline#2 has 4 points and score 1000
-		555, 380
-		571, 451
-		586, 513
-		600, 577
-frame#00000090 has 2 splines
-	spline#1 has 4 points and score 1000
-		283, 368
-		269, 458
-		260, 513
-		249, 570
-	spline#2 has 4 points and score 1000
-		556, 383
-		569, 444
-		582, 501
-		596, 560
-frame#00000091 has 2 splines
-	spline#1 has 4 points and score 1000
-		284, 363
-		266, 472
-		254, 545
-		242, 621
-	spline#2 has 4 points and score 1000
-		550, 355
-		568, 436
-		579, 492
-		592, 549
-frame#00000092 has 2 splines
-	spline#1 has 4 points and score 1000
-		275, 416
-		262, 508
-		247, 585
-		235, 668
-	spline#2 has 4 points and score 1000
-		554, 377
-		569, 439
-		582, 499
-		596, 561
-frame#00000093 has 2 splines
-	spline#1 has 4 points and score 1000
-		280, 381
-		269, 463
-		260, 512
-		252, 562
-	spline#2 has 4 points and score 1000
-		552, 364
-		573, 457
-		588, 526
-		604, 598
-frame#00000094 has 2 splines
-	spline#1 has 4 points and score 1000
-		280, 381
-		269, 463
-		260, 512
-		252, 562
-	spline#2 has 4 points and score 1000
-		552, 364
-		573, 457
-		588, 526
-		604, 598
-frame#00000095 has 2 splines
-	spline#1 has 4 points and score 1000
-		285, 360
-		269, 447
-		257, 530
-		242, 619
-	spline#2 has 4 points and score 1000
-		550, 357
-		574, 458
-		590, 541
-		625, 683
-frame#00000096 has 2 splines
-	spline#1 has 4 points and score 1000
-		275, 416
-		262, 499
-		254, 558
-		242, 620
-	spline#2 has 4 points and score 1000
-		554, 368
-		571, 448
-		586, 517
-		602, 590
-frame#00000097 has 2 splines
-	spline#1 has 4 points and score 1000
-		285, 361
-		261, 500
-		253, 552
-		243, 607
-	spline#2 has 4 points and score 1000
-		561, 409
-		588, 523
-		601, 583
-		614, 646
-frame#00000098 has 2 splines
-	spline#1 has 4 points and score 1000
-		281, 390
-		255, 534
-		247, 585
-		238, 639
-	spline#2 has 4 points and score 1000
-		554, 369
-		573, 451
-		588, 527
-		606, 607
-frame#00000099 has 2 splines
-	spline#1 has 4 points and score 1000
-		280, 379
-		270, 453
-		255, 532
-		242, 617
-	spline#2 has 4 points and score 1000
-		549, 355
-		571, 449
-		586, 515
-		602, 585
-frame#00000100 has 2 splines
-	spline#1 has 4 points and score 1000
-		277, 412
-		253, 547
-		244, 604
-		234, 663
-	spline#2 has 4 points and score 1000
-		554, 379
-		576, 472
-		592, 541
-		608, 614
-frame#00000101 has 2 splines
-	spline#1 has 4 points and score 1000
-		277, 416
-		261, 502
-		252, 561
-		242, 623
-	spline#2 has 4 points and score 1000
-		550, 358
-		573, 462
-		593, 545
-		614, 633
-frame#00000102 has 2 splines
-	spline#1 has 4 points and score 1000
-		286, 355
-		265, 481
-		257, 531
-		248, 584
-	spline#2 has 4 points and score 1000
-		559, 389
-		575, 467
-		586, 523
-		600, 581
-frame#00000103 has 2 splines
-	spline#1 has 4 points and score 1000
-		285, 359
-		268, 465
-		257, 526
-		247, 591
-	spline#2 has 4 points and score 1000
-		550, 358
-		584, 514
-		600, 579
-		616, 648
-frame#00000104 has 2 splines
-	spline#1 has 4 points and score 1000
-		285, 359
-		268, 454
-		258, 532
-		244, 616
-	spline#2 has 4 points and score 1000
-		552, 372
-		570, 449
-		588, 524
-		607, 604
-frame#00000105 has 2 splines
-	spline#1 has 4 points and score 1000
-		285, 359
-		268, 454
-		258, 532
-		244, 616
-	spline#2 has 4 points and score 1000
-		552, 372
-		570, 449
-		588, 524
-		607, 604
-frame#00000106 has 2 splines
-	spline#1 has 4 points and score 1000
-		285, 359
-		268, 454
-		258, 532
-		244, 616
-	spline#2 has 4 points and score 1000
-		552, 372
-		570, 449
-		588, 524
-		607, 604
-frame#00000107 has 2 splines
-	spline#1 has 4 points and score 1000
-		285, 359
-		268, 454
-		258, 532
-		244, 616
-	spline#2 has 4 points and score 1000
-		552, 372
-		570, 450
-		589, 527
-		623, 684
-frame#00000108 has 2 splines
-	spline#1 has 4 points and score 1000
-		283, 370
-		274, 429
-		263, 488
-		253, 550
-	spline#2 has 4 points and score 1000
-		617, 389
-		641, 470
-		659, 527
-		678, 586
-frame#00000109 has 2 splines
-	spline#1 has 4 points and score 1000
-		286, 358
-		266, 470
-		257, 526
-		248, 584
-	spline#2 has 4 points and score 1000
-		608, 363
-		628, 423
-		641, 465
-		653, 506
-frame#00000110 has 2 splines
-	spline#1 has 4 points and score 1000
-		282, 375
-		268, 457
-		257, 527
-		246, 600
-	spline#2 has 4 points and score 1000
-		608, 364
-		639, 458
-		657, 513
-		675, 570
-frame#00000111 has 2 splines
-	spline#1 has 4 points and score 1000
-		283, 364
-		265, 480
-		253, 547
-		242, 617
-	spline#2 has 4 points and score 1000
-		615, 384
-		657, 516
-		673, 567
-		689, 620
-frame#00000112 has 2 splines
-	spline#1 has 4 points and score 1000
-		280, 380
-		266, 472
-		255, 545
-		242, 621
-	spline#2 has 4 points and score 1000
-		606, 358
-		653, 502
-		667, 547
-		709, 678
-frame#00000113 has 2 splines
-	spline#1 has 4 points and score 1000
-		274, 421
-		253, 551
-		246, 603
-		235, 657
-	spline#2 has 4 points and score 1000
-		608, 363
-		633, 439
-		649, 492
-		667, 546
-frame#00000114 has 2 splines
-	spline#1 has 4 points and score 1000
-		284, 356
-		264, 474
-		253, 551
-		239, 635
-	spline#2 has 4 points and score 1000
-		608, 363
-		641, 468
-		659, 525
-		678, 585
-frame#00000115 has 2 splines
-	spline#1 has 4 points and score 1000
-		278, 398
-		265, 479
-		254, 542
-		243, 608
-	spline#2 has 4 points and score 1000
-		620, 399
-		647, 482
-		670, 561
-		696, 646
-frame#00000116 has 2 splines
-	spline#1 has 4 points and score 1000
-		284, 358
-		263, 496
-		254, 558
-		242, 623
-	spline#2 has 4 points and score 1000
-		613, 382
-		637, 458
-		663, 536
-		689, 618
-frame#00000117 has 2 splines
-	spline#1 has 4 points and score 1000
-		286, 357
-		272, 447
-		260, 513
-		248, 583
-	spline#2 has 4 points and score 1000
-		607, 356
-		647, 485
-		667, 551
-		691, 621
-frame#00000118 has 2 splines
-	spline#1 has 4 points and score 1000
-		286, 356
-		274, 442
-		256, 537
-		238, 639
-	spline#2 has 4 points and score 1000
-		619, 400
-		650, 492
-		667, 543
-		684, 598
-frame#00000119 has 2 splines
-	spline#1 has 4 points and score 1000
-		285, 362
-		269, 449
-		258, 515
-		248, 584
-	spline#2 has 4 points and score 1000
-		613, 379
-		637, 454
-		657, 516
-		676, 581
-frame#00000120 has 2 splines
-	spline#1 has 4 points and score 1000
-		284, 369
-		271, 441
-		260, 498
-		252, 557
-	spline#2 has 4 points and score 1000
-		619, 397
-		639, 465
-		662, 529
-		684, 597
-frame#00000121 has 2 splines
-	spline#1 has 4 points and score 1000
-		281, 385
-		266, 470
-		258, 523
-		248, 577
-	spline#2 has 4 points and score 1000
-		610, 368
-		647, 485
-		663, 534
-		678, 584
-frame#00000122 has 2 splines
-	spline#1 has 4 points and score 1000
-		282, 378
-		269, 455
-		261, 505
-		252, 558
-	spline#2 has 4 points and score 1000
-		606, 358
-		635, 449
-		657, 520
-		681, 596
-frame#00000123 has 2 splines
-	spline#1 has 4 points and score 1000
-		279, 392
-		262, 495
-		249, 569
-		237, 648
-	spline#2 has 4 points and score 1000
-		620, 398
-		647, 482
-		671, 561
-		698, 646
-frame#00000124 has 2 splines
-	spline#1 has 4 points and score 1000
-		280, 382
-		272, 444
-		260, 510
-		248, 579
-	spline#2 has 4 points and score 1000
-		609, 364
-		641, 468
-		661, 526
-		681, 586
-frame#00000125 has 2 splines
-	spline#1 has 4 points and score 1000
-		270, 450
-		258, 520
-		248, 577
-		238, 637
+		252, 538
+		244, 594
 	spline#2 has 4 points and score 1000
 		608, 362
-		639, 457
-		659, 520
-		678, 586
-frame#00000126 has 2 splines
+		634, 448
+		657, 526
+		684, 608
+frame#00000006 has 2 splines
 	spline#1 has 4 points and score 1000
-		277, 400
-		266, 473
-		256, 536
-		246, 603
+		275, 410
+		258, 504
+		247, 566
+		238, 630
 	spline#2 has 4 points and score 1000
-		606, 358
+		608, 368
+		637, 460
+		656, 516
+		675, 576
+frame#00000007 has 2 splines
+	spline#1 has 4 points and score 1000
+		275, 410
+		258, 504
+		247, 566
+		238, 630
+	spline#2 has 4 points and score 1000
+		608, 368
+		637, 460
+		656, 516
+		675, 576
+frame#00000008 has 2 splines
+	spline#1 has 4 points and score 1000
+		279, 390
+		263, 479
+		254, 548
+		241, 620
+	spline#2 has 4 points and score 1000
+		606, 364
+		643, 478
+		663, 541
+		684, 607
+frame#00000009 has 2 splines
+	spline#1 has 4 points and score 1000
+		279, 390
+		263, 479
+		254, 548
+		241, 620
+	spline#2 has 4 points and score 1000
+		606, 364
+		643, 478
+		663, 541
+		684, 607
+frame#00000010 has 2 splines
+	spline#1 has 4 points and score 1000
+		279, 390
+		263, 479
+		254, 548
+		241, 620
+	spline#2 has 4 points and score 1000
+		606, 364
+		643, 478
+		663, 541
+		684, 607
+frame#00000011 has 2 splines
+	spline#1 has 4 points and score 1000
+		281, 372
+		264, 470
+		256, 524
+		248, 579
+	spline#2 has 4 points and score 1000
+		613, 380
+		651, 503
+		666, 555
+		684, 607
+frame#00000012 has 2 splines
+	spline#1 has 4 points and score 1000
+		281, 371
+		267, 463
+		254, 542
+		240, 629
+	spline#2 has 4 points and score 1000
+		631, 437
+		659, 524
+		681, 600
+		710, 689
+frame#00000013 has 2 splines
+	spline#1 has 4 points and score 1000
+		285, 360
+		269, 443
+		257, 516
+		245, 594
+	spline#2 has 4 points and score 1000
+		632, 438
+		663, 536
+		680, 592
+		700, 652
+frame#00000014 has 2 splines
+	spline#1 has 4 points and score 1000
+		273, 433
+		262, 498
+		253, 549
+		244, 601
+	spline#2 has 4 points and score 1000
+		608, 361
 		649, 487
-		665, 537
-		680, 587
-frame#00000127 has 2 splines
+		667, 547
+		688, 608
+frame#00000015 has 2 splines
 	spline#1 has 4 points and score 1000
-		280, 394
-		264, 488
-		253, 560
-		239, 636
+		284, 357
+		263, 490
+		253, 549
+		243, 612
 	spline#2 has 4 points and score 1000
-		617, 387
-		655, 506
-		675, 569
-		697, 636
-frame#00000128 has 2 splines
+		608, 362
+		641, 470
+		661, 528
+		680, 589
+frame#00000016 has 2 splines
 	spline#1 has 4 points and score 1000
-		281, 390
-		267, 476
+		283, 370
+		268, 467
+		256, 537
+		243, 611
+	spline#2 has 4 points and score 1000
+		619, 398
+		649, 492
+		667, 547
+		684, 604
+frame#00000017 has 2 splines
+	spline#1 has 4 points and score 1000
+		282, 380
+		265, 478
+		255, 532
+		245, 590
+	spline#2 has 4 points and score 1000
+		605, 355
+		634, 446
+		659, 526
+		687, 611
+frame#00000018 has 2 splines
+	spline#1 has 4 points and score 1000
+		276, 406
+		263, 483
+		255, 548
+		242, 617
+	spline#2 has 4 points and score 1000
+		609, 364
+		645, 478
+		663, 534
+		682, 592
+frame#00000019 has 2 splines
+	spline#1 has 4 points and scframe#00000021 has 2 splines
+	spline#1 has 4 points and score 1000
+		229, 359
+		243, 599
+		238, 630
+		229, 685
+	spline#2 has 4 points aframe#00000020 has 2 splines
+	spline#1 has 4 points and scframe#00000022 has 2 splines
+	spline#1 has 4 points and score 1000
+		229, 359
+		243, 599
+		238, 630
+		229, 685
+	spline#2 has 4 points aframe#00000021 has 2 splines
+	spline#1 has 4 points and scframe#00000023 has 2 splines
+	spline#1 has 4 points and score 1000
+		229, 359
+		243, 599
+		238, 630
+		229, 685
+	spline#2 has 4 points aframe#00000022 has 2 splines
+	spline#1 has 4 points and scframe#00000024 has 2 splines
+	spline#1 has 4 points and score 1000
+		229, 359
+		243, 599
+		238, 630
+		229, 685
+	spline#2 has 4 points aframe#00000023 has 2 splines
+	spline#1 has 4 points and score 1000
+		284, 357
+		268, 467
+		257, 530
+		245, 597
+	spline#2 has 4 points and score 1000
+		608, 361
+		649, 490
+		667, 550
+		687, 613
+frame#00000024 has 2 splines
+	spline#1 has 4 points and score 1000
+		273, 421
+		261, 508
+		246, 583
+		234, 663
+	spline#2 has 4 points and score 1000
+		613, 376
+		631, 437
+		645, 481
+		659, 526
+frame#00000025 has 2 splines
+	spline#1 has 4 points and scframe#00000027 has 2 splines
+	spline#1 has 4 points and score 1000
+		284, 366
+		261, 503
+		254, 548
+		244, 593
+	spline#2 has 4 points aframe#00000026 has 2 splines
+	spline#1 has 4 points and scframe#00000028 has 2 splines
+	spline#1 has 4 points and score 1000
+		281, 371
+		269, 449
+		253, 534
+		238, 625
+	spline#2 has 4 points aframe#00000027 has 2 splines
+	spline#1 has 4 points and scframe#00000029 has 2 splines
+	spline#1 has 4 points and score 1000
+		277, 395
+		263, 481
+		254, 546
+		242, 613
+	spline#2 has 4 points aframe#00000028 has 2 splines
+	spline#1 has 4 points and scframe#00000030 has 2 splines
+	spline#1 has 4 points and score 1000
+		285, 356
+		268, 451
+		257, 518
+		244, 590
+	spline#2 has 4 points aframe#00000029 has 2 splines
+	spline#1 has 4 points and scframe#00000031 has 2 splines
+	spline#1 has 4 points and score 1000
+		285, 356
+		268, 451
+		257, 518
+		244, 590
+	spline#2 has 4 points aframe#00000030 has 2 splines
+	spline#1 has 4 points and scframe#00000032 has 2 splines
+	spline#1 has 4 points and score 1000
+		229, 360
+		222, 377
+		221, 388
+		230, 680
+	spline#2 has 4 points aframe#00000031 has 2 splines
+	spline#1 has 4 points and score 1000
+		274, 426
+		263, 488
+		255, 535
+		248, 582
+	spline#2 has 4 points and score 1000
+		630, 432
+		655, 510
+		669, 552
+		703, 663
+frame#00000032 has 2 splines
+	spline#1 has 4 points and score 1000
+		283, 364
+		266, 477
+		256, 532
+		247, 591
+	spline#2 has 4 points and score 1000
+		621, 404
+		651, 496
+		669, 557
+		689, 621
+frame#00000033 has 2 splines
+	spline#1 has 4 points and score 1000
+		280, 385
+		269, 458
+		255, 532
+		241, 611
+	spline#2 has 4 points and score 1000
+		608, 357
+		633, 441
+		649, 493
+		665, 546
+frame#00000034 has 2 splines
+	spline#1 has 4 points and score 1000
+		283, 364
+		266, 477
 		256, 540
-		243, 607
-	spline#2 has 4 points and score 1000
-		612, 377
-		637, 450
-		659, 519
-		680, 593
-frame#00000129 has 2 splines
-	spline#1 has 4 points and score 1000
-		279, 395
-		267, 474
-		254, 538
 		244, 606
 	spline#2 has 4 points and score 1000
-		606, 358
-		645, 478
-		661, 534
-		679, 591
-frame#00000130 has 2 splines
+		611, 372
+		649, 487
+		671, 557
+		695, 630
+frame#00000035 has 2 splines
 	spline#1 has 4 points and score 1000
-		285, 365
-		265, 482
-		254, 551
+		284, 356
+		262, 492
+		253, 547
+		244, 604
+	spline#2 has 4 points and score 1000
+		631, 437
+		663, 536
+		680, 592
+		700, 650
+frame#00000036 has 2 splines
+	spline#1 has 4 points and score 1000
+		271, 440
+		258, 520
+		248, 582
+		237, 646
+	spline#2 has 4 points and score 1000
+		606, 355
+		637, 454
+		657, 515
+		676, 579
+frame#00000037 has 2 splines
+	spline#1 has 4 points and score 1000
+		272, 430
+		262, 498
+		254, 540
+		236, 658
+	spline#2 has 4 points and score 1000
+		617, 388
+		642, 476
+		672, 565
+		704, 660
+frame#00000038 has 2 splines
+	spline#1 has 4 points and score 1000
+		282, 380
+		266, 460
+		255, 529
+		244, 603
+	spline#2 has 4 points and score 1000
+		606, 358
+		649, 492
+		675, 569
+		700, 652
+frame#00000039 has 2 splines
+	spline#1 has 4 points and score 1000
+		284, 358
+		262, 497
+		255, 547
+		246, 599
+	spline#2 has 4 points and score 1000
+		613, 380
+		643, 470
+		663, 534
+		683, 600
+frame#00000040 has 2 splines
+	spline#1 has 4 points and score 1000
+		282, 379
+		259, 508
+		250, 565
 		242, 624
 	spline#2 has 4 points and score 1000
-		626, 419
-		657, 522
-		676, 576
-		693, 632
-frame#00000131 has 2 splines
+		621, 407
+		657, 516
+		672, 566
+		687, 617
+frame#00000041 has 2 splines
 	spline#1 has 4 points and score 1000
-		281, 385
-		265, 468
+		285, 367
+		269, 458
+		259, 510
+		250, 562
+	spline#2 has 4 points and score 1000
+		617, 392
+		655, 506
+		673, 566
+		691, 627
+frame#00000042 has 2 splines
+	spline#1 has 4 points and score 1000
+		284, 356
+		269, 462
+		255, 549
+		238, 643
+	spline#2 has 4 points and score 1000
+		619, 400
+		647, 483
+		670, 562
+		697, 648
+frame#00000043 has 2 splines
+	spline#1 has 4 points and score 1000
+		285, 363
+		266, 476
+		255, 530
+		246, 586
+	spline#2 has 4 points and score 1000
+		617, 395
+		647, 488
+		664, 543
+		681, 600
+frame#00000044 has 2 splines
+	spline#1 has 4 points and score 1000
+		283, 365
+		267, 467
 		257, 526
 		247, 587
 	spline#2 has 4 points and score 1000
-		615, 385
-		644, 471
-		667, 550
-		694, 635
-frame#00000132 has 2 splines
-	spline#1 has 4 points and score 1000
-		285, 364
-		265, 478
-		256, 536
-		246, 596
-	spline#2 has 4 points and score 1000
-		611, 369
-		634, 445
-		653, 505
-		674, 569
-frame#00000133 has 2 splines
-	spline#1 has 4 points and score 1000
-		284, 361
-		266, 469
-		260, 512
-		252, 556
-	spline#2 has 4 points and score 1000
-		609, 363
-		655, 512
-		674, 571
-		694, 635
-frame#00000134 has 2 splines
-	spline#1 has 4 points and score 1000
-		284, 362
-		269, 454
-		254, 537
-		240, 625
-	spline#2 has 4 points and score 1000
-		618, 392
-		645, 485
-		671, 564
-		698, 647
-frame#00000135 has 2 splines
-	spline#1 has 4 points and score 1000
-		284, 370
-		268, 465
-		257, 528
-		246, 594
-	spline#2 has 4 points and score 1000
-		608, 359
-		649, 488
-		665, 545
-		684, 603
-frame#00000136 has 2 splines
-	spline#1 has 4 points and score 1000
-		285, 367
-		258, 520
-		246, 581
-		238, 643
-	spline#2 has 4 points and score 1000
-		615, 382
-		649, 491
-		663, 536
-		700, 647
-frame#00000137 has 2 splines
-	spline#1 has 4 points and score 1000
-		284, 358
-		271, 436
-		262, 493
-		253, 551
-	spline#2 has 4 points and score 1000
-		612, 376
-		639, 454
-		657, 513
-		676, 575
-frame#00000138 has 2 splines
-	spline#1 has 4 points and score 1000
-		285, 365
-		273, 435
-		263, 490
-		253, 546
-	spline#2 has 4 points and score 1000
-		615, 389
-		657, 514
-		680, 590
-		705, 670
-frame#00000139 has 2 splines
-	spline#1 has 4 points and score 1000
-		284, 359
-		269, 449
-		257, 524
-		244, 604
-	spline#2 has 4 points and score 1000
-		610, 369
-		633, 435
-		654, 502
-		675, 573
-frame#00000140 has 2 splines
-	spline#1 has 4 points and score 1000
-		280, 381
-		262, 496
-		250, 562
-		239, 632
-	spline#2 has 4 points and score 1000
-		616, 385
-		637, 456
-		653, 512
-		672, 569
-frame#00000141 has 2 splines
-	spline#1 has 4 points and score 1000
-		280, 383
-		266, 475
-		254, 543
-		242, 617
-	spline#2 has 4 points and score 1000
-		624, 412
-		653, 502
-		668, 553
-		685, 606
-frame#00000142 has 2 splines
-	spline#1 has 4 points and score 1000
-		285, 362
-		269, 446
-		257, 524
-		243, 607
-	spline#2 has 4 points and score 1000
-		608, 360
-		639, 463
-		653, 501
-		702, 652
-frame#00000143 has 2 splines
-	spline#1 has 4 points and score 1000
-		286, 358
-		266, 470
-		254, 550
-		239, 636
-	spline#2 has 4 points and score 1000
-		608, 364
-		635, 449
-		656, 512
-		676, 577
-frame#00000144 has 2 splines
-	spline#1 has 4 points and score 1000
-		286, 358
-		266, 470
-		254, 550
-		239, 636
-	spline#2 has 4 points and score 1000
-		608, 364
-		635, 449
-		656, 512
-		676, 577
-frame#00000145 has 2 splines
-	spline#1 has 4 points and score 1000
-		279, 396
-		266, 473
-		257, 531
-		247, 593
-	spline#2 has 4 points and score 1000
 		613, 375
-		647, 484
-		671, 557
-		695, 635
-frame#00000146 has 2 splines
-	spline#1 has 4 points and score 1000
-		275, 414
-		257, 531
-		245, 590
-		235, 652
-	spline#2 has 4 points and score 1000
-		606, 355
-		637, 452
-		655, 509
-		672, 567
-frame#00000147 has 2 splines
-	spline#1 has 4 points and score 1000
-		283, 366
-		271, 437
-		263, 490
-		254, 543
-	spline#2 has 4 points and score 1000
-		611, 372
-		635, 442
-		655, 509
-		674, 578
-frame#00000148 has 2 splines
-	spline#1 has 4 points and score 1000
-		282, 382
-		265, 470
-		256, 526
-		247, 585
-	spline#2 has 4 points and score 1000
-		608, 362
-		637, 449
-		659, 522
-		682, 598
-frame#00000149 has 2 splines
-	spline#1 has 4 points and score 1000
-		284, 371
-		270, 452
-		261, 503
-		252, 556
-	spline#2 has 4 points and score 1000
-		606, 359
-		649, 488
-		671, 561
-		696, 638
-
-		261, 502
-		245, 583
-		233, 670
-	spline#2 has 4 points and score 1000
-		616, 388
-		640, 467
-		657, 523
-		675, 581
-frame#00000154 has 2 splines
-	spline#1 has 4 points and score 1000
-		284, 362
-		263, 484
-		254, 545
-		242, 607
-	spline#2 has 4 points and score 1000
-		608, 359
-		642, 472
-		666, 548
-		693, 630
-frame#00000155 has 2 splines
-	spline#1 has 4 points and score 1000
-		284, 362
-		263, 484
-		254, 545
-		242, 607
-	spline#2 has 4 points and score 1000
-		608, 359
-		642, 472
-		666, 548
-		693, 630
-frame#00000156 has 2 splines
-	spline#1 has 4 points and score 1000
-		283, 359
-		265, 487
-		253, 552
-		241, 621
-	spline#2 has 4 points and score 1000
-		611, 375
-		639, 461
-		660, 529
-		684, 603
-frame#00000157 has 2 splines
-	spline#1 has 4 points and score 1000
-		279, 390
-		258, 508
-		249, 571
-		236, 639
-	spline#2 has 4 points and score 1000
-		606, 360
-		635, 452
-		657, 525
-		684, 603
-frame#00000158 has 2 splines
-	spline#1 has 4 points and score 1000
-		279, 390
-		258, 508
-		249, 571
-		236, 639
-	spline#2 has 4 points and score 1000
-		606, 360
-		635, 452
-		657, 525
-		684, 603
-frame#00000159 has 2 splines
-	spline#1 has 4 points and score 1000
-		270, 434
-		256, 522
-		248, 579
-		239, 639
-	spline#2 has 4 points and score 1000
-		608, 364
-		659, 523
-		678, 584
-		699, 648
-frame#00000160 has 2 splines
-	spline#1 has 4 points and score 1000
-		270, 434
-		256, 522
-		248, 579
-		239, 639
-	spline#2 has 4 points and score 1000
-		608, 364
-		659, 523
-		678, 584
-		699, 648
-frame#00000161 has 2 splines
-	spline#1 has 4 points and score 1000
-		270, 434
-		256, 522
-		248, 579
-		239, 639
-	spline#2 has 4 points and score 1000
-		608, 364
-		659, 523
-		678, 584
-		699, 648
-frame#00000162 has 2 splines
-	spline#1 has 4 points and score 1000
-		270, 434
-		256, 522
-		248, 579
-		239, 639
-	spline#2 has 4 points and score 1000
-		608, 364
-		659, 523
-		678, 584
-		699, 648
+		639, 458
+		660, 523
+		682, 590

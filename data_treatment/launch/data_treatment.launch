@@ -20,8 +20,6 @@
         <remap from="~camera" to="world"/>
          <param name="~kernel_size" type= "int" value="25"/>
     </node>
-   
-
 
 </launch>
 

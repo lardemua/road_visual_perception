@@ -10,15 +10,20 @@
  */
 
 #include <cv_bridge/cv_bridge.h>
-#include <geometry_msgs/Point32.h>
 #include <image_transport/image_transport.h>
 #include <lane_detector/fitting.h>
+
 #include <opencv/cv.h>
 #include <opencv/highgui.h>
+
 #include <sensor_msgs/Image.h>
 #include <sensor_msgs/image_encodings.h>
+#include <geometry_msgs/Point32.h>
+
 #include "grid_map_cv/GridMapCvConverter.hpp"
 #include "grid_map_ros/GridMapRosConverter.hpp"
+
+#include <sensor_msgs/CameraInfo.h>
 
 #include "ros/ros.h"
 
@@ -41,17 +46,33 @@ nav_msgs::MapMetaData info;
 class junction_data
 {
 public:
+  sensor_msgs::CameraInfo::_K_type k_matrix;
+
   /*Images pointers reveive*/
   cv_bridge::CvImagePtr current_image_alg1;
   cv_bridge::CvImagePtr current_image_alg2;
-  double pace = 0.05;  // cada lado da celula correponde a este valor em m
 
+  double pace; // cada lado da celula correponde a este valor em m
+
+  junction_data()
+  {
+    ros::NodeHandle n;
+    sensor_msgs::CameraInfoConstPtr CamInfo;
+    CamInfo = ros::topic::waitForMessage<sensor_msgs::CameraInfo>("/camera/camera_info", n, ros::Duration(10));
+
+    k_matrix = CamInfo->K;
+    double alpha_x = k_matrix[0];
+    pace = 1 / alpha_x;
+    // for(int i = 0; i < 9; i++)
+    // {
+    //   cout << i << " " << k_matrix[i] << endl;
+    // }
+  }
   /**
    * @brief Callback to receive the image that cames from the algorithm 1
    *
    * @param img1
    */
-
   void imageAlg1(const sensor_msgs::ImageConstPtr &img1)
   {
     try
@@ -100,7 +121,7 @@ public:
       Mat img_summed;
 
       add(img_alg1, img_alg2, img_summed);
-      auto img_final_summed = cv_bridge::CvImage{ current_image_alg1->header, "bgr8", img_summed };
+      auto img_final_summed = cv_bridge::CvImage{current_image_alg1->header, "bgr8", img_summed};
       merged_image.publish(img_final_summed);
     }
   }
@@ -125,8 +146,8 @@ public:
       threshold(img_alg2, img_alg2, 0, 255, THRESH_BINARY | THRESH_OTSU);
       bitwise_and(img_alg1, img_alg2, img_diff);
       bitwise_xor(img_alg1, img_alg2, img_ninter);
-      auto img_final_diff = cv_bridge::CvImage{ current_image_alg1->header, "mono8", img_diff };
-      auto img_final_nao_int = cv_bridge::CvImage{ current_image_alg1->header, "mono8", img_ninter };
+      auto img_final_diff = cv_bridge::CvImage{current_image_alg1->header, "mono8", img_diff};
+      auto img_final_nao_int = cv_bridge::CvImage{current_image_alg1->header, "mono8", img_ninter};
       intersect_image.publish(img_final_diff);
       non_intersect_image.publish(img_final_nao_int);
       probabilitiesMapImage(img_diff, img_ninter);
@@ -157,8 +178,7 @@ public:
       int value_filter = 0;
       float prob = 0.0;
       float prob_non_intersect = 0.0;
-      int thresh_non_intersect =
-          1;  // valore acrescentado para termos a probabilidade das secções que nao se intersectam
+      int thresh_non_intersect = 1; // valore acrescentado para termos a probabilidade das secções que nao se intersectam
       kernel_size = 25;
       ros::param::get("~kernel_size", kernel_size);
       input.convertTo(input, CV_32F);
@@ -199,30 +219,23 @@ public:
       }
 
       img_filt.convertTo(img_filt, CV_8UC1);
-      auto img_final_map = cv_bridge::CvImage{ current_image_alg1->header, "mono8", img_filt }.toImageMsg();
+      auto img_final_map = cv_bridge::CvImage{current_image_alg1->header, "mono8", img_filt}.toImageMsg();
       prob_map_image.publish(img_final_map);
       info.height = input.cols;
       info.width = input.rows;
       info.resolution = pace;
       info.origin.position.x = 0;
-      info.origin.position.y = -info.resolution*info.width/2;
-      info.origin.position.z =  0;
+      info.origin.position.y = -(info.height * pace / 2);
+      info.origin.position.z = 0;
       // cout<<info<<endl;
       // cout << current_image_alg1->header << endl;
 
       grid_map::GridMapRosConverter::initializeFromImage(*img_final_map, pace, grid_road_GridMap);
-      grid_map::GridMapRosConverter::addLayerFromImage(*img_final_map, "road probability map", grid_road_GridMap, 0,255, 255);
+      grid_map::GridMapRosConverter::addLayerFromImage(*img_final_map, "road probability map", grid_road_GridMap, 0, 255, 255);
       grid_map::GridMapRosConverter::toOccupancyGrid(grid_road_GridMap, "road probability map", 0, 255, roadmapGrid);
       // cout << "resolution " << roadmapGrid.info.resolution << endl;
       // cout<<"rows,cols: "<< roadmapGrid.info.height << ", "<<roadmapGrid.info.width<<endl;
       // cout<<"origin: " << roadmapGrid.info.origin.position.x << ", "<< roadmapGrid.info.origin.position.y << ", " << roadmapGrid.info.origin.position.z << endl;
-
-
-
-
-
-
-
 
       roadmapGrid.info = info;
       roadmapGrid.header = current_image_alg1->header;
