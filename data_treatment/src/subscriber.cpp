@@ -9,16 +9,24 @@
  *
  */
 
+/*ROS*/
 #include <cv_bridge/cv_bridge.h>
-#include <geometry_msgs/Point32.h>
+#include "ros/ros.h"
 #include <image_transport/image_transport.h>
+
+
+/*Para a mensagem*/
 #include <lane_detector/fitting.h>
-#include <opencv/cv.h>
-#include <opencv/highgui.h>
+#include <geometry_msgs/Point32.h>
 #include <sensor_msgs/Image.h>
 #include <sensor_msgs/image_encodings.h>
-#include "ros/ros.h"
 
+/*OpenCV*/
+#include <opencv/cv.h>
+#include <opencv/highgui.h>
+
+
+/*Namesapaces*/
 using namespace std;  // ja na e preciso usar o std
 using namespace ros;
 using namespace cv;

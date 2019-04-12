@@ -9,24 +9,28 @@
  *
  */
 
-#include <cv_bridge/cv_bridge.h>
-#include <image_transport/image_transport.h>
-#include <lane_detector/fitting.h>
 
+
+/*Opencv*/
 #include <opencv/cv.h>
 #include <opencv/highgui.h>
 
+/*Mensagens*/
+#include <sensor_msgs/CameraInfo.h>
 #include <sensor_msgs/Image.h>
 #include <sensor_msgs/image_encodings.h>
 #include <geometry_msgs/Point32.h>
 
+/*GridMap*/
 #include "grid_map_cv/GridMapCvConverter.hpp"
 #include "grid_map_ros/GridMapRosConverter.hpp"
 
-#include <sensor_msgs/CameraInfo.h>
-
+/*ROS*/
+#include <image_transport/image_transport.h>
+#include <cv_bridge/cv_bridge.h>
 #include "ros/ros.h"
 
+/*Namesapaces*/
 using namespace std;
 using namespace ros;
 using namespace cv;
