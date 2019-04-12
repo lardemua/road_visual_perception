@@ -160,6 +160,7 @@ public:
       int thresh_non_intersect =
           1;  // valore acrescentado para termos a probabilidade das secções que nao se intersectam
       kernel_size = 25;
+      ros::param::get("~kernel_size", kernel_size);
       input.convertTo(input, CV_32F);
       input2.convertTo(input2, CV_32F);
       input2 = input2 / (float)(kernel_size + thresh_non_intersect);

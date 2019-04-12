@@ -18,6 +18,7 @@
 
     <node pkg="data_treatment" name="junction_data" type="junction_data" output="screen">
         <remap from="~camera" to="world"/>
+         <param name="~kernel_size" type= "int" value="25"/>
     </node>
    
 
