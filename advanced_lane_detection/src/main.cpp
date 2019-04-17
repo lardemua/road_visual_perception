@@ -163,14 +163,14 @@ void alg2::processFrames()
     perspectiveMatrix = getPerspectiveTransform(perspectiveSrc, perspectiveDst);
 
     //draw the roi (for perspective transform)
-    // line(init_img, perspectiveSrc[0], perspectiveSrc[1], Scalar(0, 0, 255), 2);
-    // line(init_img, perspectiveSrc[1], perspectiveSrc[3], Scalar(0, 0, 255), 2);
-    // line(init_img, perspectiveSrc[3], perspectiveSrc[2], Scalar(0, 0, 255), 2);
-    // line(init_img, perspectiveSrc[2], perspectiveSrc[0], Scalar(0, 0, 255), 2);
-    // circle(init_img, perspectiveSrc[0], 6, Scalar(0, 0, 255), CV_FILLED);
-    // circle(init_img, perspectiveSrc[1], 6, Scalar(0, 0, 255), CV_FILLED);
-    // circle(init_img, perspectiveSrc[2], 6, Scalar(0, 0, 255), CV_FILLED);
-    // circle(init_img, perspectiveSrc[3], 6, Scalar(0, 0, 255), CV_FILLED);
+    line(init_img, perspectiveSrc[0], perspectiveSrc[1], Scalar(0, 0, 255), 2);
+    line(init_img, perspectiveSrc[1], perspectiveSrc[3], Scalar(0, 0, 255), 2);
+    line(init_img, perspectiveSrc[3], perspectiveSrc[2], Scalar(0, 0, 255), 2);
+    line(init_img, perspectiveSrc[2], perspectiveSrc[0], Scalar(0, 0, 255), 2);
+    circle(init_img, perspectiveSrc[0], 6, Scalar(0, 0, 255), CV_FILLED);
+    circle(init_img, perspectiveSrc[1], 6, Scalar(0, 0, 255), CV_FILLED);
+    circle(init_img, perspectiveSrc[2], 6, Scalar(0, 0, 255), CV_FILLED);
+    circle(init_img, perspectiveSrc[3], 6, Scalar(0, 0, 255), CV_FILLED);
     frameSize = init_img.size();
 
     warpPerspective(init_img, imgPerspective, perspectiveMatrix, frameSize);

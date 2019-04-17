@@ -239,18 +239,18 @@ lane_detector::Lane Fitting::fitting(cv::Mat &original, cv::Mat &processed_bgr, 
   {
     splines.clear();
   }
-  if (config.transform_back)
-  {
-    // save results?
-    outputFile << "frame#" << setw(8) << setfill('0') << index << " has " << splines.size() << " splines" << endl;
-    for (int i = 0; i < splines.size(); ++i)
-    {
-      outputFile << "\tspline#" << i + 1 << " has " << 4 << " points and score " << 1000 << endl;
-      for (int j = 0; j <= 3; ++j)
-        outputFile << "\t\t" << splines[i][j].x << ", " << splines[i][j].y << endl;
-    }
-    index++;
-  }
+  // if (config.transform_back)
+  // {
+  //   // save results?
+  //   outputFile << "frame#" << setw(8) << setfill('0') << index << " has " << splines.size() << " splines" << endl;
+  //   for (int i = 0; i < splines.size(); ++i)
+  //   {
+  //     outputFile << "\tspline#" << i + 1 << " has " << 4 << " points and score " << 1000 << endl;
+  //     for (int j = 0; j <= 3; ++j)
+  //       outputFile << "\t\t" << splines[i][j].x << ", " << splines[i][j].y << endl;
+  //   }
+  //   index++;
+  // }
   return current_lane_msg;
 }
 
