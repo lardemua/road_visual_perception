@@ -1,0 +1,5 @@
+
+<launch>
+    <node pkg="advanced_lane_detection" type="main" name="advanced_algo"  output="screen">
+    </node>
+</launch>

@@ -297,7 +297,7 @@ void junction_data::probabilitiesMapImage(Mat &input, Mat &input2)
     info.origin.position.y = -(info.height * pace / 2);
     info.origin.position.z = 0;
     grid_map::GridMapRosConverter::initializeFromImage(*img_final_map, pace, grid_road_GridMap);
-    grid_map::GridMapRosConverter::addLayerFromImage(*img_final_map, "road probability map", grid_road_GridMap, 0, 255, 255);
+    grid_map::GridMapRosConverter::addLayerFromImage(*img_final_map, "road probability map", grid_road_GridMap,0,255,128);
     grid_map::GridMapRosConverter::toOccupancyGrid(grid_road_GridMap, "road probability map", 0, 255, roadmapGrid);
     roadmapGrid.info = info;
     roadmapGrid.header = current_image_alg1->header;

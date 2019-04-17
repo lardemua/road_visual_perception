@@ -237,8 +237,7 @@ int main(int argc, char **argv)
    * IMPORTANT: If images are loaded from a folder the camera parameters have to be set
    * inside the function readCameraInfo (lane_detector.cpp::57)
    */
-  ros::Subscriber cameraInfo_sub = nh.subscribe<sensor_msgs::CameraInfo>(
-      "camera_info", 1, std::bind(readCameraInfo, std::placeholders::_1, &info_set));
+  ros::Subscriber cameraInfo_sub = nh.subscribe<sensor_msgs::CameraInfo>("camera_info", 1, std::bind(readCameraInfo, std::placeholders::_1, &info_set));
   if (loadFiles)
     readCameraInfo(NULL, &info_set);
   while (!info_set)
