@@ -53,7 +53,7 @@
 
  
   <include file="$(find data_treatment)/launch/data_treatment.launch" />
-   <include file="$(find advanced_lane_detection)/launch/advanced_lane_detection.launch" />
+
   <node type="rviz" name="rviz" pkg="rviz"/>
 
 </launch>

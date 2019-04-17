@@ -1,8 +1,8 @@
 <launch>
 
     <node pkg="data_treatment" name="subscriber" type="subscriber" output="screen">
-        <param name="~R_channel" type= "int" value="0"/>
-        <param name="~G_channel" type= "int" value="255"/>
+        <param name="~R_channel" type= "int" value="255"/>
+        <param name="~G_channel" type= "int" value="0"/>
         <param name="~B_channel" type= "int" value="0"/>
     </node>
 
@@ -15,10 +15,11 @@
         <param name="~G_channel" type= "int" value="0"/>
         <param name="~B_channel" type= "int" value="255"/>
     </node>
+    <include file="$(find advanced_lane_detection)/launch/advanced_lane_detection.launch" />
 
     <node pkg="data_treatment" name="junction_data" type="junction_data" output="screen">
         <remap from="~camera" to="world"/>
-         <param name="~kernel_size" type= "int" value="25"/>
+        <param name="~kernel_size" type= "int" value="25"/>
     </node>
 
 </launch>

@@ -62,10 +62,12 @@ private:
   ros::Publisher grid_road_map_pub;
   image_transport::Subscriber sub_img1;
   image_transport::Subscriber sub_img2;
+  image_transport::Subscriber sub_advanced_algo;
 
   /*Images pointers reveive*/
   cv_bridge::CvImagePtr current_image_alg1;
   cv_bridge::CvImagePtr current_image_alg2;
+  cv_bridge::CvImagePtr current_image_alg3;
 
   /*Images messages*/
   sensor_msgs::ImagePtr img_final_summed, img_final_diff, img_final_nao_int, img_final_map;
@@ -74,10 +76,10 @@ private:
   void Publishers();
   void imageAlg1(const sensor_msgs::ImageConstPtr &img1);
   void imageAlg2(const sensor_msgs::ImageConstPtr &img2);
+  void advanced_algo(const sensor_msgs::ImageConstPtr &img3);
   void mergedImage();
   void diffImage();
   void probabilitiesMapImage(Mat &input, Mat &input2);
-
 };
 
 /**
@@ -85,7 +87,7 @@ private:
  * 
  */
 
-junction_data::junction_data(): it (n)
+junction_data::junction_data() : it(n)
 {
   /*Getting the scale factor m/pix*/
   sensor_msgs::CameraInfoConstPtr CamInfo;
@@ -103,7 +105,7 @@ junction_data::junction_data(): it (n)
 
   sub_img1 = it.subscribe("data_treatment/final", 10, &junction_data::imageAlg1, this);
   sub_img2 = it.subscribe("data_treatment2/final", 10, &junction_data::imageAlg2, this);
-
+  sub_advanced_algo = it.subscribe("advanced_algorithm/greenMask", 10, &junction_data::advanced_algo, this);
 }
 
 /**
@@ -113,9 +115,9 @@ junction_data::junction_data(): it (n)
 
 void junction_data::MainLoop()
 {
-  if (current_image_alg1 && current_image_alg2)
+  if (current_image_alg1 && current_image_alg2 && current_image_alg3)
   {
-   
+
     mergedImage();
     diffImage();
     Publishers();
@@ -136,7 +138,6 @@ void junction_data::Publishers()
   grid_road_map_pub.publish(roadmapGrid);
 }
 
-
 /**
    * @brief Callback to receive the image that cames from the algorithm 1
    *
@@ -147,8 +148,6 @@ void junction_data::imageAlg1(const sensor_msgs::ImageConstPtr &img1)
   try
   {
     current_image_alg1 = cv_bridge::toCvCopy(img1, sensor_msgs::image_encodings::BGR8);
-    
-  
   }
   catch (cv_bridge::Exception &e)
   {
@@ -175,19 +174,41 @@ void junction_data::imageAlg2(const sensor_msgs::ImageConstPtr &img2)
 }
 
 /**
+ * @brief Function tha receives the image with green area representing road zone.
+ * 
+ * @param img3 
+ */
+
+void junction_data::advanced_algo(const sensor_msgs::ImageConstPtr &img3)
+{
+  try
+  {
+    current_image_alg3 = cv_bridge::toCvCopy(img3, sensor_msgs::image_encodings::BGR8);
+  }
+  catch (cv_bridge::Exception &e)
+  {
+    ROS_ERROR("Could not convert from '%s' to 'bgr8'.", img3->encoding.c_str());
+  }
+}
+
+/**
    * @brief Function that shows the 2 retuned color images on the same image
    *
    */
 
 void junction_data::mergedImage()
 {
-  if (current_image_alg1 && current_image_alg2)
+  int i,j=0;
+  if (current_image_alg1 && current_image_alg2 && current_image_alg3)
   {
     Mat img_alg1 = current_image_alg1->image;
     Mat img_alg2 = current_image_alg2->image;
+    Mat img_alg3 = current_image_alg3->image; //Image thar is painted! Any algorithm that returns painted areas do like that!
     Mat img_summed;
 
+
     add(img_alg1, img_alg2, img_summed);
+    add(img_summed, img_alg3, img_summed);
     img_final_summed = cv_bridge::CvImage{current_image_alg1->header, "bgr8", img_summed}.toImageMsg();
   }
 }
@@ -199,19 +220,26 @@ void junction_data::mergedImage()
 
 void junction_data::diffImage()
 {
-  if (current_image_alg1 && current_image_alg2)
+  if (current_image_alg1 && current_image_alg2 && current_image_alg3)
   {
     Mat img_diff;
     Mat img_ninter;
     Mat img_alg1 = current_image_alg1->image;
     Mat img_alg2 = current_image_alg2->image;
-    int i, j = 0;
+    Mat img_alg3 = current_image_alg3->image;
     cvtColor(img_alg1, img_alg1, CV_BGR2GRAY);
     cvtColor(img_alg2, img_alg2, CV_BGR2GRAY);
+    cvtColor(img_alg3, img_alg3, CV_BGR2GRAY);
     threshold(img_alg1, img_alg1, 0, 255, THRESH_BINARY | THRESH_OTSU);
     threshold(img_alg2, img_alg2, 0, 255, THRESH_BINARY | THRESH_OTSU);
+    threshold(img_alg3, img_alg3, 0, 255, THRESH_BINARY | THRESH_OTSU);
+
     bitwise_and(img_alg1, img_alg2, img_diff);
-    bitwise_xor(img_alg1, img_alg2, img_ninter);
+    bitwise_and(img_diff, img_alg3, img_diff);
+
+    //bitwise_xor(img_alg1, img_alg2, img_ninter);
+    bitwise_xor( img_diff,img_alg3, img_ninter); // rever isto!!
+    
     img_final_diff = cv_bridge::CvImage{current_image_alg1->header, "mono8", img_diff}.toImageMsg();
     img_final_nao_int = cv_bridge::CvImage{current_image_alg1->header, "mono8", img_ninter}.toImageMsg();
 
@@ -219,20 +247,16 @@ void junction_data::diffImage()
   }
 }
 
-
-
-
-
 /**
    * @brief Function tha builds the probability map on an image type.
    *
-   * @param input
-   * @param input2
+   * @param input intersection zone
+   * @param input2 non intersected zone
    */
 
 void junction_data::probabilitiesMapImage(Mat &input, Mat &input2)
 {
-  if (current_image_alg1 && current_image_alg2)
+  if (current_image_alg1 && current_image_alg2 && current_image_alg3)
   {
     Mat kernel;
     Mat img_filt;
@@ -297,7 +321,7 @@ void junction_data::probabilitiesMapImage(Mat &input, Mat &input2)
     info.origin.position.y = -(info.height * pace / 2);
     info.origin.position.z = 0;
     grid_map::GridMapRosConverter::initializeFromImage(*img_final_map, pace, grid_road_GridMap);
-    grid_map::GridMapRosConverter::addLayerFromImage(*img_final_map, "road probability map", grid_road_GridMap,0,255,128);
+    grid_map::GridMapRosConverter::addLayerFromImage(*img_final_map, "road probability map", grid_road_GridMap, 0, 255, 128);
     grid_map::GridMapRosConverter::toOccupancyGrid(grid_road_GridMap, "road probability map", 0, 255, roadmapGrid);
     roadmapGrid.info = info;
     roadmapGrid.header = current_image_alg1->header;
@@ -318,7 +342,6 @@ int main(int argc, char **argv)
 {
   ros::init(argc, argv, "junction_data");
   junction_data data;
-
 
   while (ros::ok())
   {

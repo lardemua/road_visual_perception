@@ -65,6 +65,7 @@ class alg2
 
     /*Publishers && Subs*/
     ros::Publisher initial_image;
+    ros::Publisher poly_image;
     ros::Subscriber camInfo;
 
     image_transport::Subscriber sub_img;
@@ -74,6 +75,7 @@ class alg2
 
     /*Images messages*/
     sensor_msgs::ImagePtr img_init;
+    sensor_msgs::ImagePtr poly_draw;
 
     /*Functions*/
     void Publishers();
@@ -93,7 +95,8 @@ alg2::alg2() : it(n)
 
     /*Publishers*/
     sub_img = it.subscribe("/camera/image_rect_color", 10, &alg2::receiveInitImg, this);
-    initial_image = n.advertise<sensor_msgs::Image>("advanced_algorithm/final", 10);
+    poly_image = n.advertise<sensor_msgs::Image>("advanced_algorithm/greenMask", 10);
+    initial_image=n.advertise<sensor_msgs::Image>("advanced_algorithm/finalResult", 10);
     // camInfo = n.subscribe<sensor_msgs::CameraInfo>("/camera/camera_info", 10, std::bind(readCameraInfo, std::placeholders::_1, &info_set));
 }
 
@@ -120,6 +123,7 @@ void alg2::Publishers()
 {
     if (current_image)
     {
+        poly_image.publish(poly_draw);
         initial_image.publish(img_init);
     }
 }
@@ -191,6 +195,7 @@ void alg2::processFrames()
 
     // init_img.convertTo(init_img,CV_8UC3);
 
+    poly_draw = cv_bridge::CvImage{current_image->header, "bgr8", warpMask}.toImageMsg();
     img_init = cv_bridge::CvImage{current_image->header, "bgr8", finalResult}.toImageMsg();
 }
 

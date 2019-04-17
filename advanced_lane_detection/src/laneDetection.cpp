@@ -318,10 +318,10 @@ void laneDetection::laneFitting()
     }
     Mat curveL(curvePointsL, true);
     curveL.convertTo(curveL, CV_32S);
-    polylines(maskImage, curveL, false, Scalar(255,0,0), 20, CV_AA);
+    polylines(maskImage, curveL, false, Scalar(0,255,0), 20, CV_AA);
     Mat curveR(curvePointsR, true);
     curveR.convertTo(curveR, CV_32S);
-    polylines(maskImage, curveR, false, Scalar(0,0,255), 20, CV_AA);
+    polylines(maskImage, curveR, false, Scalar(0,255,0), 20, CV_AA);
 
     uchar* matPtr;
     for(int i=0; i<maskImage.size().height; i++)

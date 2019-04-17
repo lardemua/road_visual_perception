@@ -313,6 +313,7 @@ void get_lines::drawingPolygn()
   // cout <<"Right lane: (row_max_col_max)= "<<row_max_right_lane<<","<<col_max_right_lane<<endl;
   init_fill.x = min_ll.x + 1;
   init_fill.y = min_ll.y + 1;
+  //imagem com um canal com tudo já pintado a branco!
 
   line(processedImage, min_ll, min_rl, Scalar(B_channel, G_channel, R_channel), 1);
   line(processedImage, max_ll, max_rl, Scalar(B_channel, G_channel, R_channel), 1);
