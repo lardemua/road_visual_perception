@@ -83,7 +83,7 @@ get_lines::get_lines() : it(n)
 {
   finalimage = n.advertise<sensor_msgs::Image>("data_treatment/final", 10);
 
-  sub = it.subscribe("lane_detector/result", 10, &get_lines::imagereceiveCallback, this);
+  sub = it.subscribe("camera/image_raw", 10, &get_lines::imagereceiveCallback, this);
   sub_lanes = n.subscribe("lane_detector/lane", 10, &get_lines::lanereceiveCallback, this);
 }
 

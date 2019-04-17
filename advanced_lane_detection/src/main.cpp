@@ -33,7 +33,8 @@ using namespace std;
 using namespace ros;
 using namespace cv;
 
-Point2f perspectiveSrc[] = {Point2f(425, 472), Point2f(542, 472), Point2f(208, 700), Point2f(858, 700)};
+//te
+Point2f perspectiveSrc[] = {Point2f(225, 362), Point2f(739, 362), Point2f(88, 700), Point2f(858, 700)};
 Point2f perspectiveDst[] = {Point2f(226, 0), Point2f(737, 0), Point2f(226, 724), Point2f(737, 724)};
 
 class alg2
@@ -92,7 +93,7 @@ alg2::alg2() : it(n)
 
     /*Publishers*/
     sub_img = it.subscribe("/camera/image_rect_color", 10, &alg2::receiveInitImg, this);
-    initial_image = n.advertise<sensor_msgs::Image>("alorithm2/init_img", 10);
+    initial_image = n.advertise<sensor_msgs::Image>("advanced_algorithm/final", 10);
     // camInfo = n.subscribe<sensor_msgs::CameraInfo>("/camera/camera_info", 10, std::bind(readCameraInfo, std::placeholders::_1, &info_set));
 }
 
@@ -163,14 +164,14 @@ void alg2::processFrames()
     perspectiveMatrix = getPerspectiveTransform(perspectiveSrc, perspectiveDst);
 
     //draw the roi (for perspective transform)
-    line(init_img, perspectiveSrc[0], perspectiveSrc[1], Scalar(0, 0, 255), 2);
-    line(init_img, perspectiveSrc[1], perspectiveSrc[3], Scalar(0, 0, 255), 2);
-    line(init_img, perspectiveSrc[3], perspectiveSrc[2], Scalar(0, 0, 255), 2);
-    line(init_img, perspectiveSrc[2], perspectiveSrc[0], Scalar(0, 0, 255), 2);
-    circle(init_img, perspectiveSrc[0], 6, Scalar(0, 0, 255), CV_FILLED);
-    circle(init_img, perspectiveSrc[1], 6, Scalar(0, 0, 255), CV_FILLED);
-    circle(init_img, perspectiveSrc[2], 6, Scalar(0, 0, 255), CV_FILLED);
-    circle(init_img, perspectiveSrc[3], 6, Scalar(0, 0, 255), CV_FILLED);
+    // line(init_img, perspectiveSrc[0], perspectiveSrc[1], Scalar(0, 0, 255), 2);
+    // line(init_img, perspectiveSrc[1], perspectiveSrc[3], Scalar(0, 0, 255), 2);
+    // line(init_img, perspectiveSrc[3], perspectiveSrc[2], Scalar(0, 0, 255), 2);
+    // line(init_img, perspectiveSrc[2], perspectiveSrc[0], Scalar(0, 0, 255), 2);
+    // circle(init_img, perspectiveSrc[0], 6, Scalar(0, 0, 255), CV_FILLED);
+    // circle(init_img, perspectiveSrc[1], 6, Scalar(0, 0, 255), CV_FILLED);
+    // circle(init_img, perspectiveSrc[2], 6, Scalar(0, 0, 255), CV_FILLED);
+    // circle(init_img, perspectiveSrc[3], 6, Scalar(0, 0, 255), CV_FILLED);
     frameSize = init_img.size();
 
     warpPerspective(init_img, imgPerspective, perspectiveMatrix, frameSize);
