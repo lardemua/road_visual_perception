@@ -264,14 +264,16 @@ void get_lines::drawingPolygn()
   row_image = get<0>(imageSize);
   col_image = get<1>(imageSize);
 
-  // cout << "estou ca dentro" << endl;
-  ros::param::get("~R_channel", R_channel);
-  ros::param::get("~G_channel", G_channel);
-  ros::param::get("~B_channel", B_channel);
-  Mat processedImage = Mat::zeros(row_image, col_image, CV_8UC3);
-  drawSpline(processedImage, left_spline, 1, Scalar(B_channel, G_channel, R_channel));
-  drawSpline(processedImage, right_spline, 1, Scalar(B_channel, G_channel, R_channel));
-
+  // Para visualização:
+  // ros::param::get("~R_channel", R_channel);
+  // ros::param::get("~G_channel", G_channel);
+  // ros::param::get("~B_channel", B_channel);
+  //Mat processedImage = Mat::zeros(row_image, col_image, CV_8UC3);
+  Mat processedImage = Mat::zeros(row_image, col_image, CV_8UC1);
+  //drawSpline(processedImage, left_spline, 1, Scalar(B_channel, G_channel, R_channel));
+  //drawSpline(processedImage, right_spline, 1, Scalar(B_channel, G_channel, R_channel));
+  drawSpline(processedImage, left_spline, 1, 255);
+  drawSpline(processedImage, right_spline, 1, 255);
   for (n = 0; n < left_spline.size(); n++)
   {
     if (left_spline[n].y < row_min_left_lane)
@@ -314,15 +316,17 @@ void get_lines::drawingPolygn()
   init_fill.x = min_ll.x + 1;
   init_fill.y = min_ll.y + 1;
   //imagem com um canal com tudo já pintado a branco!
-
-  line(processedImage, min_ll, min_rl, Scalar(B_channel, G_channel, R_channel), 1);
-  line(processedImage, max_ll, max_rl, Scalar(B_channel, G_channel, R_channel), 1);
-  floodFill(processedImage, init_fill, Scalar(B_channel, G_channel, R_channel));
+  //Vissialização dos poligonos pintados:
+  // line(processedImage, min_ll, min_rl, Scalar(B_channel, G_channel, R_channel), 1);
+  // line(processedImage, max_ll, max_rl, Scalar(B_channel, G_channel, R_channel), 1);
+  // floodFill(processedImage, init_fill, Scalar(B_channel, G_channel, R_channel));
+  line(processedImage, min_ll, min_rl, 255, 1);
+  line(processedImage, max_ll, max_rl, 255, 1);
+  floodFill(processedImage, init_fill, 255);
   // processedImage.convertTo(processedImage, CV_8UC3);
 
-  processed_img = cv_bridge::CvImage{current_image->header, "bgr8", processedImage}.toImageMsg();
+  processed_img = cv_bridge::CvImage{current_image->header, "mono8", processedImage}.toImageMsg();
 }
-
 
 /**
  * @brief This callback is the one that receives the lanes and show images with the filled area
