@@ -33,10 +33,13 @@ using namespace std;
 using namespace ros;
 using namespace cv;
 
-//te
+//Global Variables
+//Img size 964*724:
 Point2f perspectiveSrc[] = {Point2f(225, 362), Point2f(739, 362), Point2f(88, 700), Point2f(858, 700)};
 Point2f perspectiveDst[] = {Point2f(226, 0), Point2f(737, 0), Point2f(226, 724), Point2f(737, 724)};
-
+//Img size 640*480
+//  Point2f perspectiveSrc[] = {Point2f(125, 162), Point2f(325, 162), Point2f(44, 453), Point2f(580,453)};
+//  Point2f perspectiveDst[] = {Point2f(126, 0), Point2f(426, 0), Point2f(126, 480), Point2f(426, 480)};
 class alg2
 {
   public:
@@ -165,6 +168,7 @@ void alg2::processFrames()
 {
 
     Mat init_img = current_image->image;
+    // resize(init_img, init_img, cv::Size(init_img.cols * (640/964),init_img.rows * (640/964)), 0, 0, CV_INTER_LINEAR);
     perspectiveMatrix = getPerspectiveTransform(perspectiveSrc, perspectiveDst);
 
     //draw the roi (for perspective transform)

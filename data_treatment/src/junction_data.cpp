@@ -203,9 +203,9 @@ void junction_data::mergedImage()
   {
     Mat img_alg1 = current_image_alg1->image;
     Mat img_alg2 = current_image_alg2->image;
-    Mat img_alg3 = current_image_alg3->image; //Image thar is painted! Any algorithm that returns painted areas do like that!
+    Mat img_alg3 = current_image_alg3->image; //Image that is painted! Any algorithm that returns painted areas do like that!
     Mat img_summed;
-
+  
 
     add(img_alg1, img_alg2, img_summed);
     add(img_summed, img_alg3, img_summed);

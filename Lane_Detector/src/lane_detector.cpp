@@ -113,6 +113,7 @@ void processImage(LaneDetector::CameraInfo &cameraInfo, LaneDetector::LaneDetect
     // detect bounding boxes arround the lanes
     std::vector<LaneDetector::Box> boxes;
     cv::Mat processed_bgr = currentFrame_ptr->image;
+    // resize(processed_bgr, processed_bgr, cv::Size(processed_bgr.cols * (640/964),processed_bgr.rows * (640/964)), 0, 0, CV_INTER_LINEAR);
     preproc.preprocess(currentFrame_ptr->image, processed_bgr, ipmInfo, cameraInfo);
     cv::Mat preprocessed = processed_bgr.clone();
     lane_detector::utils::scaleMat(processed_bgr, processed_bgr);

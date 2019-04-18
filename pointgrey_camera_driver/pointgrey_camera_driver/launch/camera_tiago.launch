@@ -15,6 +15,7 @@
       <param name="frame_id" value="camera" />
       <param name="serial" value="$(arg camera_serial)" />
       <param name="packet_resend" value="$(arg packet_resend)" />
+      
 
 
       <!-- When unspecified, the driver will use the default framerate as given by the
