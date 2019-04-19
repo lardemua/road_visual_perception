@@ -24,6 +24,8 @@
 
     <node pkg="data_treatment" name="junction_data" type="junction_data" output="screen">
         <remap from="~camera" to="world"/>
+        <param name="~cols_img_big" type= "double" value="964"/>
+        <param name="~cols_img_small" type= "double" value="640"/>
         <param name="~kernel_size" type= "int" value="25"/>
     </node>
 

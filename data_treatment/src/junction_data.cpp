@@ -43,7 +43,7 @@ private:
   ros::NodeHandle n;
 
   /*Important variables*/
-  double alpha_x, pace;
+  double alpha_x, pace, scale_factor,cols_img_big,cols_img_small;
 
   /*ROS*/
   grid_map::GridMap grid_road_GridMap;
@@ -90,11 +90,16 @@ private:
 junction_data::junction_data() : it(n)
 {
   /*Getting the scale factor m/pix*/
+  //Resize image
+  cols_img_big=0;
+  cols_img_small=0;
+  ros::param::get("~cols_img_big", cols_img_big);
+  ros::param::get("~cols_img_small", cols_img_small);
   sensor_msgs::CameraInfoConstPtr CamInfo;
   CamInfo = ros::topic::waitForMessage<sensor_msgs::CameraInfo>("/camera/camera_info", n, ros::Duration(10));
   k_matrix = CamInfo->K;
   alpha_x = k_matrix[0];
-  pace = 1 / alpha_x; // cada lado da celula correponde a este valor em m
+  pace = (1 / (alpha_x)) * (cols_img_big / cols_img_small); // cada lado da celula correponde a este valor em m
 
   /*Publishers and Subscribers*/
   merged_image = n.advertise<sensor_msgs::Image>("junction_data/summed_img", 10);
@@ -314,7 +319,6 @@ void junction_data::probabilitiesMapImage(Mat &input, Mat &input2)
 
     img_filt.convertTo(img_filt, CV_8UC1);
     img_final_map = cv_bridge::CvImage{current_image_alg1->header, "mono8", img_filt}.toImageMsg();
-
     info.height = input.cols;
     info.width = input.rows;
     info.resolution = pace;
