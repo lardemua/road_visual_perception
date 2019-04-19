@@ -40,6 +40,11 @@ using namespace cv;
 //Img size 640*480
 Point2f perspectiveSrc[] = {Point2f(125, 262), Point2f(400, 262), Point2f(44, 453), Point2f(550, 453)};
 Point2f perspectiveDst[] = {Point2f(126, 0), Point2f(426, 0), Point2f(126, 480), Point2f(426, 480)};
+//Img size (320*240)
+// Point2f perspectiveSrc[] = {Point2f(63, 131), Point2f(220, 131), Point2f(22, 300), Point2f(270, 300)};
+// Point2f perspectiveDst[] = {Point2f(63, 0), Point2f(263, 0), Point2f(63, 240), Point2f(263, 240)};
+
+
 class alg2
 {
   public:
@@ -179,14 +184,14 @@ void alg2::processFrames()
     perspectiveMatrix = getPerspectiveTransform(perspectiveSrc, perspectiveDst);
 
     //draw the roi (for perspective transform)
-    line(init_img, perspectiveSrc[0], perspectiveSrc[1], Scalar(0, 0, 255), 2);
-    line(init_img, perspectiveSrc[1], perspectiveSrc[3], Scalar(0, 0, 255), 2);
-    line(init_img, perspectiveSrc[3], perspectiveSrc[2], Scalar(0, 0, 255), 2);
-    line(init_img, perspectiveSrc[2], perspectiveSrc[0], Scalar(0, 0, 255), 2);
-    circle(init_img, perspectiveSrc[0], 6, Scalar(0, 0, 255), CV_FILLED);
-    circle(init_img, perspectiveSrc[1], 6, Scalar(0, 0, 255), CV_FILLED);
-    circle(init_img, perspectiveSrc[2], 6, Scalar(0, 0, 255), CV_FILLED);
-    circle(init_img, perspectiveSrc[3], 6, Scalar(0, 0, 255), CV_FILLED);
+    // line(init_img, perspectiveSrc[0], perspectiveSrc[1], Scalar(0, 0, 255), 2);
+    // line(init_img, perspectiveSrc[1], perspectiveSrc[3], Scalar(0, 0, 255), 2);
+    // line(init_img, perspectiveSrc[3], perspectiveSrc[2], Scalar(0, 0, 255), 2);
+    // line(init_img, perspectiveSrc[2], perspectiveSrc[0], Scalar(0, 0, 255), 2);
+    // circle(init_img, perspectiveSrc[0], 6, Scalar(0, 0, 255), CV_FILLED);
+    // circle(init_img, perspectiveSrc[1], 6, Scalar(0, 0, 255), CV_FILLED);
+    // circle(init_img, perspectiveSrc[2], 6, Scalar(0, 0, 255), CV_FILLED);
+    // circle(init_img, perspectiveSrc[3], 6, Scalar(0, 0, 255), CV_FILLED);
     frameSize = init_img.size();
 
     warpPerspective(init_img, imgPerspective, perspectiveMatrix, frameSize);
