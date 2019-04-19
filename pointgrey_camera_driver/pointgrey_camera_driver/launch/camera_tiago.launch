@@ -15,7 +15,7 @@
       <param name="frame_id" value="camera" />
       <param name="serial" value="$(arg camera_serial)" />
       <param name="packet_resend" value="$(arg packet_resend)" />
-      
+
 
 
       <!-- When unspecified, the driver will use the default framerate as given by the
@@ -36,6 +36,8 @@
     <remap from="image" to="/camera/image_rect_color" />
     <param name="images_from_folder" value="$(arg load_images_from_folder)" />
     <param name="images_path" value="$(find lane_detector)/data/first_set" />
+    <param name="~cols_resize" type= "int" value="640"/>
+    <param name="~rows_resize" type= "int" value="480"/>
   </node>
   <node pkg="lane_detector" type="lane_detector" name="lane_detector2" output="screen">
     <remap from="camera_info" to="/camera/camera_info" />
@@ -45,6 +47,8 @@
     <remap from="lane_detector/processed" to="lane_detector2/processed" />
     <remap from="lane_detector/lane" to="lane_detector2/lane" />
     <remap from="lane_detector/result" to="lane_detector2/result"/>
+    <param name="~cols_resize" type= "int" value="640"/>
+    <param name="~rows_resize" type= "int" value="480"/>
     <rosparam command="load" file="$(find lane_detector)/params/Detector2.yaml"/>
   </node>
 
@@ -52,7 +56,7 @@
   <param name="robot_description" command="$(find xacro)/xacro --inorder '$(find pointgrey_camera_description)/urdf/camera_tiago.urdf.xacro'" />
   <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
 
- 
+
   <include file="$(find data_treatment)/launch/data_treatment.launch" />
 
   <node type="rviz" name="rviz" pkg="rviz"/>

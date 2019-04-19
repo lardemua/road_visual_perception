@@ -1,7 +1,9 @@
 <launch>
 
     <node pkg="data_treatment" name="subscriber" type="subscriber" output="screen">
-    <!-- </Para visualização dos poligonos com áreas pintadas> -->
+        <param name="~cols_resize" type= "int" value="640"/>
+        <param name="~rows_resize" type= "int" value="480"/>
+        <!-- </Para visualização dos poligonos com áreas pintadas> -->
         <!-- <param name="~R_channel" type= "int" value="255"/>
         <param name="~G_channel" type= "int" value="0"/>
         <param name="~B_channel" type= "int" value="0"/> -->
@@ -12,6 +14,8 @@
         <remap from="lane_detector/lane" to="lane_detector2/lane" />
         <remap from="data_treatment/initial" to="data_treatment2/initial"/>
         <remap from="data_treatment/final" to="data_treatment2/final"/>
+        <param name="~cols_resize" type= "int" value="640"/>
+        <param name="~rows_resize" type= "int" value="480"/>
         <!-- <param name="~R_channel" type= "int" value="0"/>
         <param name="~G_channel" type= "int" value="0"/>
         <param name="~B_channel" type= "int" value="255"/> -->

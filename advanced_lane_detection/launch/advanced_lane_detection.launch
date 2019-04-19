@@ -1,5 +1,6 @@
-
 <launch>
-    <node pkg="advanced_lane_detection" type="main" name="advanced_algo"  output="screen">
+    <node pkg="advanced_lane_detection" type="main" name="advanced_algo" output="screen">
+        <param name="~cols_resize" type= "int" value="640"/>
+        <param name="~rows_resize" type= "int" value="480"/>
     </node>
 </launch>

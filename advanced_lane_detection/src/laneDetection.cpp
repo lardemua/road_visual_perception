@@ -380,6 +380,8 @@ Mat laneDetection::getWarpMask()
 
 Mat laneDetection::getFinalResult()
 {
+    cv::Size size(640,480);
+    resize(oriImage,oriImage,size);
     addWeighted(maskImageWarp, 0.5, oriImage, 1, 0, finalResult);
     return finalResult;
 }

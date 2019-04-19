@@ -28,6 +28,7 @@
 #include <lane_detector/mcv.hh>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
+#include <opencv/cv.h>
 #include <sstream>
 
 cv_bridge::CvImagePtr currentFrame_ptr;
@@ -39,6 +40,9 @@ ros::Publisher lane_pub;
 lane_detector::DetectorConfig dynConfig;
 LaneDetector::CameraInfo cameraInfo;
 LaneDetector::LaneDetectorConf lanesConf;
+cv::Mat img_init;
+int cols_resize = 964;
+int rows_resize = 724;
 
 ros::Publisher processed_pub;
 
@@ -108,13 +112,16 @@ void processImage(LaneDetector::CameraInfo &cameraInfo, LaneDetector::LaneDetect
 {
   if (currentFrame_ptr)
   {
+    ros::param::get("~cols_resize", cols_resize);
+    ros::param::get("~rows_resize", rows_resize);
+    cv::Size size(cols_resize, rows_resize);
     // information paramameters of the IPM transform
     LaneDetector::IPMInfo ipmInfo;
     // detect bounding boxes arround the lanes
     std::vector<LaneDetector::Box> boxes;
     cv::Mat processed_bgr = currentFrame_ptr->image;
-    // resize(processed_bgr, processed_bgr, cv::Size(processed_bgr.cols * (640/964),processed_bgr.rows * (640/964)), 0, 0, CV_INTER_LINEAR);
-    preproc.preprocess(currentFrame_ptr->image, processed_bgr, ipmInfo, cameraInfo);
+    resize(processed_bgr, processed_bgr, size);
+    preproc.preprocess(img_init, processed_bgr, ipmInfo, cameraInfo);
     cv::Mat preprocessed = processed_bgr.clone();
     lane_detector::utils::scaleMat(processed_bgr, processed_bgr);
     if (processed_bgr.channels() == 1)
@@ -122,12 +129,12 @@ void processImage(LaneDetector::CameraInfo &cameraInfo, LaneDetector::LaneDetect
 
     extractor.extract(processed_bgr, preprocessed, boxes);
     lane_detector::Lane current_lane =
-        fitting_phase.fitting(currentFrame_ptr->image, processed_bgr, preprocessed, ipmInfo, cameraInfo, boxes);
+        fitting_phase.fitting(img_init, processed_bgr, preprocessed, ipmInfo, cameraInfo, boxes);
     lane_pub.publish(current_lane);
 
     // Sending the processed image to a node
     processed_bgr.convertTo(processed_bgr, CV_8UC3);
-    auto processed_img = cv_bridge::CvImage{ currentFrame_ptr->header, "bgr8", processed_bgr };
+    auto processed_img = cv_bridge::CvImage{currentFrame_ptr->header, "bgr8", processed_bgr};
     processed_pub.publish(processed_img);
 
     // cv::imshow("Out", processed_bgr);
@@ -140,11 +147,19 @@ void processImage(LaneDetector::CameraInfo &cameraInfo, LaneDetector::LaneDetect
 // Callback function for a new image on topic "image".
 void readImg(const sensor_msgs::ImageConstPtr &img)
 {
+
   try
   {
     currentFrame_ptr = cv_bridge::toCvCopy(img, sensor_msgs::image_encodings::BGR8);
+    img_init = currentFrame_ptr->image;
+    ros::param::get("~cols_resize", cols_resize);
+    ros::param::get("~rows_resize", rows_resize);
+    cv::Size size(cols_resize, rows_resize);
+    resize(img_init, img_init, size);
     processImage(cameraInfo, lanesConf);
-    resultImg_pub.publish(*currentFrame_ptr->toImageMsg());
+
+    auto result_img = cv_bridge::CvImage{currentFrame_ptr->header, "bgr8", img_init}.toImageMsg();
+    resultImg_pub.publish(result_img);
   }
   catch (cv_bridge::Exception &e)
   {
@@ -178,10 +193,10 @@ void laneDetectionFromFiles(std::string &path)
     {
       cv::Mat img = cv::imread(path + "/" + fileNames.at(i));
       cv_bridge::CvImage img_bridge;
-      std_msgs::Header header;          // empty header
-      header.stamp = ros::Time::now();  // time
+      std_msgs::Header header;         // empty header
+      header.stamp = ros::Time::now(); // time
       img_bridge = cv_bridge::CvImage(header, sensor_msgs::image_encodings::BGR8, img);
-      currentFrame = *img_bridge.toImageMsg();  // from cv_bridge to sensor_msgs::Image
+      currentFrame = *img_bridge.toImageMsg(); // from cv_bridge to sensor_msgs::Image
       if (currentFrame.step == 0)
       {
         std::cout << "Error: No image with name " << fileNames.at(i) << " received" << std::endl;
@@ -288,7 +303,7 @@ int main(int argc, char **argv)
   ros::param::get("~images_path", imagesPath);
   if (loadFiles)
   {
-    laneDetectionFromFiles(imagesPath);  // Whether to load the images from a folder (data set) or from the kinect
+    laneDetectionFromFiles(imagesPath); // Whether to load the images from a folder (data set) or from the kinect
   }
   // ros::MultiThreadedSpinner spinner(0); // Use one thread for core
   // spinner.spin(); // spin() will not return until the node has been shutdown

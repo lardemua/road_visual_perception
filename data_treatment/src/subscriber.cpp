@@ -38,6 +38,10 @@ public:
 private:
   ros::NodeHandle n;
 
+  /*Vars resize*/
+  int cols_resize = 964; //default parameters
+  int rows_resize = 724; // default parameters
+
   /*importante variables*/
   std::vector<geometry_msgs::Point32> left;
   std::vector<geometry_msgs::Point32> right;
@@ -81,6 +85,9 @@ private:
  */
 get_lines::get_lines() : it(n)
 {
+  //Resize image
+  ros::param::get("~cols_resize", cols_resize);
+  ros::param::get("~rows_resize", rows_resize);
   finalimage = n.advertise<sensor_msgs::Image>("data_treatment/final", 10);
 
   sub = it.subscribe("camera/image_raw", 10, &get_lines::imagereceiveCallback, this);
@@ -182,7 +189,9 @@ tuple<int, int> get_lines::getImageSize()
 {
   if (current_image)
   {
+    Size size_img(cols_resize, rows_resize);
     Mat image_cv = current_image->image;
+    resize(image_cv, image_cv, size_img);
 
     float image_rows = image_cv.rows;
     float image_cols = image_cv.cols;

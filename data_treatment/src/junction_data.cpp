@@ -198,15 +198,16 @@ void junction_data::advanced_algo(const sensor_msgs::ImageConstPtr &img3)
 
 void junction_data::mergedImage()
 {
-  int i,j=0;
+  int i, j = 0;
   if (current_image_alg1 && current_image_alg2 && current_image_alg3)
   {
     Mat img_alg1 = current_image_alg1->image;
     Mat img_alg2 = current_image_alg2->image;
     Mat img_alg3 = current_image_alg3->image; //Image that is painted! Any algorithm that returns painted areas do like that!
     Mat img_summed;
-  
-
+    // cout << img_alg1.cols << endl;
+    // cout << img_alg2.cols << endl;
+    // cout << img_alg3.cols << endl;
     add(img_alg1, img_alg2, img_summed);
     add(img_summed, img_alg3, img_summed);
     img_final_summed = cv_bridge::CvImage{current_image_alg1->header, "bgr8", img_summed}.toImageMsg();
@@ -238,8 +239,8 @@ void junction_data::diffImage()
     bitwise_and(img_diff, img_alg3, img_diff);
 
     //bitwise_xor(img_alg1, img_alg2, img_ninter);
-    bitwise_xor( img_diff,img_alg3, img_ninter); // rever isto!!
-    
+    bitwise_xor(img_diff, img_alg3, img_ninter); // rever isto!!
+
     img_final_diff = cv_bridge::CvImage{current_image_alg1->header, "mono8", img_diff}.toImageMsg();
     img_final_nao_int = cv_bridge::CvImage{current_image_alg1->header, "mono8", img_ninter}.toImageMsg();
 
