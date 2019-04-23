@@ -43,7 +43,7 @@ private:
   ros::NodeHandle n;
 
   /*Important variables*/
-  double alpha_x, pace, scale_factor,cols_img_big,cols_img_small;
+  double alpha_x, pace, scale_factor, cols_img_big, cols_img_small, rows_img_small;
 
   /*ROS*/
   grid_map::GridMap grid_road_GridMap;
@@ -60,23 +60,27 @@ private:
   ros::Publisher non_intersect_image;
   ros::Publisher prob_map_image;
   ros::Publisher grid_road_map_pub;
+  ros::Publisher result;
   image_transport::Subscriber sub_img1;
   image_transport::Subscriber sub_img2;
   image_transport::Subscriber sub_advanced_algo;
+  image_transport::Subscriber sub_img_ori;
 
   /*Images pointers reveive*/
   cv_bridge::CvImagePtr current_image_alg1;
   cv_bridge::CvImagePtr current_image_alg2;
   cv_bridge::CvImagePtr current_image_alg3;
+  cv_bridge::CvImagePtr current_image_original;
 
   /*Images messages*/
-  sensor_msgs::ImagePtr img_final_summed, img_final_diff, img_final_nao_int, img_final_map;
+  sensor_msgs::ImagePtr img_final_summed, img_final_diff, img_final_nao_int, img_final_map, image_final_result;
 
   /*Functions*/
   void Publishers();
   void imageAlg1(const sensor_msgs::ImageConstPtr &img1);
   void imageAlg2(const sensor_msgs::ImageConstPtr &img2);
   void advanced_algo(const sensor_msgs::ImageConstPtr &img3);
+  void imageOri(const sensor_msgs::ImageConstPtr &img4);
   void mergedImage();
   void diffImage();
   void probabilitiesMapImage(Mat &input, Mat &input2);
@@ -91,8 +95,8 @@ junction_data::junction_data() : it(n)
 {
   /*Getting the scale factor m/pix*/
   //Resize image
-  cols_img_big=0;
-  cols_img_small=0;
+  cols_img_big = 0;
+  cols_img_small = 0;
   ros::param::get("~cols_img_big", cols_img_big);
   ros::param::get("~cols_img_small", cols_img_small);
   sensor_msgs::CameraInfoConstPtr CamInfo;
@@ -107,10 +111,12 @@ junction_data::junction_data() : it(n)
   non_intersect_image = n.advertise<sensor_msgs::Image>("junction_data/nonintersect_img", 10);
   prob_map_image = n.advertise<sensor_msgs::Image>("junction_data/prob_map", 10);
   grid_road_map_pub = n.advertise<nav_msgs::OccupancyGrid>("road_probabilities_map", 10, true);
+  result=n.advertise<sensor_msgs::Image>("junction_data/finalResult", 10);
 
   sub_img1 = it.subscribe("data_treatment/final", 10, &junction_data::imageAlg1, this);
   sub_img2 = it.subscribe("data_treatment2/final", 10, &junction_data::imageAlg2, this);
   sub_advanced_algo = it.subscribe("advanced_algorithm/greenMask", 10, &junction_data::advanced_algo, this);
+  sub_img_ori = it.subscribe("camera/image_rect", 10, &junction_data::imageOri, this);
 }
 
 /**
@@ -139,6 +145,7 @@ void junction_data::Publishers()
   merged_image.publish(img_final_summed);
   intersect_image.publish(img_final_diff);
   non_intersect_image.publish(img_final_nao_int);
+  result.publish(image_final_result);
   prob_map_image.publish(img_final_map);
   grid_road_map_pub.publish(roadmapGrid);
 }
@@ -193,6 +200,23 @@ void junction_data::advanced_algo(const sensor_msgs::ImageConstPtr &img3)
   catch (cv_bridge::Exception &e)
   {
     ROS_ERROR("Could not convert from '%s' to 'bgr8'.", img3->encoding.c_str());
+  }
+}
+
+/**
+ * @brief dunction that receives the original image to get the final result
+ * 
+ * @param img3 
+ */
+void junction_data::imageOri(const sensor_msgs::ImageConstPtr &img4)
+{
+  try
+  {
+    current_image_original = cv_bridge::toCvCopy(img4, sensor_msgs::image_encodings::BGR8);
+  }
+  catch (cv_bridge::Exception &e)
+  {
+    ROS_ERROR("Could not convert from '%s' to 'bgr8'.", img4->encoding.c_str());
   }
 }
 
@@ -264,9 +288,15 @@ void junction_data::probabilitiesMapImage(Mat &input, Mat &input2)
 {
   if (current_image_alg1 && current_image_alg2 && current_image_alg3)
   {
+    rows_img_small = 0;
+    ros::param::get("~ccols_img_small", cols_img_small);
+    ros::param::get("~rows_img_small", rows_img_small);
+    cv::Size size(cols_img_small, rows_img_small);
     Mat kernel;
     Mat img_filt;
     Mat img_final;
+    Mat img_original;
+    Mat final_result;
     Point anchor;
     double delta;
     int ddepth;
@@ -317,6 +347,19 @@ void junction_data::probabilitiesMapImage(Mat &input, Mat &input2)
       }
     }
 
+    //Image result:-----------------------------------------------------
+    if (current_image_original)
+    {
+      img_original = current_image_original->image;
+      resize(img_original, img_original, size);
+      cvtColor(img_filt, img_filt, CV_GRAY2BGR);
+      img_filt.convertTo(img_filt, CV_8UC3);
+      img_original.convertTo(img_original, CV_8UC3);
+      addWeighted(img_filt, 0.5, img_original, 1, 0, final_result);
+      image_final_result = cv_bridge::CvImage{current_image_alg1->header, "bgr8", final_result}.toImageMsg();
+    }
+    //-------------------------------------------------------------------
+    cvtColor(img_filt, img_filt, CV_BGR2GRAY);
     img_filt.convertTo(img_filt, CV_8UC1);
     img_final_map = cv_bridge::CvImage{current_image_alg1->header, "mono8", img_filt}.toImageMsg();
     info.height = input.cols;
