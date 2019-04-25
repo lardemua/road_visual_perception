@@ -117,7 +117,7 @@ junction_data::junction_data() : it(n)
   sub_img1 = it.subscribe("draw_poly/poly_alg1", 10, &junction_data::imageAlg1, this);
   sub_img2 = it.subscribe("draw_poly/poly_alg2", 10, &junction_data::imageAlg2, this);
   sub_advanced_algo = it.subscribe("advanced_algorithm/poly", 10, &junction_data::advanced_algo, this);
-  sub_img_ori = it.subscribe("camera/image_rect", 10, &junction_data::imageOri, this);
+  sub_img_ori = it.subscribe("camera/image_rect_color", 10, &junction_data::imageOri, this);
 }
 
 /**
