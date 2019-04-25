@@ -110,7 +110,7 @@ alg2::alg2() : it(n)
 
     /*Publishers*/
     sub_img = it.subscribe("/camera/image_rect_color", 10, &alg2::receiveInitImg, this);
-    poly_image = n.advertise<sensor_msgs::Image>("advanced_algorithm/greenMask", 10);
+    poly_image = n.advertise<sensor_msgs::Image>("advanced_algorithm/poly", 10);
     initial_image = n.advertise<sensor_msgs::Image>("advanced_algorithm/finalResult", 10);
     // camInfo = n.subscribe<sensor_msgs::CameraInfo>("/camera/camera_info", 10, std::bind(readCameraInfo, std::placeholders::_1, &info_set));
 }

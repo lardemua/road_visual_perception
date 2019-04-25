@@ -106,16 +106,17 @@ junction_data::junction_data() : it(n)
   pace = (1 / (alpha_x)) * (cols_img_big / cols_img_small); // cada lado da celula correponde a este valor em m
 
   /*Publishers and Subscribers*/
-  merged_image = n.advertise<sensor_msgs::Image>("junction_data/summed_img", 10);
-  intersect_image = n.advertise<sensor_msgs::Image>("junction_data/diff_img", 10);
-  non_intersect_image = n.advertise<sensor_msgs::Image>("junction_data/nonintersect_img", 10);
-  prob_map_image = n.advertise<sensor_msgs::Image>("junction_data/prob_map", 10);
+  merged_image = n.advertise<sensor_msgs::Image>("draw_prob_map/summed_img", 10);
+  intersect_image = n.advertise<sensor_msgs::Image>("draw_prob_map/diff_img", 10);
+  non_intersect_image = n.advertise<sensor_msgs::Image>("draw_prob_map/nonintersect_img", 10);
+  prob_map_image = n.advertise<sensor_msgs::Image>("draw_prob_map/image_map", 10);
+  result=n.advertise<sensor_msgs::Image>("draw_prob_map/final_result", 10);
   grid_road_map_pub = n.advertise<nav_msgs::OccupancyGrid>("road_probabilities_map", 10, true);
-  result=n.advertise<sensor_msgs::Image>("junction_data/finalResult", 10);
+  
 
-  sub_img1 = it.subscribe("data_treatment/final", 10, &junction_data::imageAlg1, this);
-  sub_img2 = it.subscribe("data_treatment2/final", 10, &junction_data::imageAlg2, this);
-  sub_advanced_algo = it.subscribe("advanced_algorithm/greenMask", 10, &junction_data::advanced_algo, this);
+  sub_img1 = it.subscribe("draw_poly/poly_alg1", 10, &junction_data::imageAlg1, this);
+  sub_img2 = it.subscribe("draw_poly/poly_alg2", 10, &junction_data::imageAlg2, this);
+  sub_advanced_algo = it.subscribe("advanced_algorithm/poly", 10, &junction_data::advanced_algo, this);
   sub_img_ori = it.subscribe("camera/image_rect", 10, &junction_data::imageOri, this);
 }
 
@@ -388,7 +389,7 @@ void junction_data::probabilitiesMapImage(Mat &input, Mat &input2)
 
 int main(int argc, char **argv)
 {
-  ros::init(argc, argv, "junction_data");
+  ros::init(argc, argv, "draw_prob_map");
   junction_data data;
 
   while (ros::ok())

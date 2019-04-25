@@ -88,7 +88,7 @@ get_lines::get_lines() : it(n)
   //Resize image
   ros::param::get("~cols_resize", cols_resize);
   ros::param::get("~rows_resize", rows_resize);
-  finalimage = n.advertise<sensor_msgs::Image>("data_treatment/final", 10);
+  finalimage = n.advertise<sensor_msgs::Image>("draw_poly/poly_alg1", 10);
 
   sub = it.subscribe("camera/image_raw", 10, &get_lines::imagereceiveCallback, this);
   sub_lanes = n.subscribe("lane_detector/lane", 10, &get_lines::lanereceiveCallback, this);
@@ -344,7 +344,7 @@ void get_lines::drawingPolygn()
 
 int main(int argc, char **argv)
 {
-  ros::init(argc, argv, "subscriber");
+  ros::init(argc, argv, "draw_poly");
   get_lines subs_lines;
 
   while (ros::ok())
