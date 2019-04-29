@@ -1,8 +1,8 @@
 <launch>
 
     <node pkg="data_treatment" name="draw_poly" type="subscriber" output="screen">
-        <param name="~cols_resize" type= "int" value="640"/>
-        <param name="~rows_resize" type= "int" value="480"/>
+        <param name="~cols_resize" type= "int" value="320"/>
+        <param name="~rows_resize" type= "int" value="240"/>
         <!-- </Para visualização dos poligonos com áreas pintadas> -->
         <!-- <param name="~R_channel" type= "int" value="255"/>
         <param name="~G_channel" type= "int" value="0"/>
@@ -13,8 +13,8 @@
         <remap from="lane_detector/processed" to="lane_detector2/result" />
         <remap from="lane_detector/lane" to="lane_detector2/lane" />
         <remap from="draw_poly/poly_alg1" to="draw_poly/poly_alg2"/>
-        <param name="~cols_resize" type= "int" value="640"/>
-        <param name="~rows_resize" type= "int" value="480"/>
+        <param name="~cols_resize" type= "int" value="320"/>
+        <param name="~rows_resize" type= "int" value="240"/>
         <!-- <param name="~R_channel" type= "int" value="0"/>
         <param name="~G_channel" type= "int" value="0"/>
         <param name="~B_channel" type= "int" value="255"/> -->
@@ -24,8 +24,8 @@
     <node pkg="data_treatment" name="draw_prob_map" type="junction_data" output="screen">
         <remap from="~camera" to="world"/>
         <param name="~cols_img_big" type= "double" value="964"/>
-        <param name="~cols_img_small" type= "double" value="640"/>
-        <param name="~rows_img_small" type= "double" value="480"/>
+        <param name="~cols_img_small" type= "double" value="320"/>
+        <param name="~rows_img_small" type= "double" value="240"/>
         <param name="~kernel_size" type= "int" value="25"/>
     </node>
 
