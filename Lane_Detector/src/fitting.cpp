@@ -22,9 +22,9 @@ lane_detector::Lane Fitting::fitting(cv::Mat &original, cv::Mat &processed_bgr, 
   {
     last_lane = SplineCombination();
   }
-  cv::Scalar Colors[] = { cv::Scalar(255, 0, 0),     cv::Scalar(0, 255, 0),   cv::Scalar(0, 0, 255),
-                          cv::Scalar(255, 255, 0),   cv::Scalar(0, 255, 255), cv::Scalar(255, 0, 255),
-                          cv::Scalar(255, 127, 255), cv::Scalar(127, 0, 255), cv::Scalar(127, 0, 127) };
+  cv::Scalar Colors[] = {cv::Scalar(255, 0, 0), cv::Scalar(0, 255, 0), cv::Scalar(0, 0, 255),
+                         cv::Scalar(255, 255, 0), cv::Scalar(0, 255, 255), cv::Scalar(255, 0, 255),
+                         cv::Scalar(255, 127, 255), cv::Scalar(127, 0, 255), cv::Scalar(127, 0, 127)};
   std::vector<cv::Point> splinePoints;
   std::vector<cv::Point2f> centroids;
   std::vector<cv::Rect> rects;
@@ -40,7 +40,7 @@ lane_detector::Lane Fitting::fitting(cv::Mat &original, cv::Mat &processed_bgr, 
   rects = std::vector<cv::Rect>(rectsAux.begin(), rectsAux.end());
   lane_detector::utils::getRectsCentroids(rects, centroids);
   std::vector<std::vector<cv::Point>> splines(rects.size());
-  ROS_DEBUG("Lanes detected: %lu", rects.size());  // Verificado
+  ROS_DEBUG("Lanes detected: %lu", rects.size()); // Verificado
   // current_lane.correct=true;
 
   if (rects.size() > 0)
@@ -49,7 +49,7 @@ lane_detector::Lane Fitting::fitting(cv::Mat &original, cv::Mat &processed_bgr, 
 #pragma omp parallel shared(splines)
     {
       std::vector<cv::Point> spline_private;
-#pragma omp for nowait  // fill splines_private in parallel
+#pragma omp for nowait // fill splines_private in parallel
       for (int i = 0; i < rects.size(); i++)
       {
         cv::Rect bounding_box = rects[i];
@@ -75,8 +75,8 @@ lane_detector::Lane Fitting::fitting(cv::Mat &original, cv::Mat &processed_bgr, 
   {
     // cout<< "Current Lane antes:------------------------------ "<<current_lane.correct <<endl;
     findCurrentLane(centroids, splines, current_lane,
-                    processed_bgr);  //-----------------------------------------------------------------------É
-                                     // aqui que a correct passa a 1
+                    processed_bgr); //-----------------------------------------------------------------------É
+                                    // aqui que a correct passa a 1
     // cout<< "Current Lane depois:------------------------------ "<<current_lane.correct <<endl;
     if (current_lane.correct)
       last_lane = current_lane;
@@ -104,13 +104,13 @@ lane_detector::Lane Fitting::fitting(cv::Mat &original, cv::Mat &processed_bgr, 
     if (config.draw_splines)
       lane_detector::utils::drawSpline(
           processed_bgr, current_lane.spline1, 2,
-          cv::Scalar(0, 255, 0));  //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!Linha
-                                   //! da esquerda
+          cv::Scalar(0, 255, 0)); //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!Linha
+                                  //! da esquerda
     if (config.draw_splines)
       lane_detector::utils::drawSpline(
           processed_bgr, current_lane.spline2, 2,
-          cv::Scalar(0, 255, 0));  //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!Linha
-                                   //! da da direita
+          cv::Scalar(0, 255, 0)); //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!Linha
+                                  //! da da direita
   }
   if (config.draw_tracked_centroids)
   {
@@ -132,8 +132,8 @@ lane_detector::Lane Fitting::fitting(cv::Mat &original, cv::Mat &processed_bgr, 
   // cout<< "Current Lane??"<<current_lane.correct <<endl;
 
   if (current_lane
-          .correct)  /// ERRO É
-                     /// AQUIIIIIIIIIIIIIIIIIIIIIIIIIIIII!------------------------------------------------------------------------------------------------
+          .correct) /// ERRO É
+                    /// AQUIIIIIIIIIIIIIIIIIIIIIIIIIIIII!------------------------------------------------------------------------------------------------
   {
     longest_spline = current_lane.longest_spline;
     right_spline = current_lane.right_spline;
@@ -196,43 +196,43 @@ lane_detector::Lane Fitting::fitting(cv::Mat &original, cv::Mat &processed_bgr, 
     // cout << "right_spline_float: "<< right_spline_float <<"\n"<<endl;
     // cout << "left_spline_float: "<< left_spline_float<<"\n"<<endl;
 
-  // current_lane_msg.guide_line_pix = guide_spline_pix_ros;
+    // current_lane_msg.guide_line_pix = guide_spline_pix_ros;
 
     // if (config.transform_back)
     // {
-      cv::Mat left_spline_mat(2, left_spline_float.size(), CV_32FC1);
-      cv::Mat right_spline_mat(2, right_spline_float.size(), CV_32FC1);
-      lane_detector::utils::spline2Mat(left_spline_float, left_spline_mat);
-      lane_detector::utils::spline2Mat(right_spline_float, right_spline_mat);
-      left_spline_mat = left_spline_mat * 1000.0;    // convert to mm
-      right_spline_mat = right_spline_mat * 1000.0;  // convert to mm
-      CvMat left_spline_mat_ = left_spline_mat;
-      CvMat right_spline_mat_ = right_spline_mat;
-      LaneDetector::mcvTransformGround2Image(&left_spline_mat_, &left_spline_mat_, &cameraInfo);
-      LaneDetector::mcvTransformGround2Image(&right_spline_mat_, &right_spline_mat_, &cameraInfo);
-      left_spline_mat = cv::cvarrToMat(&left_spline_mat_, false);
-      right_spline_mat = cv::cvarrToMat(&right_spline_mat_, false);
-      lane_detector::utils::mat2Spline(left_spline_mat, left_spline_float);
-      lane_detector::utils::mat2Spline(right_spline_mat, right_spline_float);
-      lane_detector::utils::cvtCvPoints2ROSPoints(right_spline_float, right_spline_pix_ros);
-      lane_detector::utils::cvtCvPoints2ROSPoints(left_spline_float, left_spline_pix_ros);
-      current_lane_msg.guide_line = guide_spline_ros;
-      current_lane_msg.right_line = right_spline_ros;
-      current_lane_msg.left_line = left_spline_ros;
-      current_lane_msg.right_line_pix = right_spline_pix_ros;
-      current_lane_msg.left_line_pix = left_spline_pix_ros;
-      left_spline = lane_detector::utils::cvtCvPoint2f2CvPoint(left_spline_float);
-      right_spline = lane_detector::utils::cvtCvPoint2f2CvPoint(right_spline_float);
-      if (config.draw_splines && config.transform_back)
-      {
-        lane_detector::utils::drawSpline(original, left_spline, 6, cv::Scalar(0, 255, 0));
-        lane_detector::utils::drawSpline(original, right_spline, 6, cv::Scalar(0, 255, 0));
-      }
-      left_spline = lane_detector::utils::splineSampling(left_spline);
-      right_spline = lane_detector::utils::splineSampling(right_spline);
-      splines.clear();
-      splines.push_back(left_spline);
-      splines.push_back(right_spline);
+    cv::Mat left_spline_mat(2, left_spline_float.size(), CV_32FC1);
+    cv::Mat right_spline_mat(2, right_spline_float.size(), CV_32FC1);
+    lane_detector::utils::spline2Mat(left_spline_float, left_spline_mat);
+    lane_detector::utils::spline2Mat(right_spline_float, right_spline_mat);
+    left_spline_mat = left_spline_mat * 1000.0;   // convert to mm
+    right_spline_mat = right_spline_mat * 1000.0; // convert to mm
+    CvMat left_spline_mat_ = left_spline_mat;
+    CvMat right_spline_mat_ = right_spline_mat;
+    LaneDetector::mcvTransformGround2Image(&left_spline_mat_, &left_spline_mat_, &cameraInfo);
+    LaneDetector::mcvTransformGround2Image(&right_spline_mat_, &right_spline_mat_, &cameraInfo);
+    left_spline_mat = cv::cvarrToMat(&left_spline_mat_, false);
+    right_spline_mat = cv::cvarrToMat(&right_spline_mat_, false);
+    lane_detector::utils::mat2Spline(left_spline_mat, left_spline_float);
+    lane_detector::utils::mat2Spline(right_spline_mat, right_spline_float);
+    lane_detector::utils::cvtCvPoints2ROSPoints(right_spline_float, right_spline_pix_ros);
+    lane_detector::utils::cvtCvPoints2ROSPoints(left_spline_float, left_spline_pix_ros);
+    current_lane_msg.guide_line = guide_spline_ros;
+    current_lane_msg.right_line = right_spline_ros;
+    current_lane_msg.left_line = left_spline_ros;
+    current_lane_msg.right_line_pix = right_spline_pix_ros;
+    current_lane_msg.left_line_pix = left_spline_pix_ros;
+    left_spline = lane_detector::utils::cvtCvPoint2f2CvPoint(left_spline_float);
+    right_spline = lane_detector::utils::cvtCvPoint2f2CvPoint(right_spline_float);
+    if (config.draw_splines && config.transform_back)
+    {
+      lane_detector::utils::drawSpline(original, left_spline, 6, cv::Scalar(0, 255, 0));
+      lane_detector::utils::drawSpline(original, right_spline, 6, cv::Scalar(0, 255, 0));
+    }
+    left_spline = lane_detector::utils::splineSampling(left_spline);
+    right_spline = lane_detector::utils::splineSampling(right_spline);
+    splines.clear();
+    splines.push_back(left_spline);
+    splines.push_back(right_spline);
     // }
   }
   else
@@ -275,7 +275,7 @@ void Fitting::findCurrentLane(const std::vector<cv::Point2f> &centroids,
   {
     for (int i = 0; i < spline_combinations.size(); i++)
     {
-      costs.at(i) = calcCost(spline_combinations[i]);  // Não é aqui que a variável passa a um
+      costs.at(i) = calcCost(spline_combinations[i]); // Não é aqui que a variável passa a um
       // if(spline_combinations[i].closest_points_set)
       // cv::line(image, spline_combinations[i].closest_point_s1, spline_combinations[i].closest_point_s2,
       // cv::Scalar(255, 255, 0), 1); std::cout << "Cost: " << costs[i] << std::endl;
@@ -296,8 +296,8 @@ void Fitting::findCurrentLane(const std::vector<cv::Point2f> &centroids,
     // cout<<"Best combination: "<<best_combination.correct<<endl;
     // cout<<"lane threshold: "<<config.lane_threshold<<endl;
     // cout<<"best_cost: "<<best_cost<<endl;
-    if (best_cost < config.lane_threshold)  //É aqui que o current lane passa a um................................
-      current_lane = best_combination;      // Ao serem igualadas passa a um!!
+    if (best_cost < config.lane_threshold) //É aqui que o current lane passa a um................................
+      current_lane = best_combination;     // Ao serem igualadas passa a um!!
     //  cout<< "Current Lane(depois): "<<current_lane.correct<<endl;
   }
 
