@@ -1,0 +1,9 @@
+<launch>
+    <param name="robot_description" command="$(find xacro)/xacro --inorder '$(find pointgrey_camera_description)/urdf/camera_tiago.urdf.xacro'" />
+    <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
+
+    <include file="$(find lane_detector)/launch/algorithm1.launch" /> 
+    <include file="$(find advanced_lane_detection)/launch/advanced_lane_detection.launch" />
+    <include file="$(find data_treatment)/launch/data_treatment.launch" />
+
+</launch>

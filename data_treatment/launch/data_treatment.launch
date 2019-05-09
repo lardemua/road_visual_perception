@@ -19,7 +19,7 @@
         <param name="~G_channel" type= "int" value="0"/>
         <param name="~B_channel" type= "int" value="255"/> -->
     </node>
-    <include file="$(find advanced_lane_detection)/launch/advanced_lane_detection.launch" />
+   
 
     <node pkg="data_treatment" name="draw_prob_map" type="junction_data" output="screen">
         <remap from="~camera" to="world"/>

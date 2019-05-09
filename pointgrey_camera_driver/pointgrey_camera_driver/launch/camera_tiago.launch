@@ -5,7 +5,6 @@
   <arg name="camera_serial" default="0" />
   <arg name="calibrated" default="0" />
   <arg name="packet_resend" default="true" />
-  <arg name="load_images_from_folder" default="false" />
   <node name="image_proc" pkg="image_proc" type="image_proc" ns="camera"/>
 
   <group ns="$(arg camera_name)">
@@ -30,34 +29,6 @@
     <node pkg="nodelet" type="nodelet" name="image_proc_debayer" args="load image_proc/debayer camera_nodelet_manager">
     </node>
   </group>
-
-  <node pkg="lane_detector" type="lane_detector" name="lane_detector" output="screen">
-    <remap from="camera_info" to="/camera/camera_info" />
-    <remap from="image" to="/camera/image_rect_color" />
-    <param name="images_from_folder" value="$(arg load_images_from_folder)" />
-    <param name="images_path" value="$(find lane_detector)/data/first_set" />
-    <param name="~cols_resize" type= "int" value="320"/>
-    <param name="~rows_resize" type= "int" value="240"/>
-  </node>
-  <node pkg="lane_detector" type="lane_detector" name="lane_detector2" output="screen">
-    <remap from="camera_info" to="/camera/camera_info" />
-    <remap from="image" to="/camera/image_rect_color" />
-    <param name="images_from_folder" value="$(arg load_images_from_folder)" />
-    <param name="images_path" value="$(find lane_detector)/data/first_set" />
-    <remap from="lane_detector/processed" to="lane_detector2/processed" />
-    <remap from="lane_detector/lane" to="lane_detector2/lane" />
-    <remap from="lane_detector/result" to="lane_detector2/result"/>
-    <param name="~cols_resize" type= "int" value="320"/>
-    <param name="~rows_resize" type= "int" value="240"/>
-    <rosparam command="load" file="$(find lane_detector)/params/Detector2.yaml"/>
-  </node>
-
-
-  <param name="robot_description" command="$(find xacro)/xacro --inorder '$(find pointgrey_camera_description)/urdf/camera_tiago.urdf.xacro'" />
-  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
-
-
-  <include file="$(find data_treatment)/launch/data_treatment.launch" />
 
   <node type="rviz" name="rviz" pkg="rviz"/>
 
