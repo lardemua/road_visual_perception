@@ -49,18 +49,24 @@ In order to get faster results, I rescale the initial image inside of my archite
 3) In Lane_Detector/params/Detector2.yaml change the value's variable ipmRight to number of columns of the image;
 4) In Lane_Detector/cfg/Detector.cfg (lines 47-70) uncomment or comment the lines based on the image resolution;
 5) On the launch files:
-    -camera_tiago.launch;
+    -algorithm1.launch;
     -data_treatment.launch;
     -advaced_lane_detection.launch;
-    Change the parmaters related to the image resolution.
+    Change the paramaters related to the image resolution.
 
 
 ## Usage
 
-To launch everything:
+To launch cameras:
 
 ```
 roslaunch pointgrey_camera_driver camera_tiago.launch packet_resend:=false
+```
+
+To launch the architecture:
+
+```
+roslaunch data_treatment road_visual_perception.launch 
 ```
 
 ### Algorithms that were used
