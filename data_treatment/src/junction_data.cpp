@@ -111,7 +111,7 @@ junction_data::junction_data() : it(n)
   non_intersect_image = n.advertise<sensor_msgs::Image>("draw_prob_map/nonintersect_img", 10);
   prob_map_image = n.advertise<sensor_msgs::Image>("draw_prob_map/image_map", 10);
   result=n.advertise<sensor_msgs::Image>("draw_prob_map/final_result", 10);
-  grid_road_map_pub = n.advertise<nav_msgs::OccupancyGrid>("road_probabilities_map", 10, true);
+  grid_road_map_pub = n.advertise<nav_msgs::OccupancyGrid>("draw_prob_map/road_probabilities_map", 10, true);
   
 
   sub_img1 = it.subscribe("draw_poly/poly_alg1", 10, &junction_data::imageAlg1, this);

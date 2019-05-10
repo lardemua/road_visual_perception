@@ -222,7 +222,7 @@ void alg2::processFrames()
 
 int main(int argc, char **argv)
 {
-    ros::init(argc, argv, "advanced_algo");
+    ros::init(argc, argv, "advanced_algorithm");
     alg2 processImage;
 
     while (ros::ok())
