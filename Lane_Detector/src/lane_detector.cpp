@@ -229,7 +229,7 @@ void laneDetectionFromFiles(std::string &path)
 
 int main(int argc, char **argv)
 {
-  ros::init(argc, argv, "lane_detector");
+  ros::init(argc, argv, "lane_detector_node");
 
   /**
    * NodeHandle is the main access point to communications with the ROS system.

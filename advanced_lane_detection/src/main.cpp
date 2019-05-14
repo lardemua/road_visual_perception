@@ -110,8 +110,8 @@ alg2::alg2() : it(n)
 
     /*Publishers*/
     sub_img = it.subscribe("/camera/image_rect_color", 10, &alg2::receiveInitImg, this);
-    poly_image = n.advertise<sensor_msgs::Image>("advanced_algorithm/poly", 10);
-    initial_image = n.advertise<sensor_msgs::Image>("advanced_algorithm/finalResult", 10);
+    poly_image = n.advertise<sensor_msgs::Image>("/advanced_algorithm/polygon", 10);
+    initial_image = n.advertise<sensor_msgs::Image>("/advanced_algorithm/finalResult", 10);
     // camInfo = n.subscribe<sensor_msgs::CameraInfo>("/camera/camera_info", 10, std::bind(readCameraInfo, std::placeholders::_1, &info_set));
 }
 
@@ -160,16 +160,7 @@ void alg2::receiveInitImg(const sensor_msgs::ImageConstPtr &img)
     }
 }
 
-/**
- * @brief Callback to receive the camera info 
- * 
- * @param cm 
- * @param done 
- */
 
-// void callbackCamInfo(const sensor_msgs::CameraInfo::ConstPtr &cm, bool *done)
-// {
-// }
 
 /**
  * @brief process algorithm application
@@ -222,7 +213,7 @@ void alg2::processFrames()
 
 int main(int argc, char **argv)
 {
-    ros::init(argc, argv, "advanced_algorithm");
+    ros::init(argc, argv,"advanced_algorithm_node" );
     alg2 processImage;
 
     while (ros::ok())

@@ -1,15 +1,12 @@
-/**
- * @file junction_data.cpp
- * @author Tiago Almeida (tm.almeida@ua.pt)
- * @brief The junction of the 2 images treated with painted area and the probability map are made here!
- * @version 0.1
- * @date 2019-04-02
- *
- * @copyright Copyright (c) 2019
- *
- */
+#include <initializer_list>
+#include <vector>
+#include <memory>
+#include <functional>
+#include <mutex>
 
-/*Opencv*/
+#include <boost/bind.hpp>
+#include <boost/algorithm/string.hpp>
+
 #include <opencv/cv.h>
 #include <opencv/highgui.h>
 
@@ -22,286 +19,185 @@
 /*GridMap*/
 #include "grid_map_cv/GridMapCvConverter.hpp"
 #include "grid_map_ros/GridMapRosConverter.hpp"
+#include "std_msgs/Header.h"
 
 /*ROS*/
 #include <image_transport/image_transport.h>
 #include <cv_bridge/cv_bridge.h>
 #include "ros/ros.h"
 
-/*Namesapaces*/
-using namespace std;
-using namespace ros;
-using namespace cv;
+struct image_info
+{
+    cv::Mat image;
+    ros::Time time_stamp;
+    bool isupdate;
+    std_msgs::Header image_header;
+};
 
 class junction_data
 {
 public:
-  junction_data();
-  void MainLoop();
+    struct params
+    {
+        int width;
+        int height;
+        int kernel_size;
+    };
+    /*Important variables*/
+    double alpha_x, pace, scale_factor, cols_img_big, cols_img_small;
+
+    junction_data(const std::vector<std::string> &image_topics, params params);
+
+    void img_callback(const sensor_msgs::ImageConstPtr &img1, int alg_idx);
+    void process();
+    void mergedImage();
+    void probabilitiesMapImage(cv::Mat &img_intersection, cv::Mat &img_nonintersection);
 
 private:
-  ros::NodeHandle n;
+    params _params;
 
-  /*Important variables*/
-  double alpha_x, pace, scale_factor, cols_img_big, cols_img_small, rows_img_small;
+    ros::NodeHandle _nh;
+    image_transport::ImageTransport _it;
+    std::vector<image_transport::Subscriber> _image_subscribers;
+    ros::Publisher _image_publisher_summed;
+    ros::Publisher _image_publisher_diff;
+    ros::Publisher _image_publisher_nonint;
+    ros::Publisher _prob_map_image;
+    ros::Publisher _grid_road_map_pub;
 
-  /*ROS*/
-  grid_map::GridMap grid_road_GridMap;
-  nav_msgs::OccupancyGrid roadmapGrid;
-  image_transport::ImageTransport it;
+    std::vector<std::string> _algorithms_names;
+    std::vector<bool> _image_updates;
+    std::vector<std::shared_ptr<cv::Mat>> _images;
+    std::vector<std_msgs::Header> _images_headers;
 
-  /*Messages*/
-  nav_msgs::MapMetaData info;
-  sensor_msgs::CameraInfo::_K_type k_matrix;
+    /*Messages*/
+    nav_msgs::MapMetaData info;
+    sensor_msgs::CameraInfo::_K_type k_matrix;
 
-  /*Publishers && Subs*/
-  ros::Publisher merged_image;
-  ros::Publisher intersect_image;
-  ros::Publisher non_intersect_image;
-  ros::Publisher prob_map_image;
-  ros::Publisher grid_road_map_pub;
-  ros::Publisher result;
-  image_transport::Subscriber sub_img1;
-  image_transport::Subscriber sub_img2;
-  image_transport::Subscriber sub_advanced_algo;
-  image_transport::Subscriber sub_img_ori;
-
-  /*Images pointers reveive*/
-  cv_bridge::CvImagePtr current_image_alg1;
-  cv_bridge::CvImagePtr current_image_alg2;
-  cv_bridge::CvImagePtr current_image_alg3;
-  cv_bridge::CvImagePtr current_image_original;
-
-  /*Images messages*/
-  sensor_msgs::ImagePtr img_final_summed, img_final_diff, img_final_nao_int, img_final_map, image_final_result;
-
-  /*Functions*/
-  void Publishers();
-  void imageAlg1(const sensor_msgs::ImageConstPtr &img1);
-  void imageAlg2(const sensor_msgs::ImageConstPtr &img2);
-  void advanced_algo(const sensor_msgs::ImageConstPtr &img3);
-  void imageOri(const sensor_msgs::ImageConstPtr &img4);
-  void mergedImage();
-  void diffImage();
-  void probabilitiesMapImage(Mat &input, Mat &input2);
+    /*ROS*/
+    grid_map::GridMap grid_road_GridMap;
+    nav_msgs::OccupancyGrid roadmapGrid;
 };
 
-/**
- * @brief Construct a new junction data::junction data object
- * 
- */
-
-junction_data::junction_data() : it(n)
+junction_data::junction_data(const std::vector<std::string> &image_topics, params params)
+    // clang-format off
+    : _params(params)
+    , _nh()
+    , _it(_nh)
+    , _image_publisher_summed(_nh.advertise<sensor_msgs::Image>("draw_prob_map/summed_img", 10))
+    , _image_publisher_diff(_nh.advertise<sensor_msgs::Image>("draw_prob_map/intersect_img", 10))
+    , _image_publisher_nonint(_nh.advertise<sensor_msgs::Image>("draw_prob_map/nonintersect_img", 10))
+    , _prob_map_image(_nh.advertise<sensor_msgs::Image>("draw_prob_map/image_map", 10))
+    , _grid_road_map_pub(_nh.advertise<nav_msgs::OccupancyGrid>("draw_prob_map/road_probabilistic_map", 10, true))
+    , _algorithms_names(image_topics.begin(), image_topics.end())
+    , _image_updates(image_topics.size(), false)
+    , _images_headers(image_topics.size())
+// clang-format on
 {
-  /*Getting the scale factor m/pix*/
-  //Resize image
-  cols_img_big = 0;
-  cols_img_small = 0;
-  ros::param::get("~cols_img_big", cols_img_big);
-  ros::param::get("~cols_img_small", cols_img_small);
-  sensor_msgs::CameraInfoConstPtr CamInfo;
-  CamInfo = ros::topic::waitForMessage<sensor_msgs::CameraInfo>("/camera/camera_info", n, ros::Duration(10));
-  k_matrix = CamInfo->K;
-  alpha_x = k_matrix[0];
-  pace = (1 / (alpha_x)) * (cols_img_big / cols_img_small); // cada lado da celula correponde a este valor em m
+    cols_img_big = 0;
+    cols_img_small = 0;
+    ros::param::get("~cols_img_big", cols_img_big);
+    ros::param::get("~cols_img_small", cols_img_small);
+    sensor_msgs::CameraInfoConstPtr CamInfo;
+    CamInfo = ros::topic::waitForMessage<sensor_msgs::CameraInfo>("/camera/camera_info", _nh, ros::Duration(10));
+    k_matrix = CamInfo->K;
+    alpha_x = k_matrix[0];
+    pace = (1 / (alpha_x)) * (cols_img_big / cols_img_small); // cada lado da celula correponde a este valor em m
 
-  /*Publishers and Subscribers*/
-  merged_image = n.advertise<sensor_msgs::Image>("draw_prob_map/summed_img", 10);
-  intersect_image = n.advertise<sensor_msgs::Image>("draw_prob_map/diff_img", 10);
-  non_intersect_image = n.advertise<sensor_msgs::Image>("draw_prob_map/nonintersect_img", 10);
-  prob_map_image = n.advertise<sensor_msgs::Image>("draw_prob_map/image_map", 10);
-  result=n.advertise<sensor_msgs::Image>("draw_prob_map/final_result", 10);
-  grid_road_map_pub = n.advertise<nav_msgs::OccupancyGrid>("draw_prob_map/road_probabilities_map", 10, true);
-  
+    for (auto topic = image_topics.begin(); topic != image_topics.end(); topic++)
+    {
+        auto topic_idx = std::distance(image_topics.begin(), topic);
 
-  sub_img1 = it.subscribe("draw_poly/poly_alg1", 10, &junction_data::imageAlg1, this);
-  sub_img2 = it.subscribe("draw_poly/poly_alg2", 10, &junction_data::imageAlg2, this);
-  sub_advanced_algo = it.subscribe("advanced_algorithm/poly", 10, &junction_data::advanced_algo, this);
-  sub_img_ori = it.subscribe("camera/image_rect_color", 10, &junction_data::imageOri, this);
+        auto callback = boost::bind(&junction_data::img_callback, this, _1, topic_idx);
+
+        auto subscriber = _it.subscribe(*topic, 10, callback);
+
+        _image_subscribers.push_back(subscriber);
+    }
+
+    _images.reserve(image_topics.size());
+    for (int i = 0; i < image_topics.size(); i++)
+    {
+        auto img = std::make_shared<cv::Mat>(_params.width, _params.height, CV_8UC3);
+        _images.push_back(img);
+    }
 }
 
-/**
- * @brief main loop
- * 
- */
-
-void junction_data::MainLoop()
+void junction_data::img_callback(const sensor_msgs::ImageConstPtr &img_msg, int alg_idx)
 {
-  if (current_image_alg1 && current_image_alg2 && current_image_alg3)
-  {
+    auto img = cv_bridge::toCvCopy(img_msg, sensor_msgs::image_encodings::BGR8);
+    auto buffer = _images[alg_idx];
+    img->image.copyTo(*buffer);
 
-    mergedImage();
-    diffImage();
-    Publishers();
-  }
+    _image_updates[alg_idx] = true;
+
+    _images_headers[alg_idx] = img_msg->header;
+
+    ROS_INFO("received image from algorithm %d", alg_idx);
+
+    process();
 }
 
-/**
- * @brief Publishers function
- * 
- * @param i
- */
-void junction_data::Publishers()
+void junction_data::process()
 {
-  merged_image.publish(img_final_summed);
-  intersect_image.publish(img_final_diff);
-  non_intersect_image.publish(img_final_nao_int);
-  result.publish(image_final_result);
-  prob_map_image.publish(img_final_map);
-  grid_road_map_pub.publish(roadmapGrid);
-}
+    cv::Mat image_int;
+    cv::Mat image_ref;
+    cv::Mat image_nonint;
+    // verificar se as 3 images estão set
+    for (auto is_updated : _image_updates)
+    {
+        if (!is_updated)
+            return;
+    }
 
-/**
-   * @brief Callback to receive the image that cames from the algorithm 1
-   *
-   * @param img1
-   */
-void junction_data::imageAlg1(const sensor_msgs::ImageConstPtr &img1)
-{
-  try
-  {
-    current_image_alg1 = cv_bridge::toCvCopy(img1, sensor_msgs::image_encodings::BGR8);
-  }
-  catch (cv_bridge::Exception &e)
-  {
-    ROS_ERROR("Could not convert from '%s' to 'bgr8'.", img1->encoding.c_str());
-  }
-}
+    auto buffer_sum = _images[0];
+    auto buffer_int = _images[0];
+    buffer_int->copyTo(image_int);
+    cv::cvtColor(image_int, image_int, CV_BGR2GRAY);
+    cv::threshold(image_int, image_int, 0, 255, cv::THRESH_BINARY | cv::THRESH_OTSU);
 
-/**
-   * @brief Callback to receive the image that cames from the algorithm 2
-   *
-   * @param img2
-   */
+    for (int i = 1; i < _images.size(); i++)
+    {
+        cv::add(*buffer_sum, *_images[i], *buffer_sum);
+        _images[i]->copyTo(image_ref);
+        cv::cvtColor(image_ref, image_ref, CV_BGR2GRAY);
+        cv::threshold(image_ref, image_ref, 0, 255, cv::THRESH_BINARY | cv::THRESH_OTSU);
+        cv::bitwise_and(image_int, image_ref, image_int);
+        cv::bitwise_xor(image_int, image_ref, image_nonint);
+    }
 
-void junction_data::imageAlg2(const sensor_msgs::ImageConstPtr &img2)
-{
-  try
-  {
-    current_image_alg2 = cv_bridge::toCvCopy(img2, sensor_msgs::image_encodings::BGR8);
-  }
-  catch (cv_bridge::Exception &e)
-  {
-    ROS_ERROR("Could not convert from '%s' to 'bgr8'.", img2->encoding.c_str());
-  }
-}
+    auto img_msg = cv_bridge::CvImage{_images_headers[0], "bgr8", *buffer_sum}.toImageMsg();
+    auto img_msg_diff = cv_bridge::CvImage{_images_headers[0], "mono8", image_int}.toImageMsg();
+    auto img_msg_nonint = cv_bridge::CvImage{_images_headers[0], "mono8", image_nonint}.toImageMsg();
 
-/**
- * @brief Function tha receives the image with green area representing road zone.
- * 
- * @param img3 
- */
+    _image_publisher_summed.publish(img_msg);
+    _image_publisher_diff.publish(img_msg_diff);
+    _image_publisher_nonint.publish(img_msg_nonint);
 
-void junction_data::advanced_algo(const sensor_msgs::ImageConstPtr &img3)
-{
-  try
-  {
-    current_image_alg3 = cv_bridge::toCvCopy(img3, sensor_msgs::image_encodings::BGR8);
-  }
-  catch (cv_bridge::Exception &e)
-  {
-    ROS_ERROR("Could not convert from '%s' to 'bgr8'.", img3->encoding.c_str());
-  }
-}
+    probabilitiesMapImage(image_int, image_nonint);
 
-/**
- * @brief dunction that receives the original image to get the final result
- * 
- * @param img3 
- */
-void junction_data::imageOri(const sensor_msgs::ImageConstPtr &img4)
-{
-  try
-  {
-    current_image_original = cv_bridge::toCvCopy(img4, sensor_msgs::image_encodings::BGR8);
-  }
-  catch (cv_bridge::Exception &e)
-  {
-    ROS_ERROR("Could not convert from '%s' to 'bgr8'.", img4->encoding.c_str());
-  }
-}
-
-/**
-   * @brief Function that shows the 2 retuned color images on the same image
-   *
-   */
-
-void junction_data::mergedImage()
-{
-  int i, j = 0;
-  if (current_image_alg1 && current_image_alg2 && current_image_alg3)
-  {
-    Mat img_alg1 = current_image_alg1->image;
-    Mat img_alg2 = current_image_alg2->image;
-    Mat img_alg3 = current_image_alg3->image; //Image that is painted! Any algorithm that returns painted areas do like that!
-    Mat img_summed;
-    // cout << img_alg1.cols << endl;
-    // cout << img_alg2.cols << endl;
-    // cout << img_alg3.cols << endl;
-    add(img_alg1, img_alg2, img_summed);
-    add(img_summed, img_alg3, img_summed);
-    img_final_summed = cv_bridge::CvImage{current_image_alg1->header, "bgr8", img_summed}.toImageMsg();
-  }
-}
-
-/**
-   * @brief Function that returns the intersection and non intersection region.
-   *
-   */
-
-void junction_data::diffImage()
-{
-  if (current_image_alg1 && current_image_alg2 && current_image_alg3)
-  {
-    Mat img_diff;
-    Mat img_ninter;
-    Mat img_alg1 = current_image_alg1->image;
-    Mat img_alg2 = current_image_alg2->image;
-    Mat img_alg3 = current_image_alg3->image;
-    cvtColor(img_alg1, img_alg1, CV_BGR2GRAY);
-    cvtColor(img_alg2, img_alg2, CV_BGR2GRAY);
-    cvtColor(img_alg3, img_alg3, CV_BGR2GRAY);
-    threshold(img_alg1, img_alg1, 0, 255, THRESH_BINARY | THRESH_OTSU);
-    threshold(img_alg2, img_alg2, 0, 255, THRESH_BINARY | THRESH_OTSU);
-    threshold(img_alg3, img_alg3, 0, 255, THRESH_BINARY | THRESH_OTSU);
-
-    bitwise_and(img_alg1, img_alg2, img_diff);
-    bitwise_and(img_diff, img_alg3, img_diff);
-
-    //bitwise_xor(img_alg1, img_alg2, img_ninter);
-    bitwise_xor(img_diff, img_alg3, img_ninter); // rever isto!!
-
-    img_final_diff = cv_bridge::CvImage{current_image_alg1->header, "mono8", img_diff}.toImageMsg();
-    img_final_nao_int = cv_bridge::CvImage{current_image_alg1->header, "mono8", img_ninter}.toImageMsg();
-
-    probabilitiesMapImage(img_diff, img_ninter);
-  }
+    std::fill(_image_updates.begin(), _image_updates.end(), false);
 }
 
 /**
    * @brief Function tha builds the probability map on an image type.
    *
-   * @param input intersection zone
-   * @param input2 non intersected zone
+   * @param mage_intersection intersection zone
+   * @param image_nonintersection non intersected zone
    */
 
-void junction_data::probabilitiesMapImage(Mat &input, Mat &input2)
+void junction_data::probabilitiesMapImage(cv::Mat &image_intersection, cv::Mat &image_nonintersection)
 {
-  if (current_image_alg1 && current_image_alg2 && current_image_alg3)
-  {
-    rows_img_small = 0;
-    ros::param::get("~ccols_img_small", cols_img_small);
-    ros::param::get("~rows_img_small", rows_img_small);
-    cv::Size size(cols_img_small, rows_img_small);
-    Mat kernel;
-    Mat img_filt;
-    Mat img_final;
-    Mat img_original;
-    Mat final_result;
-    Point anchor;
+
+    cv::Size size(_params.width, _params.height);
+    cv::Mat kernel;
+    cv::Mat img_filt;
+    cv::Mat img_final;
+    cv::Mat img_original;
+    cv::Mat final_result;
+    cv::Point anchor;
     double delta;
     int ddepth;
-    int kernel_size;
     int x = 0;
     int y = 0;
     float pix_cinzentosf = 0;
@@ -309,62 +205,55 @@ void junction_data::probabilitiesMapImage(Mat &input, Mat &input2)
     float prob = 0.0;
     float prob_non_intersect = 0.0;
     int thresh_non_intersect = 1; // valore acrescentado para termos a probabilidade das secções que nao se intersectam
-    kernel_size = 25;
-    ros::param::get("~kernel_size", kernel_size);
-    input.convertTo(input, CV_32F);
-    input2.convertTo(input2, CV_32F);
-    input2 = input2 / (float)(kernel_size + thresh_non_intersect);
 
-    kernel = Mat::ones(kernel_size, kernel_size, CV_32F) / (float)(kernel_size * kernel_size);
+    image_intersection.convertTo(image_intersection, CV_32F);
+    image_nonintersection.convertTo(image_nonintersection, CV_32F);
+    image_nonintersection = image_nonintersection / (float)(_params.kernel_size + thresh_non_intersect);
 
+    kernel = cv::Mat::ones(_params.kernel_size, _params.kernel_size, CV_32F) / (float)(_params.kernel_size * _params.kernel_size);
     /// Initialize arguments for the filter
-    anchor = Point(-1, -1);
+    anchor = cv::Point(-1, -1);
     delta = 0;
     ddepth = -1;
 
-    filter2D(input, img_filt, ddepth, kernel, anchor, delta, BORDER_DEFAULT);
-    img_final = Mat::zeros(input.rows, input.cols, CV_8UC1);
-    img_filt = img_filt + input2;
+    cv::filter2D(image_intersection, img_filt, ddepth, kernel, anchor, delta, cv::BORDER_DEFAULT);
+    img_final = cv::Mat::zeros(image_intersection.rows, image_intersection.cols, CV_8UC1);
+    img_filt = img_filt + image_nonintersection;
 
-    for (x = 0; x < input.rows; x++)
-    {
-      for (y = 0; y < input.cols; y++)
-      {
-        value_filter = img_filt.at<uchar>(x, y);
-        prob = value_filter / (float)255;
-        pix_cinzentosf = prob * (float)255;
-        img_final.at<uchar>(x, y) = (int)pix_cinzentosf;
+    //Probabilities calculations:
 
-        if (input2.at<uchar>(x, y) != 0)
-        {
-          prob_non_intersect = input2.at<uchar>(x, y) / (float)255;
-        }
-
-        // if (value_filter != 0)
-        // {
-        //   cout << "value filter= " << value_filter << endl;
-        //   cout << "Probabilidade " << prob << endl;
-        // }
-      }
-    }
+    // for (x = 0; x < image_intersection.rows; x++)
+    // {
+    //     for (y = 0; y < image_intersection.cols; y++)
+    //     {
+    //         value_filter = img_filt.at<uchar>(x, y);
+    //         prob = value_filter / (float)255;
+    //         pix_cinzentosf = prob * (float)255;
+    //         img_final.at<uchar>(x, y) = (int)pix_cinzentosf;
+    //     }
+    // }
 
     //Image result:-----------------------------------------------------
-    if (current_image_original)
-    {
-      img_original = current_image_original->image;
-      resize(img_original, img_original, size);
-      cvtColor(img_filt, img_filt, CV_GRAY2BGR);
-      img_filt.convertTo(img_filt, CV_8UC3);
-      img_original.convertTo(img_original, CV_8UC3);
-      addWeighted(img_filt, 0.5, img_original, 1, 0, final_result);
-      image_final_result = cv_bridge::CvImage{current_image_alg1->header, "bgr8", final_result}.toImageMsg();
-    }
+    //   if (current_image_original)
+    //   {
+    //     img_original = current_image_original->image;
+    //     resize(img_original, img_original, size);
+    //     cvtColor(img_filt, img_filt, CV_GRAY2BGR);
+    //     img_filt.convertTo(img_filt, CV_8UC3);
+    //     img_original.convertTo(img_original, CV_8UC3);
+    //     addWeighted(img_filt, 0.5, img_original, 1, 0, final_result);
+    //     image_final_result = cv_bridge::CvImage{current_image_alg1->header, "bgr8", final_result}.toImageMsg();
+    //   }
     //-------------------------------------------------------------------
-    cvtColor(img_filt, img_filt, CV_BGR2GRAY);
+    // cv::cvtColor(img_filt, img_filt, CV_BGR2GRAY);
     img_filt.convertTo(img_filt, CV_8UC1);
-    img_final_map = cv_bridge::CvImage{current_image_alg1->header, "mono8", img_filt}.toImageMsg();
-    info.height = input.cols;
-    info.width = input.rows;
+
+    //GridMap:-----------------------------------------------------
+    auto img_final_map = cv_bridge::CvImage{_images_headers[0], "mono8", img_filt}.toImageMsg();
+    _prob_map_image.publish(img_final_map);
+
+    info.height = image_intersection.cols;
+    info.width = image_intersection.rows;
     info.resolution = pace;
     info.origin.position.x = 0;
     info.origin.position.y = -(info.height * pace / 2);
@@ -373,30 +262,27 @@ void junction_data::probabilitiesMapImage(Mat &input, Mat &input2)
     grid_map::GridMapRosConverter::addLayerFromImage(*img_final_map, "road probability map", grid_road_GridMap, 0, 255, 128);
     grid_map::GridMapRosConverter::toOccupancyGrid(grid_road_GridMap, "road probability map", 0, 255, roadmapGrid);
     roadmapGrid.info = info;
-    roadmapGrid.header = current_image_alg1->header;
+    roadmapGrid.header = _images_headers[0];
     roadmapGrid.header.frame_id = "/world";
+    _grid_road_map_pub.publish(roadmapGrid);
     // cout << "Header: " << roadmapGrid.header << endl;
-  }
 }
 
-/**
- * @brief Main function
- *
- * @param argc
- * @param argv
- * @return int
- */
-
-int main(int argc, char **argv)
+int main(int argc, char *argv[])
 {
-  ros::init(argc, argv, "draw_prob_map");
-  junction_data data;
+    ros::init(argc, argv, "draw_prob_map_node");
+    auto params = junction_data::params{};
+    ros::param::get("~cols_img_small", params.width);
+    ros::param::get("~rows_img_small", params.height);
+    ros::param::get("~kernel_size", params.kernel_size);
+    std::vector<std::string> topic_names;
+    std::string topic_names_str;
+    ros::param::get("~topics_polygons", topic_names_str);
+    boost::split(topic_names, topic_names_str, boost::is_any_of(" ,"));
+    auto data_merger = junction_data(topic_names, params);
 
-  while (ros::ok())
-  {
-    data.MainLoop();
-    ros::spinOnce();
-  }
 
-  return 0;
+    ros::spin();
+
+    return 0;
 }

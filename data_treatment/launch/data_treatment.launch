@@ -1,6 +1,6 @@
 <launch>
 
-    <node pkg="data_treatment" name="draw_poly" type="subscriber" output="screen">
+    <node pkg="data_treatment" name="draw_poly_node" type="subscriber" output="screen">
         <param name="~cols_resize" type= "int" value="320"/>
         <param name="~rows_resize" type= "int" value="240"/>
         <!-- </Para visualização dos poligonos com áreas pintadas> -->
@@ -9,7 +9,7 @@
         <param name="~B_channel" type= "int" value="0"/> -->
     </node>
 
-    <node pkg="data_treatment" name="draw_poly2" type="subscriber2" output="screen">
+    <node pkg="data_treatment" name="draw_poly2_node" type="subscriber2" output="screen">
         <remap from="lane_detector/processed" to="lane_detector2/result" />
         <remap from="lane_detector/lane" to="lane_detector2/lane" />
         <remap from="draw_poly/poly_alg1" to="draw_poly/poly_alg2"/>
@@ -21,8 +21,9 @@
     </node>
    
 
-    <node pkg="data_treatment" name="draw_prob_map" type="junction_data" output="screen">
-        <remap from="~camera" to="world"/>
+    <node pkg="data_treatment" name="draw_prob_map_node" type="junction_data" output="screen" >
+        <!-- <remap from="~camera" to="world"/> -->
+        <param name="~topics_polygons" type="string" value="draw_poly/poly_alg1,draw_poly/poly_alg2,advanced_algorithm/polygon"/>
         <param name="~cols_img_big" type= "double" value="964"/>
         <param name="~cols_img_small" type= "double" value="320"/>
         <param name="~rows_img_small" type= "double" value="240"/>

@@ -344,7 +344,7 @@ void get_lines::drawingPolygn()
 
 int main(int argc, char **argv)
 {
-  ros::init(argc, argv, "draw_poly");
+  ros::init(argc, argv, "draw_poly_node");
   get_lines subs_lines;
 
   while (ros::ok())
