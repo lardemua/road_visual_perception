@@ -1,4 +1,4 @@
-#include <initializer_list>
+// #include <initializer_list>
 #include <vector>
 #include <memory>
 #include <functional>
@@ -29,9 +29,8 @@
 struct image_info
 {
     cv::Mat image;
-    ros::Time time_stamp;
     bool isupdate;
-    std_msgs::Header image_header;
+    double image_delay;
 };
 
 class junction_data
@@ -49,7 +48,7 @@ public:
     junction_data(const std::vector<std::string> &image_topics, params params);
 
     void img_callback(const sensor_msgs::ImageConstPtr &img1, int alg_idx);
-    void process();
+    void process(int alg_idx);
     void mergedImage();
     void probabilitiesMapImage(cv::Mat &img_intersection, cv::Mat &img_nonintersection);
 
@@ -69,6 +68,7 @@ private:
     std::vector<bool> _image_updates;
     std::vector<std::shared_ptr<cv::Mat>> _images;
     std::vector<std_msgs::Header> _images_headers;
+    std::vector<double> _images_durations;
 
     /*Messages*/
     nav_msgs::MapMetaData info;
@@ -77,7 +77,16 @@ private:
     /*ROS*/
     grid_map::GridMap grid_road_GridMap;
     nav_msgs::OccupancyGrid roadmapGrid;
+
+    /*Time variables*/
+    ros::Time t_img;
+    ros::Duration duration_image;
 };
+
+/**
+ * @brief Construct a new junction data::junction data object
+ * 
+ */
 
 junction_data::junction_data(const std::vector<std::string> &image_topics, params params)
     // clang-format off
@@ -99,7 +108,7 @@ junction_data::junction_data(const std::vector<std::string> &image_topics, param
     ros::param::get("~cols_img_big", cols_img_big);
     ros::param::get("~cols_img_small", cols_img_small);
     sensor_msgs::CameraInfoConstPtr CamInfo;
-    CamInfo = ros::topic::waitForMessage<sensor_msgs::CameraInfo>("/camera/camera_info", _nh, ros::Duration(10));
+    CamInfo = ros::topic::waitForMessage<sensor_msgs::CameraInfo>("/camera/camera_info", _nh /*, ros::Duration(10)*/);
     k_matrix = CamInfo->K;
     alpha_x = k_matrix[0];
     pace = (1 / (alpha_x)) * (cols_img_big / cols_img_small); // cada lado da celula correponde a este valor em m
@@ -123,6 +132,13 @@ junction_data::junction_data(const std::vector<std::string> &image_topics, param
     }
 }
 
+/**
+ * @brief Function that receives each image 
+ * 
+ * @param img_msg image messase
+ * @param alg_idx algorithm index 
+ */
+
 void junction_data::img_callback(const sensor_msgs::ImageConstPtr &img_msg, int alg_idx)
 {
     auto img = cv_bridge::toCvCopy(img_msg, sensor_msgs::image_encodings::BGR8);
@@ -130,43 +146,70 @@ void junction_data::img_callback(const sensor_msgs::ImageConstPtr &img_msg, int 
     img->image.copyTo(*buffer);
 
     _image_updates[alg_idx] = true;
-
     _images_headers[alg_idx] = img_msg->header;
 
-    ROS_INFO("received image from algorithm %d", alg_idx);
+    t_img = img_msg->header.stamp;
+    duration_image = ros::Time::now() - t_img;
+    _images_durations.push_back(duration_image.toSec());
+    ROS_INFO_STREAM("Time to process: " << duration_image.toSec());
 
-    process();
+    ROS_INFO("received image from algorithm %d", alg_idx);
+    process(alg_idx);
 }
 
-void junction_data::process()
+/**
+ * @brief Intersection and disjunction of the images  
+ * 
+ */
+
+void junction_data::process(int alg_idx)
 {
+    std::vector<image_info> images_data_vect;
     cv::Mat image_int;
     cv::Mat image_ref;
     cv::Mat image_nonint;
+    image_info indiv_img_data; // each image data
+    double delta_timer;
+    double time_seconds;
     // verificar se as 3 images estão set
     for (auto is_updated : _image_updates)
     {
         if (!is_updated)
+        {
             return;
+        }
+        else
+        {
+            _images[is_updated]->copyTo(indiv_img_data.image);
+            indiv_img_data.isupdate = is_updated;
+            indiv_img_data.image_delay = _images_durations.back();
+            images_data_vect.push_back(indiv_img_data);
+        }
     }
 
-    auto buffer_sum = _images[0];
-    auto buffer_int = _images[0];
-    buffer_int->copyTo(image_int);
+
+    auto buffer_sum = images_data_vect.at(0).image;
+    image_int = images_data_vect.at(0).image;
+
     cv::cvtColor(image_int, image_int, CV_BGR2GRAY);
     cv::threshold(image_int, image_int, 0, 255, cv::THRESH_BINARY | cv::THRESH_OTSU);
 
-    for (int i = 1; i < _images.size(); i++)
+    for (int i = 1; i < images_data_vect.size(); i++)
     {
-        cv::add(*buffer_sum, *_images[i], *buffer_sum);
-        _images[i]->copyTo(image_ref);
+        //Too many time of processing? Don't count to the probabilistic map
+        if (images_data_vect.at(i).image_delay > 0.5)
+        {
+            images_data_vect.erase(images_data_vect.begin()+i);
+        }
+        cv::add(buffer_sum, images_data_vect.at(i).image, buffer_sum);
+        image_ref = images_data_vect.at(i).image;
         cv::cvtColor(image_ref, image_ref, CV_BGR2GRAY);
         cv::threshold(image_ref, image_ref, 0, 255, cv::THRESH_BINARY | cv::THRESH_OTSU);
         cv::bitwise_and(image_int, image_ref, image_int);
         cv::bitwise_xor(image_int, image_ref, image_nonint);
     }
 
-    auto img_msg = cv_bridge::CvImage{_images_headers[0], "bgr8", *buffer_sum}.toImageMsg();
+    auto img_msg = cv_bridge::CvImage{_images_headers[0], "bgr8", buffer_sum}.toImageMsg();
     auto img_msg_diff = cv_bridge::CvImage{_images_headers[0], "mono8", image_int}.toImageMsg();
     auto img_msg_nonint = cv_bridge::CvImage{_images_headers[0], "mono8", image_nonint}.toImageMsg();
 
@@ -174,9 +217,12 @@ void junction_data::process()
     _image_publisher_diff.publish(img_msg_diff);
     _image_publisher_nonint.publish(img_msg_nonint);
 
+
     probabilitiesMapImage(image_int, image_nonint);
 
     std::fill(_image_updates.begin(), _image_updates.end(), false);
+    std::vector<double>().swap(_images_durations);    //Delete and deallocation of the vector _images_durations
+    std::vector<image_info>().swap(images_data_vect); //Delete and deallocation of the vector of structures _images_data_vect
 }
 
 /**
@@ -280,7 +326,6 @@ int main(int argc, char *argv[])
     ros::param::get("~topics_polygons", topic_names_str);
     boost::split(topic_names, topic_names_str, boost::is_any_of(" ,"));
     auto data_merger = junction_data(topic_names, params);
-
 
     ros::spin();
 
