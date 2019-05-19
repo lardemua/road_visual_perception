@@ -49,7 +49,6 @@ public:
 
     void img_callback(const sensor_msgs::ImageConstPtr &img1, int alg_idx);
     void process(int alg_idx);
-    void mergedImage();
     void probabilitiesMapImage(cv::Mat &img_intersection, cv::Mat &img_nonintersection);
 
 private:
@@ -58,6 +57,7 @@ private:
     ros::NodeHandle _nh;
     image_transport::ImageTransport _it;
     std::vector<image_transport::Subscriber> _image_subscribers;
+    std::vector<image_info> images_data_vect;
     ros::Publisher _image_publisher_summed;
     ros::Publisher _image_publisher_diff;
     ros::Publisher _image_publisher_nonint;
@@ -142,18 +142,23 @@ junction_data::junction_data(const std::vector<std::string> &image_topics, param
 void junction_data::img_callback(const sensor_msgs::ImageConstPtr &img_msg, int alg_idx)
 {
     auto img = cv_bridge::toCvCopy(img_msg, sensor_msgs::image_encodings::BGR8);
-    auto buffer = _images[alg_idx];
-    img->image.copyTo(*buffer);
+
+    image_info indiv_img_data; // each image data
+    //auto buffer = _images[alg_idx];
+    img->image.copyTo(indiv_img_data.image);
 
     _image_updates[alg_idx] = true;
+    indiv_img_data.image_delay=true;
     _images_headers[alg_idx] = img_msg->header;
 
     t_img = img_msg->header.stamp;
     duration_image = ros::Time::now() - t_img;
     _images_durations.push_back(duration_image.toSec());
+    indiv_img_data.image_delay=_images_durations.back();
     ROS_INFO_STREAM("Time to process: " << duration_image.toSec());
 
     ROS_INFO("received image from algorithm %d", alg_idx);
+    images_data_vect.push_back(indiv_img_data);
     process(alg_idx);
 }
 
@@ -164,42 +169,34 @@ void junction_data::img_callback(const sensor_msgs::ImageConstPtr &img_msg, int 
 
 void junction_data::process(int alg_idx)
 {
-    std::vector<image_info> images_data_vect;
     cv::Mat image_int;
     cv::Mat image_ref;
     cv::Mat image_nonint;
-    image_info indiv_img_data; // each image data
+
     double delta_timer;
     double time_seconds;
-    // verificar se as 3 images estão set
+// verificar se as 3 images estão set
+
     for (auto is_updated : _image_updates)
     {
         if (!is_updated)
         {
             return;
         }
-        else
-        {
-            _images[is_updated]->copyTo(indiv_img_data.image);
-            indiv_img_data.isupdate = is_updated;
-            indiv_img_data.image_delay = _images_durations.back();
-            images_data_vect.push_back(indiv_img_data);
-        }
     }
-
 
     auto buffer_sum = images_data_vect.at(0).image;
     image_int = images_data_vect.at(0).image;
 
     cv::cvtColor(image_int, image_int, CV_BGR2GRAY);
     cv::threshold(image_int, image_int, 0, 255, cv::THRESH_BINARY | cv::THRESH_OTSU);
-
     for (int i = 1; i < images_data_vect.size(); i++)
     {
         //Too many time of processing? Don't count to the probabilistic map
-        if (images_data_vect.at(i).image_delay > 0.5)
+        if (images_data_vect.at(i).image_delay > 0.6)
         {
             images_data_vect.erase(images_data_vect.begin()+i);
+            continue;
         }
         cv::add(buffer_sum, images_data_vect.at(i).image, buffer_sum);
         image_ref = images_data_vect.at(i).image;
@@ -213,10 +210,10 @@ void junction_data::process(int alg_idx)
     auto img_msg_diff = cv_bridge::CvImage{_images_headers[0], "mono8", image_int}.toImageMsg();
     auto img_msg_nonint = cv_bridge::CvImage{_images_headers[0], "mono8", image_nonint}.toImageMsg();
 
+
     _image_publisher_summed.publish(img_msg);
     _image_publisher_diff.publish(img_msg_diff);
     _image_publisher_nonint.publish(img_msg_nonint);
-
 
     probabilitiesMapImage(image_int, image_nonint);
 
@@ -324,7 +321,7 @@ int main(int argc, char *argv[])
     std::vector<std::string> topic_names;
     std::string topic_names_str;
     ros::param::get("~topics_polygons", topic_names_str);
-    boost::split(topic_names, topic_names_str, boost::is_any_of(" ,"));
+    boost::split(topic_names, topic_names_str, boost::is_any_of(","));
     auto data_merger = junction_data(topic_names, params);
 
     ros::spin();

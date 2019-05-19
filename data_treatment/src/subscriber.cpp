@@ -277,10 +277,10 @@ void get_lines::drawingPolygn()
   // ros::param::get("~R_channel", R_channel);
   // ros::param::get("~G_channel", G_channel);
   // ros::param::get("~B_channel", B_channel);
-  //Mat processedImage = Mat::zeros(row_image, col_image, CV_8UC3);
+  // Mat processedImage = Mat::zeros(row_image, col_image, CV_8UC3);
   Mat processedImage = Mat::zeros(row_image, col_image, CV_8UC1);
-  //drawSpline(processedImage, left_spline, 1, Scalar(B_channel, G_channel, R_channel));
-  //drawSpline(processedImage, right_spline, 1, Scalar(B_channel, G_channel, R_channel));
+  // drawSpline(processedImage, left_spline, 1, Scalar(B_channel, G_channel, R_channel));
+  // drawSpline(processedImage, right_spline, 1, Scalar(B_channel, G_channel, R_channel));
   drawSpline(processedImage, left_spline, 1, 255);
   drawSpline(processedImage, right_spline, 1, 255);
   for (n = 0; n < left_spline.size(); n++)
@@ -332,7 +332,7 @@ void get_lines::drawingPolygn()
   line(processedImage, min_ll, min_rl, 255, 1);
   line(processedImage, max_ll, max_rl, 255, 1);
   floodFill(processedImage, init_fill, 255);
-  // processedImage.convertTo(processedImage, CV_8UC3);
+
 
   processed_img = cv_bridge::CvImage{current_image->header, "mono8", processedImage}.toImageMsg();
 }
