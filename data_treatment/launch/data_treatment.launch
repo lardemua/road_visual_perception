@@ -20,10 +20,11 @@
         <param name="~B_channel" type= "int" value="255"/> -->
     </node>
    
-
+    <arg name = "topics" doc="topics that enters on the architechture"/>
     <node pkg="data_treatment" name="draw_prob_map_node" type="junction_data" output="screen" >
         <!-- <remap from="~camera" to="world"/> -->
-        <param name="~topics_polygons" type="string" value="draw_poly/poly_alg1,draw_poly/poly_alg2,advanced_algorithm/polygon"/>
+        <!-- <param name="~topics_polygons" type="string" value="draw_poly/poly_alg1,draw_poly/poly_alg2,advanced_algorithm/polygon"/> -->
+        <param name="~topics_polygons" type="string" value="$(arg topics)"/>
         <param name="~cols_img_big" type= "double" value="964"/>
         <param name="~cols_img_small" type= "double" value="320"/>
         <param name="~rows_img_small" type= "double" value="240"/>

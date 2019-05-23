@@ -193,11 +193,11 @@ void junction_data::process(int alg_idx)
     for (int i = 1; i < images_data_vect.size(); i++)
     {
         //Too many time of processing? Don't count to the probabilistic map
-        if (images_data_vect.at(i).image_delay > 0.6)
-        {
-            images_data_vect.erase(images_data_vect.begin()+i);
-            continue;
-        }
+        // if (images_data_vect.at(i).image_delay > 0.6)
+        // {
+        //     images_data_vect.erase(images_data_vect.begin()+i);
+        //     continue;
+        // }
         cv::add(buffer_sum, images_data_vect.at(i).image, buffer_sum);
         image_ref = images_data_vect.at(i).image;
         cv::cvtColor(image_ref, image_ref, CV_BGR2GRAY);

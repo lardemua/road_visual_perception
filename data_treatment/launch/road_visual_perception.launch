@@ -1,9 +1,16 @@
 <launch>
+    <arg name="with-advanced_algorithm" default="true"/>
+    <arg name="with-nsteel_algorithm" default="true"/>
+    <arg name="topics" default="draw_poly/poly_alg1,draw_poly/poly_alg2,advanced_algorithm/polygon"/>
+
     <param name="robot_description" command="$(find xacro)/xacro --inorder '$(find pointgrey_camera_description)/urdf/camera_tiago.urdf.xacro'" />
     <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
 
-    <include file="$(find lane_detector)/launch/algorithm1.launch" /> 
-    <include file="$(find advanced_lane_detection)/launch/advanced_lane_detection.launch" />
-    <include file="$(find data_treatment)/launch/data_treatment.launch" />
+    <include file="$(find lane_detector)/launch/algorithm1.launch" if="$(arg with-nsteel_algorithm)" />
+    <include file="$(find advanced_lane_detection)/launch/advanced_lane_detection.launch" if="$(arg with-advanced_algorithm)"/>
+    <include file="$(find data_treatment)/launch/data_treatment.launch">
+        <arg name="topics" value="$(arg topics)"/>
+    </include>
+    <!-- <node type="rviz" name="rviz" pkg="rviz"/> -->
 
 </launch>

@@ -1,0 +1,12 @@
+<launch>
+<arg name = "pathToRosbag"  default = "/home/tiago/OAtlasVaiAFeiraSoCamera.bag" />
+<remap from = "/top_camera/image_raw" to = "/camera/image_raw" />
+<remap from = "/top_camera/camera_nodelet_manager/bond" to = "/camera/camera_nodelet_manager/bond"/>
+<remap from = "/top_camera/camera_info" to = "/camera/camera_info"/>
+<remap from = "/top_camera/image_rect_color" to = "/camera/image_rect_color"/>
+
+<node pkg  = "rosbag"
+      type = "play"
+      name = "player"
+      args = "$(arg pathToRosbag)"/>
+</launch>
