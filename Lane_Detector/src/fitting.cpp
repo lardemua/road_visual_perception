@@ -70,7 +70,7 @@ lane_detector::Lane Fitting::fitting(cv::Mat &original, cv::Mat &processed_bgr, 
   if (config.draw_boxes)
     drawBoxes(processed_bgr, rects);
 
-  // std::cout << "centroids: " << centroids.size() << std::endl; Verficado!
+  // std::cout << "centroids: " << centroids.size() << std::endl; //Verficado!
   if (centroids.size() >= 2)
   {
     // cout<< "Current Lane antes:------------------------------ "<<current_lane.correct <<endl;

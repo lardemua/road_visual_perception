@@ -45,7 +45,7 @@ using namespace cv;
 // Point2f perspectiveDst[] = {Point2f(63, 0), Point2f(263, 0), Point2f(63, 240), Point2f(263, 240)};
 
 //Oboard Atlas
-Point2f perspectiveSrc[] = {Point2f(130, 135), Point2f(160, 135), Point2f(60, 240), Point2f(260, 240)};
+Point2f perspectiveSrc[] = {Point2f(130, 135), Point2f(160, 135), Point2f(60, 220), Point2f(260, 220)};
 Point2f perspectiveDst[] = {Point2f(63, 0), Point2f(263, 0), Point2f(63, 240), Point2f(263, 240)};
 
 
@@ -177,24 +177,24 @@ void alg2::processFrames()
     Mat init_img = current_image->image;
     resize(init_img, init_img, size_img);
     perspectiveMatrix = getPerspectiveTransform(perspectiveSrc, perspectiveDst);
-    Mat _init_img = init_img.clone();
+    
 
     // draw the roi (for perspective transform)
-    line(init_img, perspectiveSrc[0], perspectiveSrc[1], Scalar(0, 0, 255), 2);
-    line(init_img, perspectiveSrc[1], perspectiveSrc[3], Scalar(0, 0, 255), 2);
-    line(init_img, perspectiveSrc[3], perspectiveSrc[2], Scalar(0, 0, 255), 2);
-    line(init_img, perspectiveSrc[2], perspectiveSrc[0], Scalar(0, 0, 255), 2);
-    circle(init_img, perspectiveSrc[0], 6, Scalar(0, 0, 255), CV_FILLED);
-    circle(init_img, perspectiveSrc[1], 6, Scalar(0, 0, 255), CV_FILLED);
-    circle(init_img, perspectiveSrc[2], 6, Scalar(0, 0, 255), CV_FILLED);
-    circle(init_img, perspectiveSrc[3], 6, Scalar(0, 0, 255), CV_FILLED);
-    frameSize = init_img.size();
+    // line(init_img, perspectiveSrc[0], perspectiveSrc[1], Scalar(0, 0, 255), 2);
+    // line(init_img, perspectiveSrc[1], perspectiveSrc[3], Scalar(0, 0, 255), 2);
+    // line(init_img, perspectiveSrc[3], perspectiveSrc[2], Scalar(0, 0, 255), 2);
+    // line(init_img, perspectiveSrc[2], perspectiveSrc[0], Scalar(0, 0, 255), 2);
+    // circle(init_img, perspectiveSrc[0], 6, Scalar(0, 0, 255), CV_FILLED);
+    // circle(init_img, perspectiveSrc[1], 6, Scalar(0, 0, 255), CV_FILLED);
+    // circle(init_img, perspectiveSrc[2], 6, Scalar(0, 0, 255), CV_FILLED);
+    // circle(init_img, perspectiveSrc[3], 6, Scalar(0, 0, 255), CV_FILLED);
+    //frameSize = init_img.size();
 
-    warpPerspective(_init_img, imgPerspective, perspectiveMatrix, frameSize);
+    
 
     
     //Applying lane detection algorithm
-    laneDetection LaneAlgo(_init_img, perspectiveMatrix);
+    laneDetection LaneAlgo(init_img, perspectiveMatrix);
     LaneAlgo.laneDetctAlgo();
 
     warpEdge = LaneAlgo.getWarpEdgeDetectResult().clone();

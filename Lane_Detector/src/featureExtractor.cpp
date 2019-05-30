@@ -18,6 +18,7 @@ void FeatureExtractor::extract(cv::Mat &original, cv::Mat &preprocessed, std::ve
   {
     lanes[ind].score = lineScores[ind];
   }
+  // std::cout<<"Size dos vetor de linhas: "<<lineScores.size()<<std::endl;
 
   mcvGetLinesBoundingBoxesVec(lanes, LaneDetector::LINE_VERTICAL, cvSize(preprocessed.cols - 1, preprocessed.rows - 1), boxes);
 

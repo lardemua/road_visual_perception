@@ -360,6 +360,7 @@ void mcvGetHVLines(const CvMat *inImage, vector<Line> *lines, vector<FLOAT> *lin
       else
         mcvDrawLine(im, line, CV_RGB(1, 0, 0), 1);
     }
+  
 
     char str[256];
     switch (lineType)

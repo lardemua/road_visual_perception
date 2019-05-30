@@ -128,8 +128,7 @@ void processImage(LaneDetector::CameraInfo &cameraInfo, LaneDetector::LaneDetect
       cv::cvtColor(processed_bgr, processed_bgr, CV_GRAY2BGR);
 
     extractor.extract(processed_bgr, preprocessed, boxes);
-    lane_detector::Lane current_lane =
-        fitting_phase.fitting(img_init, processed_bgr, preprocessed, ipmInfo, cameraInfo, boxes);
+    lane_detector::Lane current_lane = fitting_phase.fitting(img_init, processed_bgr, preprocessed, ipmInfo, cameraInfo, boxes);
     lane_pub.publish(current_lane);
 
     // Sending the processed image to a node

@@ -12,5 +12,4 @@
         <arg name="topics" value="$(arg topics)"/>
     </include>
     <!-- <node type="rviz" name="rviz" pkg="rviz"/> -->
-
 </launch>
