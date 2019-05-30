@@ -1,21 +1,47 @@
 <launch>
   <arg name="load_images_from_folder" default="false" />
-  <node pkg="lane_detector" type="lane_detector" name="lane_detector_node" output="screen">
-    <remap from="camera_info" to="/camera/camera_info" />
-    <remap from="image" to="/camera/image_rect_color" />
+  <arg name="top_left_camera" default="true"/>
+  <arg name="top_right_camera" default="true"/>
+
+  <node pkg="lane_detector" type="lane_detector" name="lane_detector_node" output="screen" ns="top_left_camera" if="$(arg top_left_camera)">
+    <remap from="camera_info" to="/top_left_camera/camera_info" />
+    <remap from="image" to="/top_left_camera/image_rect_color" />
     <param name="images_from_folder" value="$(arg load_images_from_folder)" />
     <param name="images_path" value="$(find lane_detector)/data/first_set" />
     <param name="~cols_resize" type= "int" value="320"/>
     <param name="~rows_resize" type= "int" value="240"/>
   </node>
-  <node pkg="lane_detector" type="lane_detector" name="lane_detector2_node" output="screen">
-    <remap from="camera_info" to="/camera/camera_info" />
-    <remap from="image" to="/camera/image_rect_color" />
+
+  <node pkg="lane_detector" type="lane_detector" name="lane_detector_node" output="screen" ns="top_right_camera" if="$(arg top_right_camera)">
+    <remap from="camera_info" to="/top_right_camera/camera_info" />
+    <remap from="image" to="/top_right_camera/image_rect_color" />
     <param name="images_from_folder" value="$(arg load_images_from_folder)" />
     <param name="images_path" value="$(find lane_detector)/data/first_set" />
-    <remap from="lane_detector/processed" to="lane_detector2/processed" />
-    <remap from="lane_detector/lane" to="lane_detector2/lane" />
-    <remap from="lane_detector/result" to="lane_detector2/result"/>
+    <param name="~cols_resize" type= "int" value="320"/>
+    <param name="~rows_resize" type= "int" value="240"/>
+  </node>
+
+  <node pkg="lane_detector" type="lane_detector" name="lane_detector2_node" output="screen" ns="top_left_camera" if="$(arg top_left_camera)">
+    <remap from="camera_info" to="/top_left_camera/camera_info" />
+    <remap from="image" to="/top_left_camera/image_rect_color" />
+    <param name="images_from_folder" value="$(arg load_images_from_folder)" />
+    <param name="images_path" value="$(find lane_detector)/data/first_set" />
+    <remap from="/lane_detector/processed" to="/top_left_camera/lane_detector2/processed" />
+    <remap from="/lane_detector/lane" to="/top_left_camera/lane_detector2/lane" />
+    <remap from="/lane_detector/result" to="/top_left_camera/lane_detector2/result"/>
+    <param name="~cols_resize" type= "int" value="320"/>
+    <param name="~rows_resize" type= "int" value="240"/>
+    <rosparam command="load" file="$(find lane_detector)/params/Detector2.yaml"/>
+  </node>
+
+  <node pkg="lane_detector" type="lane_detector" name="lane_detector2_node" output="screen" ns="top_right_camera" if="$(arg top_right_camera)">
+    <remap from="camera_info" to="/top_right_camera/camera/camera_info" />
+    <remap from="image" to="/top_right_camera/camera/image_rect_color" />
+    <param name="images_from_folder" value="$(arg load_images_from_folder)" />
+    <param name="images_path" value="$(find lane_detector)/data/first_set" />
+    <remap from="/lane_detector/processed" to="/top_right_camera/lane_detector2/processed" />
+    <remap from="/lane_detector/lane" to="/top_right_camera/lane_detector2/lane" />
+    <remap from="/lane_detector/result" to="/top_right_camera/lane_detector2/result"/>
     <param name="~cols_resize" type= "int" value="320"/>
     <param name="~rows_resize" type= "int" value="240"/>
     <rosparam command="load" file="$(find lane_detector)/params/Detector2.yaml"/>

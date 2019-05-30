@@ -1,6 +1,12 @@
 <launch>
+    <arg name="top_left_camera" default="true"/>
+    <arg name="top_right_camera" default="true"/>
 
-    <node pkg="data_treatment" name="draw_poly_node" type="subscriber" output="screen">
+    <!-- Draw poly node to the first processor node that return lnes_: top_left_camera -->
+    <node pkg="data_treatment" name="draw_poly_node" type="subscriber" output="screen" ns="top_left_camera" if="$(arg top_left_camera)">
+        <remap from="draw_poly/poly_alg1" to="/top_camera_left/draw_poly/poly_alg1"/>
+        <remap from="lane_detector/lane" to="/top_left_camera/lane_detector/lane"/>
+        <remap from="camera/image_raw" to="/top_left_camera/image_raw"/>
         <param name="~cols_resize" type= "int" value="320"/>
         <param name="~rows_resize" type= "int" value="240"/>
         <!-- </Para visualização dos poligonos com áreas pintadas> -->
@@ -9,22 +15,80 @@
         <param name="~B_channel" type= "int" value="0"/> -->
     </node>
 
-    <node pkg="data_treatment" name="draw_poly2_node" type="subscriber2" output="screen">
-        <remap from="lane_detector/processed" to="lane_detector2/result" />
-        <remap from="lane_detector/lane" to="lane_detector2/lane" />
-        <remap from="draw_poly/poly_alg1" to="draw_poly/poly_alg2"/>
+    <!-- Draw poly node to the first processor node that return lnes_: top_right_camera -->
+    <node pkg="data_treatment" name="draw_poly_node" type="subscriber" output="screen" ns="top_right_camera" if="$(arg top_right_camera)">
+        <remap from="draw_poly/poly_alg1" to="/top_camera_right/draw_poly/poly_alg1"/>
+        <remap from="lane_detector/lane" to="/top_right_camera/lane_detector/lane"/>
+        <remap from="camera/image_raw" to="/top_right_camera/image_raw"/>
+        <param name="~cols_resize" type= "int" value="320"/>
+        <param name="~rows_resize" type= "int" value="240"/>
+        <!-- </Para visualização dos poligonos com áreas pintadas> -->
+        <!-- <param name="~R_channel" type= "int" value="255"/>
+        <param name="~G_channel" type= "int" value="0"/>
+        <param name="~B_channel" type= "int" value="0"/> -->
+    </node>
+
+    <!-- Draw poly node to the second processor node that return lnes_: top_left_camera -->
+    <node pkg="data_treatment" name="draw_poly2_node" type="subscriber2" output="screen" ns="top_left_camera" if="$(arg top_left_camera)">
+        <remap from="/lane_detector/processed" to="/top_left_camera/lane_detector2/result" />
+        <remap from="/lane_detector/lane" to="/top_left_camera/lane_detector2/lane" />
+        <remap from="/draw_poly/poly_alg1" to="/top_left_camera/draw_poly/poly_alg2"/>
+        <remap from="camera/image_raw" to="/top_left_camera/image_raw"/>
         <param name="~cols_resize" type= "int" value="320"/>
         <param name="~rows_resize" type= "int" value="240"/>
         <!-- <param name="~R_channel" type= "int" value="0"/>
         <param name="~G_channel" type= "int" value="0"/>
         <param name="~B_channel" type= "int" value="255"/> -->
     </node>
-   
-    <arg name = "topics" doc="topics that enters on the architechture"/>
-    <node pkg="data_treatment" name="draw_prob_map_node" type="junction_data" output="screen" >
+
+    <!-- Draw poly node to the second processor node that return lnes_: top_right_camera -->
+    <node pkg="data_treatment" name="draw_poly2_node" type="subscriber2" output="screen" ns="top_right_camera" if="$(arg top_right_camera)">
+        <remap from="/lane_detector/processed" to="/top_right_camera/lane_detector2/result" />
+        <remap from="/lane_detector2/lane" to="/top_right_camera/lane_detector2/lane" />
+        <remap from="/draw_poly/poly_alg2" to="/top_right_camera/draw_poly/poly_alg2"/>
+        <remap from="camera/image_raw" to="/top_right_camera/image_raw"/>
+        <param name="~cols_resize" type= "int" value="320"/>
+        <param name="~rows_resize" type= "int" value="240"/>
+        <!-- </Para visualização dos poligonos com áreas pintadas> -->
+        <!-- <param name="~R_channel" type= "int" value="255"/>
+        <param name="~G_channel" type= "int" value="0"/>
+        <param name="~B_channel" type= "int" value="0"/> -->
+    </node>
+
+
+
+
+
+
+    <!-- Node that calculate and launches the probabilistic map -->
+    <!-- Top left camera -->
+    <arg name = "topics_left" doc="topics that enters on the architechture"/>
+    <node pkg="data_treatment" name="draw_prob_map_node" type="junction_data" output="screen" ns="top_left_camera" if="$(arg top_left_camera)">
+        <remap from="draw_prob_map/summed_img" to="/top_camera_left/draw_prob_map/summed_img"/>
+        <remap from="draw_prob_map/intersect_img" to="/top_camera_left/draw_prob_map/intersect_img"/>
+        <remap from="draw_prob_map/nonintersect_img" to="/top_camera_left/nonintersect_map/summed_img"/>
+        <remap from="draw_prob_map/image_map" to="/top_camera_left/draw_prob_map/image_map"/>
+        <remap from="draw_prob_map/road_probabilistic_map" to="/top_camera_left/draw_prob_map/road_probabilistic_map"/>
+        <remap from="/camera/camera_info" to="/top_left_camera/camera_info" />
         <!-- <remap from="~camera" to="world"/> -->
-        <!-- <param name="~topics_polygons" type="string" value="draw_poly/poly_alg1,draw_poly/poly_alg2,advanced_algorithm/polygon"/> -->
-        <param name="~topics_polygons" type="string" value="$(arg topics)"/>
+        <param name="~topics_polygons" type="string" value="$(arg topics_left)"/>
+        <param name="~cols_img_big" type= "double" value="964"/>
+        <param name="~cols_img_small" type= "double" value="320"/>
+        <param name="~rows_img_small" type= "double" value="240"/>
+        <param name="~kernel_size" type= "int" value="25"/>
+    </node>
+
+    <!-- Top right camera -->
+    <arg name = "topics_right" doc="topics that enters on the architechture"/>
+    <node pkg="data_treatment" name="draw_prob_map_node" type="junction_data" output="screen" ns="top_right_camera" if="$(arg top_right_camera)">
+        <!-- <remap from="~camera" to="world"/> -->
+        <remap from="draw_prob_map/summed_img" to="/top_camera_right/draw_prob_map/summed_img"/>
+        <remap from="draw_prob_map/intersect_img" to="/top_camera_right/draw_prob_map/intersect_img"/>
+        <remap from="draw_prob_map/nonintersect_img" to="/top_camera_right/nonintersect_map/summed_img"/>
+        <remap from="draw_prob_map/image_map" to="/top_camera_right/draw_prob_map/image_map"/>
+        <remap from="draw_prob_map/road_probabilistic_map" to="/top_camera_right/draw_prob_map/road_probabilistic_map"/>
+        <remap from="/camera/camera_info" to="/top_right_camera/camera_info" />
+        <param name="~topics_polygons" type="string" value="$(arg topics_right)"/>
         <param name="~cols_img_big" type= "double" value="964"/>
         <param name="~cols_img_small" type= "double" value="320"/>
         <param name="~rows_img_small" type= "double" value="240"/>

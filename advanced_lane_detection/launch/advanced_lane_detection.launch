@@ -1,5 +1,24 @@
 <launch>
-    <node pkg="advanced_lane_detection" type="main" name="advanced_algorithm_node" output="screen">
+    <arg name="top_left_camera" default="true"/>
+    <arg name="top_right_camera" default="true"/>
+
+    <!-- Node to top_left_camera -->
+    <node pkg="advanced_lane_detection" type="main" name="advanced_algorithm_node" output="screen" ns="top_left_camera" if="$(arg top_left_camera)">
+        <remap from="camera_info" to="/top_left_camera/camera/camera_info" />
+        <remap from="image" to="/top_left_camera/image_rect_color" />
+        <remap from="/advanced_algorithm/polygon" to="/top_left_camera/advanced_algorithm/polygon"/>
+        <remap from="/advanced_algorithm/finalResult" to="/top_left_camera/advanced_algorithm/finalResult"/>
+        <param name="~cols_resize" type= "int" value="320"/>
+        <param name="~rows_resize" type= "int" value="240"/>
+    </node>
+
+
+    <!-- Node to top_righ_camera -->
+    <node pkg="advanced_lane_detection" type="main" name="advanced_algorithm_node" output="screen" ns="top_right_camera" if="$(arg top_right_camera)">
+        <remap from="camera_info" to="/top_right_camera/camera_info" />
+        <remap from="image" to="/top_right_camera/image_rect_color" />
+        <remap from="/advanced_algorithm/polygon" to="/top_right_camera/advanced_algorithm/polygon"/>
+        <remap from="/advanced_algorithm/finalResult" to="/top_right_camera/advanced_algorithm/finalResult"/>
         <param name="~cols_resize" type= "int" value="320"/>
         <param name="~rows_resize" type= "int" value="240"/>
     </node>
