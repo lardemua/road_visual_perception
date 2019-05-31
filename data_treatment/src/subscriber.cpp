@@ -92,6 +92,7 @@ get_lines::get_lines() : it(n)
 
   sub = it.subscribe("camera/image_raw", 10, &get_lines::imagereceiveCallback, this);
   sub_lanes = n.subscribe("lane_detector/lane", 10, &get_lines::lanereceiveCallback, this);
+  
 }
 
 /**

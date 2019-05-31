@@ -1,0 +1,59 @@
+<?xml version="1.0"?>
+<launch>
+    <arg name="top_left_camera" default="true"/>
+    <arg name="top_right_camera" default="true"/>
+    <!-- Draw poly node to the first processor node that return lnes_: top_left_camera -->
+    <node pkg="data_treatment" name="draw_poly_node" type="subscriber" output="screen" ns="top_left_camera" if="$(arg top_left_camera)">
+        <remap from="lane_detector/lane" to="/top_left_camera/lane_detector/lane"/>
+        <remap from="draw_poly/poly_alg1" to="/top_left_camera/draw_poly/poly_alg1"/>
+        <remap from="camera/image_raw" to="/top_left_camera/image_raw"/>
+        <param name="~cols_resize" type= "int" value="320"/>
+        <param name="~rows_resize" type= "int" value="240"/>
+        <!-- </Para visualização dos poligonos com áreas pintadas> -->
+        <!-- <param name="~R_channel" type= "int" value="255"/>
+            <param name="~G_channel" type= "int" value="0"/>
+            <param name="~B_channel" type= "int" value="0"/> -->
+    </node>
+
+    <!-- Draw poly node to the first processor node that return lnes_: top_right_camera -->
+    <node pkg="data_treatment" name="draw_poly_node" type="subscriber" output="screen" ns="top_right_camera" if="$(arg top_right_camera)">
+        <remap from="lane_detector/lane" to="/top_right_camera/lane_detector/lane" />
+        <remap from="draw_poly/poly_alg1" to="/top_right_camera/draw_poly/poly_alg1"/>
+        <remap from="camera/image_raw" to="/top_right_camera/image_raw"/>
+        <param name="~cols_resize" type= "int" value="320"/>
+        <param name="~rows_resize" type= "int" value="240"/>
+        <!-- </Para visualização dos poligonos com áreas pintadas> -->
+        <!-- <param name="~R_channel" type= "int" value="255"/>
+            <param name="~G_channel" type= "int" value="0"/>
+            <param name="~B_channel" type= "int" value="0"/> -->
+    </node>
+
+    <!-- Draw poly node to the second processor node that return lnes_: top_left_camera -->
+    <node pkg="data_treatment" name="draw_poly2_node" type="subscriber" output="screen" ns="top_left_camera" if="$(arg top_left_camera)">
+        <remap from="lane_detector/lane" to="/top_left_camera/lane_detector2/lane" />
+        <remap from="draw_poly/poly_alg11" to="/top_left_camera/draw_poly/poly_alg2"/>
+        <remap from="camera/image_raw" to="/top_left_camera/image_raw"/>
+        <param name="~cols_resize" type= "int" value="320"/>
+        <param name="~rows_resize" type= "int" value="240"/>
+        <!-- <param name="~R_channel" type= "int" value="0"/>
+            <param name="~G_channel" type= "int" value="0"/>
+            <param name="~B_channel" type= "int" value="255"/> -->
+    </node>
+
+    <!-- Draw poly node to the second processor node that return lnes_: top_right_camera -->
+    <node pkg="data_treatment" name="draw_poly2_node" type="subscriber" output="screen" ns="top_right_camera" if="$(arg top_right_camera)">
+        <remap from="lane_detector/lane" to="/top_right_camera/lane_detector2/lane" />
+        <remap from="draw_poly/poly_alg1" to="/top_right_camera/draw_poly/poly_alg2"/>
+        <remap from="camera/image_raw" to="/top_right_camera/image_raw"/>
+        <param name="~cols_resize" type= "int" value="320"/>
+        <param name="~rows_resize" type= "int" value="240"/>
+        <!-- </Para visualização dos poligonos com áreas pintadas> -->
+        <!-- <param name="~R_channel" type= "int" value="255"/>
+            <param name="~G_channel" type= "int" value="0"/>
+            <param name="~B_channel" type= "int" value="0"/> -->
+    </node>
+
+</launch>
+
+  
+    

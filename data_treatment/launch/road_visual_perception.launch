@@ -1,8 +1,8 @@
 <launch>
     <arg name="with-advanced_algorithm" default="true"/>
     <arg name="with-nsteel_algorithm" default="true"/>
-    <arg name="topics_left" default="/top_camera_left/draw_poly/poly_alg1,/top_camera_left/draw_poly/poly_alg2,/top_camera_left/advanced_algorithm/polygon"/>
-    <arg name="topics_right" default="/top_camera_right/draw_poly/poly_alg1,/top_camera_right/draw_poly/poly_alg2,/top_camera_right/advanced_algorithm/polygon"/>
+    <arg name="topics_left" default="/top_left_camera/draw_poly/poly_alg1,/top_left_camera/draw_poly/poly_alg2,/top_left_camera/advanced_algorithm/polygon"/>
+    <arg name="topics_right" default="/top_right_camera/draw_poly/poly_alg1,/top_right_camera/draw_poly/poly_alg2,/top_right_camera/advanced_algorithm/polygon"/>
     <arg name="top_left_camera" default="true"/>
     <arg name="top_right_camera" default="true"/>
 
@@ -11,20 +11,29 @@
     <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
 
 
+    <!-- To launch the nsteel algorithm node -->
     <include file="$(find lane_detector)/launch/algorithm1.launch" if="$(arg with-nsteel_algorithm)">
         <arg name="top_left_camera" value="$(arg top_left_camera)"/>
         <arg name="top_right_camera" value="$(arg top_right_camera)"/>
     </include>
 
 
+    <!-- To launch the advanced algorithm node  -->
     <include file="$(find advanced_lane_detection)/launch/advanced_lane_detection.launch" if="$(arg with-advanced_algorithm)">
+        <arg name="top_left_camera" value="$(arg top_left_camera)" />
+        <arg name="top_right_camera" value="$(arg top_right_camera)"/>
+    </include>
+
+    <!-- Just to draw the polygons to the algorithms that return localisation lanes -->
+    <include file="$(find data_treatment)/launch/draw_poly.launch" if="$(arg with-nsteel_algorithm)">
         <arg name="top_left_camera" value="$(arg top_left_camera)"/>
         <arg name="top_right_camera" value="$(arg top_right_camera)"/>
     </include>
 
+    <!-- To launch the node that calculates the probabilistic map -->
     <include file="$(find data_treatment)/launch/data_treatment.launch">
-        <arg name="topics_left" value="$(arg topics_left)"/>
-        <arg name="topics_right" value="$(arg topics_right)"/>
+        <arg name="topics_left" value="$(arg topics_left)" if="$(arg top_left_camera)"/>
+        <arg name="topics_right" value="$(arg topics_right)" if="$(arg top_right_camera)"/>
         <arg name="top_left_camera" value="$(arg top_left_camera)"/>
         <arg name="top_right_camera" value="$(arg top_right_camera)"/>
     </include>
