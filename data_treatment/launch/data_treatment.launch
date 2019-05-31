@@ -5,12 +5,12 @@
     <!-- Node that calculate and launches the probabilistic map -->
     <!-- Top left camera -->
     <arg name = "topics_left" doc="topics that enters on the architechture"/>
-    <node pkg="data_treatment" name="draw_prob_map_node" type="junction_data" output="screen" ns="top_left_camera" if="$(arg top_left_camera)">
-        <remap from="draw_prob_map/summed_img" to="/top_left_camera/draw_prob_map/summed_img"/>
-        <remap from="draw_prob_map/intersect_img" to="/top_left_camera/draw_prob_map/intersect_img"/>
-        <remap from="draw_prob_map/nonintersect_img" to="/top_left_camera/nonintersect_map/summed_img"/>
-        <remap from="draw_prob_map/image_map" to="/top_left_camera/draw_prob_map/image_map"/>
-        <remap from="draw_prob_map/road_probabilistic_map" to="/top_left_camera/draw_prob_map/road_probabilistic_map"/>
+    <node pkg="data_treatment" name="calc_prob_map_node" type="junction_data" output="screen" ns="top_left_camera" if="$(arg top_left_camera)">
+        <remap from="calc_prob_map/summed_img" to="/top_left_camera/calc_prob_map/summed_img"/>
+        <remap from="calc_prob_map/intersect_img" to="/top_left_camera/calc_prob_map/intersect_img"/>
+        <remap from="calc_prob_map/nonintersect_img" to="/top_left_camera/calc_prob_map/nonintersect_map"/>
+        <remap from="calc_prob_map/image_map" to="/top_left_camera/calc_prob_map/image_map"/>
+        <remap from="calc_prob_map/road_probabilistic_map" to="/top_left_camera/calc_prob_map/road_probabilistic_map"/>
         <remap from="/camera/camera_info" to="/top_left_camera/camera_info" />
         <!-- <remap from="~camera" to="world"/> -->
         <param name="~topics_polygons" type="string" value="$(arg topics_left)"/>
@@ -22,13 +22,13 @@
 
     <!-- Top right camera -->
     <arg name = "topics_right" doc="topics that enters on the architechture"/>
-    <node pkg="data_treatment" name="draw_prob_map_node" type="junction_data" output="screen" ns="top_right_camera" if="$(arg top_right_camera)">
+    <node pkg="data_treatment" name="calc_prob_map_node" type="junction_data" output="screen" ns="top_right_camera" if="$(arg top_right_camera)">
         <!-- <remap from="~camera" to="world"/> -->
-        <remap from="draw_prob_map/summed_img" to="/top_right_camera/draw_prob_map/summed_img"/>
-        <remap from="draw_prob_map/intersect_img" to="/top_right_camera/draw_prob_map/intersect_img"/>
-        <remap from="draw_prob_map/nonintersect_img" to="/top_right_camera/nonintersect_map/summed_img"/>
-        <remap from="draw_prob_map/image_map" to="/top_right_camera/draw_prob_map/image_map"/>
-        <remap from="draw_prob_map/road_probabilistic_map" to="/top_right_camera/draw_prob_map/road_probabilistic_map"/>
+        <remap from="calc_prob_map/summed_img" to="/top_right_camera/calc_prob_map/summed_img"/>
+        <remap from="calc_prob_map/intersect_img" to="/top_right_camera/calc_prob_map/intersect_img"/>
+        <remap from="calc_prob_map/nonintersect_img" to="/top_right_camera/calc_prob_map/nonintersect_map"/>
+        <remap from="calc_prob_map/image_map" to="/top_right_camera/calc_prob_map/image_map"/>
+        <remap from="calc_prob_map/road_probabilistic_map" to="/top_right_camera/calc_prob_map/road_probabilistic_map"/>
         <remap from="/camera/camera_info" to="/top_right_camera/camera_info" />
         <param name="~topics_polygons" type="string" value="$(arg topics_right)"/>
         <param name="~cols_img_big" type= "double" value="964"/>

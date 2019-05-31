@@ -93,11 +93,11 @@ junction_data::junction_data(const std::vector<std::string> &image_topics, param
     : _params(params)
     , _nh()
     , _it(_nh)
-    , _image_publisher_summed(_nh.advertise<sensor_msgs::Image>("draw_prob_map/summed_img", 10))
-    , _image_publisher_diff(_nh.advertise<sensor_msgs::Image>("draw_prob_map/intersect_img", 10))
-    , _image_publisher_nonint(_nh.advertise<sensor_msgs::Image>("draw_prob_map/nonintersect_img", 10))
-    , _prob_map_image(_nh.advertise<sensor_msgs::Image>("draw_prob_map/image_map", 10))
-    , _grid_road_map_pub(_nh.advertise<nav_msgs::OccupancyGrid>("draw_prob_map/road_probabilistic_map", 10, true))
+    , _image_publisher_summed(_nh.advertise<sensor_msgs::Image>("calc_prob_map/summed_img", 10))
+    , _image_publisher_diff(_nh.advertise<sensor_msgs::Image>("calc_prob_map/intersect_img", 10))
+    , _image_publisher_nonint(_nh.advertise<sensor_msgs::Image>("calc_prob_map/nonintersect_img", 10))
+    , _prob_map_image(_nh.advertise<sensor_msgs::Image>("calc_prob_map/image_map", 10))
+    , _grid_road_map_pub(_nh.advertise<nav_msgs::OccupancyGrid>("calc_prob_map/road_probabilistic_map", 10, true))
     , _algorithms_names(image_topics.begin(), image_topics.end())
     , _image_updates(image_topics.size(), false)
     , _images_headers(image_topics.size())
@@ -313,7 +313,7 @@ void junction_data::probabilitiesMapImage(cv::Mat &image_intersection, cv::Mat &
 
 int main(int argc, char *argv[])
 {
-    ros::init(argc, argv, "draw_prob_map_node");
+    ros::init(argc, argv, "calc_prob_map_node");
     auto params = junction_data::params{};
     ros::param::get("~cols_img_small", params.width);
     ros::param::get("~rows_img_small", params.height);
