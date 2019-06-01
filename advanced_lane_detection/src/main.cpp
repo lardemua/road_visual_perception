@@ -45,7 +45,7 @@ using namespace cv;
 // Point2f perspectiveDst[] = {Point2f(63, 0), Point2f(263, 0), Point2f(63, 240), Point2f(263, 240)};
 
 //Oboard Atlas
-Point2f perspectiveSrc[] = {Point2f(130, 135), Point2f(160, 135), Point2f(60, 220), Point2f(260, 220)};
+Point2f perspectiveSrc[] = {Point2f(120, 135), Point2f(160, 135), Point2f(30, 220), Point2f(260, 220)};
 Point2f perspectiveDst[] = {Point2f(63, 0), Point2f(263, 0), Point2f(63, 240), Point2f(263, 240)};
 
 

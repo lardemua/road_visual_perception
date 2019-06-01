@@ -43,9 +43,9 @@ To get the undistorted image (this step is already included on the my camera_dri
 ```
 $ ROS_NAMESPACE=my_camera rosrun image_proc image_proc
 ```
-In order to get faster results, I rescale the initial image inside of my architecture. At this moment, to change the resolution it is necessary follow the steps below:
+In order to get faster results, I rescale the initial image inside of my architecture. At this moment, to change the resolution it is necessary to follow the steps below:
 1) Accordingly,comment/uncomment the perspectiveSrc and the pespectiveDst variables in advanced_lane_detection/src/main.cpp because they respresent the perspective transformation (IPM);
-2) In advanced_lane_detection/src/laneDetection.cpp (lines 383/384) ucomment or comment the lines to show the right result;
+2) In advanced_lane_detection/src/laneDetection.cpp (lines 383/384) uncomment/comment the lines to show the right result;
 3) In Lane_Detector/params/Detector2.yaml change the value's variable ipmRight to number of columns of the image;
 4) In Lane_Detector/cfg/Detector.cfg (lines 47-70) uncomment or comment the lines based on the image resolution;
 5) On the launch files:
@@ -60,7 +60,7 @@ In order to get faster results, I rescale the initial image inside of my archite
 To launch cameras:
 
 ```
-roslaunch pointgrey_camera_driver camera_tiago.launch packet_resend:=false
+roslaunch atlas2_bringup drivers.launch
 ```
 
 To launch the architecture:

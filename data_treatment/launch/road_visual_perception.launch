@@ -6,11 +6,6 @@
     <arg name="top_left_camera" default="true"/>
     <arg name="top_right_camera" default="true"/>
 
-
-    <param name="robot_description" command="$(find xacro)/xacro --inorder '$(find pointgrey_camera_description)/urdf/camera_tiago.urdf.xacro'" />
-    <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
-
-
     <!-- To launch the nsteel algorithm node -->
     <include file="$(find lane_detector)/launch/algorithm1.launch" if="$(arg with-nsteel_algorithm)">
         <arg name="top_left_camera" value="$(arg top_left_camera)"/>

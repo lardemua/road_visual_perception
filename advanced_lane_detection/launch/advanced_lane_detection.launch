@@ -11,7 +11,6 @@
         <param name="~rows_resize" type= "int" value="240"/>
     </node>
 
-
     <!-- Node to top_righ_camera -->
     <node pkg="advanced_lane_detection" type="main" name="advanced_algorithm_node" output="screen" ns="top_right_camera" if="$(arg top_right_camera)">
         <remap from="/camera/image_rect_color" to="/top_right_camera/image_rect_color" />
