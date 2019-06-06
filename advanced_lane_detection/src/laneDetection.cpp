@@ -1,6 +1,6 @@
 #include "advanced_lane_detection/laneDetection.h"
-laneDetection::laneDetection(const Mat _oriImage, const Mat _perspectiveMatrix)
-:oriImage(_oriImage), perspectiveMatrix(_perspectiveMatrix), blockNum(9), windowSize(150), recordCounter(0), initRecordCount(0), failDetectFlag(true)
+laneDetection::laneDetection(/*const Mat _used_image,*/ const Mat _oriImage, const Mat _perspectiveMatrix)
+:/*used_image(_used_image),*/ oriImage(_oriImage), perspectiveMatrix(_perspectiveMatrix), blockNum(9), windowSize(150), recordCounter(0), initRecordCount(0), failDetectFlag(true)
 {
     histogram.resize(_oriImage.size().width);
     midPoint = _oriImage.size().width >> 1;
@@ -381,6 +381,7 @@ Mat laneDetection::getWarpMask()
 Mat laneDetection::getFinalResult()
 {
     cv::Size size(320,240);
+    // resize(used_image,used_image,size);
     resize(oriImage,oriImage,size);
     addWeighted(maskImageWarp, 0.5, oriImage, 1, 0, finalResult);
     return finalResult;
