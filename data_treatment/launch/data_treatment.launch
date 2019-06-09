@@ -1,7 +1,8 @@
 <launch>
     <arg name="top_left_camera" default="true"/>
     <arg name="top_right_camera" default="true"/>
-
+    <arg name ="write-results_right" doc="enables to write the results (right camera) about the indicators in a csv file"/>
+    <arg name ="write-results_left" doc="enables to write the results (left camera) about the indicators in a csv file"/>
     <!-- Node that calculate and launches the probabilistic map -->
     <!-- Top left camera -->
     <arg name = "topics_left" doc="topics that enters on the architechture"/>
@@ -17,11 +18,12 @@
         <param name="~cols_img_big" type= "double" value="964"/>
         <param name="~cols_img_small" type= "double" value="320"/>
         <param name="~rows_img_small" type= "double" value="240"/>
-        <param name="~kernel_size" type= "int" value="25"/>
+        <param name="~writing_results" value="$(arg write-results_left)"/>
     </node>
 
     <!-- Top right camera -->
     <arg name = "topics_right" doc="topics that enters on the architechture"/>
+
     <node pkg="data_treatment" name="calc_prob_map_node" type="junction_data" output="screen" ns="top_right_camera" if="$(arg top_right_camera)">
         <!-- <remap from="~camera" to="world"/> -->
         <remap from="calc_prob_map/summed_img" to="/top_right_camera/calc_prob_map/summed_img"/>
@@ -34,11 +36,11 @@
         <param name="~cols_img_big" type= "double" value="964"/>
         <param name="~cols_img_small" type= "double" value="320"/>
         <param name="~rows_img_small" type= "double" value="240"/>
-        <!-- <param name="/dynamicParameters/kernel_size" type= "int" value="25"/> -->
+        <param name="~writing_results" value="$(arg write-results_right)"/>
     </node>
 
 
-     <node pkg="data_treatment" name="dynamicParameters" type="dynamicParameters" output="screen"/>
+    <node pkg="data_treatment" name="dynamicParameters" type="dynamicParameters" output="screen"/>
 
 </launch>
 

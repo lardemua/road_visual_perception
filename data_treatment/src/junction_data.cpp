@@ -26,6 +26,11 @@
 #include <cv_bridge/cv_bridge.h>
 #include "ros/ros.h"
 
+/*write a file*/
+#include <iostream>
+#include <fstream>
+
+
 
 struct image_info
 {
@@ -33,6 +38,21 @@ struct image_info
     bool isupdate;
     double image_delay;
 };
+
+/**
+ * @brief Function that enables to write the result in a csv file
+ * 
+ */
+
+void writeResults2CSVfile(std::string frame_id, int sequence, float area_ponderada, float area_comum, float area_tot, float indicador1, float indicador2, int kernel_size)
+{
+    std::ofstream output;
+    const std::string outFileName = "Results_indicadores.csv";
+    output.open(outFileName,std::ios::app);
+
+    output << frame_id << "," <<sequence<<","<< area_ponderada << "," << area_comum << "," << area_tot << "," << indicador1 << "," << indicador2 <<","<< kernel_size << std::endl;
+    output.close();
+}
 
 class junction_data
 {
@@ -244,12 +264,15 @@ void junction_data::probabilitiesMapImage(cv::Mat &image_intersection, cv::Mat &
     int x = 0;
     int y = 0;
     float pix_cinzentosf = 0;
-    int value_filter = 0;
     float prob = 0.0;
     float prob_non_intersect = 0.0;
     int thresh_non_intersect = 1; // valore acrescentado para termos a probabilidade das secções que nao se intersectam
+    float area_common = 0;
+    bool write_results_right = 0;
+    bool write_results_left = 0;
+    // float area_probabilistica_ponderada=0;
+
     ros::param::get("/dynamicParameters/kernel_size", _params.kernel_size);
-   
 
     image_intersection.convertTo(image_intersection, CV_32F);
     image_nonintersection.convertTo(image_nonintersection, CV_32F);
@@ -262,36 +285,40 @@ void junction_data::probabilitiesMapImage(cv::Mat &image_intersection, cv::Mat &
     ddepth = -1;
 
     cv::filter2D(image_intersection, img_filt, ddepth, kernel, anchor, delta, cv::BORDER_DEFAULT);
-    img_final = cv::Mat::zeros(image_intersection.rows, image_intersection.cols, CV_8UC1);
+    // img_final = cv::Mat::zeros(image_intersection.rows, image_intersection.cols, CV_8UC1);
     img_filt = img_filt + image_nonintersection;
-
-    //Probabilities calculations:
-
-    // for (x = 0; x < image_intersection.rows; x++)
-    // {
-    //     for (y = 0; y < image_intersection.cols; y++)
-    //     {
-    //         value_filter = img_filt.at<uchar>(x, y);
-    //         prob = value_filter / (float)255;
-    //         pix_cinzentosf = prob * (float)255;
-    //         img_final.at<uchar>(x, y) = (int)pix_cinzentosf;
-    //     }
-    // }
-
-    //Image result:-----------------------------------------------------
-    //   if (current_image_original)
-    //   {
-    //     img_original = current_image_original->image;
-    //     resize(img_original, img_original, size);
-    //     cvtColor(img_filt, img_filt, CV_GRAY2BGR);
-    //     img_filt.convertTo(img_filt, CV_8UC3);
-    //     img_original.convertTo(img_original, CV_8UC3);
-    //     addWeighted(img_filt, 0.5, img_original, 1, 0, final_result);
-    //     image_final_result = cv_bridge::CvImage{current_image_alg1->header, "bgr8", final_result}.toImageMsg();
-    //   }
-    //-------------------------------------------------------------------
-    // cv::cvtColor(img_filt, img_filt, CV_BGR2GRAY);
     img_filt.convertTo(img_filt, CV_8UC1);
+
+    //-----------------------------------------------------------------------------------------------------
+    //Probabilities calculations:
+    auto area_probabilistica_ponderada = cv::sum(img_filt)[0] / (float)255;
+    auto area_total = cv::countNonZero(img_filt);
+
+    for (x = 0; x < img_filt.rows; x++)
+    {
+        for (y = 0; y < img_filt.cols; y++)
+        {
+
+            if (img_filt.at<uchar>(x, y) == 255)
+            {
+                area_common++;
+            }
+        }
+    }
+
+    //Cálculos dos indicadores:
+    auto I_1 = area_probabilistica_ponderada / area_total;
+    auto I_2 = area_common / area_total;
+
+    //-------------------------------------------------------------------
+    //Writing to a file
+    ros::param::get("/top_right_camera/calc_prob_map_node/writing_results", write_results_right);
+    ros::param::get("/top_left_camera/calc_prob_map_node/writing_results", write_results_left);
+
+    if (write_results_right == true || write_results_left == true)
+    {
+        writeResults2CSVfile(_images_headers[0].frame_id,_images_headers[0].seq, area_probabilistica_ponderada, area_common, area_total, I_1, I_2, _params.kernel_size);
+    }
 
     //GridMap:-----------------------------------------------------
     auto img_final_map = cv_bridge::CvImage{_images_headers[0], "mono8", img_filt}.toImageMsg();

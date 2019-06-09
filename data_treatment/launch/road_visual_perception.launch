@@ -5,6 +5,8 @@
     <arg name="topics_right" default="/top_right_camera/draw_poly/poly_alg1,/top_right_camera/draw_poly/poly_alg2,/top_right_camera/advanced_algorithm/polygon"/>
     <arg name="top_left_camera" default="true"/>
     <arg name="top_right_camera" default="true"/>
+    <arg name="write-results_right" default="false"/>
+    <arg name="write-results_left" default="false"/>
 
     <!-- To launch the nsteel algorithm node -->
     <include file="$(find lane_detector)/launch/algorithm1.launch" if="$(arg with-nsteel_algorithm)">
@@ -31,6 +33,8 @@
         <arg name="topics_right" value="$(arg topics_right)" if="$(arg top_right_camera)"/>
         <arg name="top_left_camera" value="$(arg top_left_camera)"/>
         <arg name="top_right_camera" value="$(arg top_right_camera)"/>
+        <arg name="write-results_right" value="$(arg write-results_right)"/>
+        <arg name="write-results_left" value="$(arg write-results_left)"/>
     </include>
 
     <!-- <node type="rviz" name="rviz" pkg="rviz"/> -->
