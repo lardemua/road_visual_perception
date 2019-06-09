@@ -34,8 +34,11 @@
         <param name="~cols_img_big" type= "double" value="964"/>
         <param name="~cols_img_small" type= "double" value="320"/>
         <param name="~rows_img_small" type= "double" value="240"/>
-        <param name="~kernel_size" type= "int" value="25"/>
+        <!-- <param name="/dynamicParameters/kernel_size" type= "int" value="25"/> -->
     </node>
+
+
+     <node pkg="data_treatment" name="dynamicParameters" type="dynamicParameters" output="screen"/>
 
 </launch>
 

@@ -26,6 +26,7 @@
 #include <cv_bridge/cv_bridge.h>
 #include "ros/ros.h"
 
+
 struct image_info
 {
     cv::Mat image;
@@ -148,13 +149,13 @@ void junction_data::img_callback(const sensor_msgs::ImageConstPtr &img_msg, int 
     img->image.copyTo(indiv_img_data.image);
 
     _image_updates[alg_idx] = true;
-    indiv_img_data.image_delay=true;
+    indiv_img_data.image_delay = true;
     _images_headers[alg_idx] = img_msg->header;
 
     t_img = img_msg->header.stamp;
     duration_image = ros::Time::now() - t_img;
     _images_durations.push_back(duration_image.toSec());
-    indiv_img_data.image_delay=_images_durations.back();
+    indiv_img_data.image_delay = _images_durations.back();
     ROS_INFO_STREAM("Time to process: " << duration_image.toSec());
 
     ROS_INFO("received image from algorithm %d", alg_idx);
@@ -175,7 +176,7 @@ void junction_data::process(int alg_idx)
 
     double delta_timer;
     double time_seconds;
-// verificar se as 3 images estão set
+    // verificar se as 3 images estão set
 
     for (auto is_updated : _image_updates)
     {
@@ -209,7 +210,6 @@ void junction_data::process(int alg_idx)
     auto img_msg = cv_bridge::CvImage{_images_headers[0], "bgr8", buffer_sum}.toImageMsg();
     auto img_msg_diff = cv_bridge::CvImage{_images_headers[0], "mono8", image_int}.toImageMsg();
     auto img_msg_nonint = cv_bridge::CvImage{_images_headers[0], "mono8", image_nonint}.toImageMsg();
-
 
     _image_publisher_summed.publish(img_msg);
     _image_publisher_diff.publish(img_msg_diff);
@@ -248,6 +248,8 @@ void junction_data::probabilitiesMapImage(cv::Mat &image_intersection, cv::Mat &
     float prob = 0.0;
     float prob_non_intersect = 0.0;
     int thresh_non_intersect = 1; // valore acrescentado para termos a probabilidade das secções que nao se intersectam
+    ros::param::get("/dynamicParameters/kernel_size", _params.kernel_size);
+   
 
     image_intersection.convertTo(image_intersection, CV_32F);
     image_nonintersection.convertTo(image_nonintersection, CV_32F);
@@ -315,9 +317,9 @@ int main(int argc, char *argv[])
 {
     ros::init(argc, argv, "calc_prob_map_node");
     auto params = junction_data::params{};
+
     ros::param::get("~cols_img_small", params.width);
     ros::param::get("~rows_img_small", params.height);
-    ros::param::get("~kernel_size", params.kernel_size);
     std::vector<std::string> topic_names;
     std::string topic_names_str;
     ros::param::get("~topics_polygons", topic_names_str);

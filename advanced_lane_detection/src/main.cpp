@@ -181,14 +181,14 @@ void alg2::processFrames()
     
 
     // draw the roi (for perspective transform)
-    line(init_img, perspectiveSrc[0], perspectiveSrc[1], Scalar(0, 0, 255), 0.01);
-    line(init_img, perspectiveSrc[1], perspectiveSrc[3], Scalar(0, 0, 255), 0.01);
-    line(init_img, perspectiveSrc[3], perspectiveSrc[2], Scalar(0, 0, 255), 0.01);
-    line(init_img, perspectiveSrc[2], perspectiveSrc[0], Scalar(0, 0, 255), 0.01);
-    circle(init_img, perspectiveSrc[0], 0.01, Scalar(0, 0, 255), CV_FILLED);
-    circle(init_img, perspectiveSrc[1], 0.01, Scalar(0, 0, 255), CV_FILLED);
-    circle(init_img, perspectiveSrc[2], 0.01, Scalar(0, 0, 255), CV_FILLED);
-    circle(init_img, perspectiveSrc[3], 0.01, Scalar(0, 0, 255), CV_FILLED);
+    // line(init_img, perspectiveSrc[0], perspectiveSrc[1], Scalar(0, 0, 255), 0.01);
+    // line(init_img, perspectiveSrc[1], perspectiveSrc[3], Scalar(0, 0, 255), 0.01);
+    // line(init_img, perspectiveSrc[3], perspectiveSrc[2], Scalar(0, 0, 255), 0.01);
+    // line(init_img, perspectiveSrc[2], perspectiveSrc[0], Scalar(0, 0, 255), 0.01);
+    // circle(init_img, perspectiveSrc[0], 0.01, Scalar(0, 0, 255), CV_FILLED);
+    // circle(init_img, perspectiveSrc[1], 0.01, Scalar(0, 0, 255), CV_FILLED);
+    // circle(init_img, perspectiveSrc[2], 0.01, Scalar(0, 0, 255), CV_FILLED);
+    // circle(init_img, perspectiveSrc[3], 0.01, Scalar(0, 0, 255), CV_FILLED);
     //frameSize = init_img.size();
 
     

@@ -14,6 +14,7 @@ find_package(catkin REQUIRED COMPONENTS
   lane_detector
   cv_bridge
   image_transport
+  dynamic_reconfigure
   grid_map_ros
   grid_map_cv
 )
@@ -95,11 +96,12 @@ find_package(OpenCV 3.2.0 REQUIRED)
 ##   * uncomment the "generate_dynamic_reconfigure_options" section below
 ##     and list every .cfg file to be processed
 
-## Generate dynamic reconfigure parameters in the 'cfg' folder
-# generate_dynamic_reconfigure_options(
-#   cfg/DynReconf1.cfg
+##Generate dynamic reconfigure parameters in the 'cfg' folder
+generate_dynamic_reconfigure_options(
+    cfg/filters.cfg
+#    cfg/Detector_imagens2.cfg
 #   cfg/DynReconf2.cfg
-# )
+)
 
 ###################################
 ## catkin specific configuration ##
@@ -113,7 +115,7 @@ find_package(OpenCV 3.2.0 REQUIRED)
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES data_treatment
-  CATKIN_DEPENDS roscpp rospy std_msgs lane_detector 
+  CATKIN_DEPENDS roscpp rospy std_msgs lane_detector dynamic_reconfigure
 #  DEPENDS system_lib
 
 )
@@ -147,6 +149,8 @@ include_directories(
 add_executable(subscriber src/subscriber.cpp)
 add_executable(subscriber2 src/subscriber.cpp)
 add_executable(junction_data src/junction_data.cpp)
+add_executable(dynamicParameters src/dynamicParameters.cpp)
+
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -156,6 +160,7 @@ add_executable(junction_data src/junction_data.cpp)
 
 ## Add cmake target dependencies of the executable
 ## same as for the library above
+add_dependencies(dynamicParameters ${PROJECT_NAME}_gencfg)
 # add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
@@ -165,6 +170,7 @@ add_executable(junction_data src/junction_data.cpp)
 target_link_libraries(subscriber ${catkin_LIBRARIES} ${OpenCV_LIBRARIES}) 
 target_link_libraries(subscriber2 ${catkin_LIBRARIES} ${OpenCV_LIBRARIES}) 
 target_link_libraries(junction_data ${catkin_LIBRARIES} ${OpenCV_LIBRARIES}) 
+target_link_libraries(dynamicParameters ${catkin_LIBRARIES})
 #############
 ## Install ##
 #############
