@@ -47,7 +47,7 @@ struct image_info
 void writeResults2CSVfile(std::string frame_id, int sequence, float area_ponderada, float area_comum, float area_tot, float indicador1, float indicador2, int kernel_size)
 {
     std::ofstream output;
-    const std::string outFileName = "Results_indicadores.csv";
+    const std::string outFileName = "two_cameras_advanced_algorithm_25*25.csv";
     output.open(outFileName,std::ios::app);
 
     output << frame_id << "," <<sequence<<","<< area_ponderada << "," << area_comum << "," << area_tot << "," << indicador1 << "," << indicador2 <<","<< kernel_size << std::endl;
@@ -290,33 +290,34 @@ void junction_data::probabilitiesMapImage(cv::Mat &image_intersection, cv::Mat &
     img_filt.convertTo(img_filt, CV_8UC1);
 
     //-----------------------------------------------------------------------------------------------------
-    //Probabilities calculations:
-    auto area_probabilistica_ponderada = cv::sum(img_filt)[0] / (float)255;
-    auto area_total = cv::countNonZero(img_filt);
-
-    for (x = 0; x < img_filt.rows; x++)
-    {
-        for (y = 0; y < img_filt.cols; y++)
-        {
-
-            if (img_filt.at<uchar>(x, y) == 255)
-            {
-                area_common++;
-            }
-        }
-    }
-
-    //Cálculos dos indicadores:
-    auto I_1 = area_probabilistica_ponderada / area_total;
-    auto I_2 = area_common / area_total;
-
-    //-------------------------------------------------------------------
+        //-------------------------------------------------------------------
     //Writing to a file
     ros::param::get("/top_right_camera/calc_prob_map_node/writing_results", write_results_right);
     ros::param::get("/top_left_camera/calc_prob_map_node/writing_results", write_results_left);
 
     if (write_results_right == true || write_results_left == true)
     {
+        //Probabilities calculations:
+        auto area_probabilistica_ponderada = cv::sum(img_filt)[0] / (float)255;
+        auto area_total = cv::countNonZero(img_filt);
+
+        for (x = 0; x < img_filt.rows; x++)
+        {
+            for (y = 0; y < img_filt.cols; y++)
+            {
+
+                if (img_filt.at<uchar>(x, y) == 255)
+                {
+                    area_common++;
+                }
+            }
+        }
+
+    //Cálculos dos indicadores:
+    auto I_1 = area_probabilistica_ponderada / area_total;
+    auto I_2 = area_common / area_total;
+
+
         writeResults2CSVfile(_images_headers[0].frame_id,_images_headers[0].seq, area_probabilistica_ponderada, area_common, area_total, I_1, I_2, _params.kernel_size);
     }
 

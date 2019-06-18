@@ -1,5 +1,5 @@
 <launch>
-<arg name = "pathToRosbag"  default = "/media/OAtlasVaiAFeira_50kmh.bag" />
+<arg name = "pathToRosbag"  default = "/media/2cams.bag" />
 <remap from = "/top_camera_right/image_raw" to = "/top_right_camera/image_raw" />
 <remap from = "/top_camera_right_camera_nodelet_manager/bond" to = "/top_right_camera_nodelet_manager/bond"/>
 <remap from = "/top_camera_right/camera_info" to = "/top_right_camera/camera_info"/>
@@ -8,9 +8,26 @@
 <remap from = "/top_camera_left_camera_nodelet_manager/bond" to = "/top_left_camera_nodelet_manager/bond"/>
 <remap from = "/top_camera_left/camera_info" to = "/top_left_camera/camera_info"/>
 <remap from = "/top_camera_left/image_rect_color" to = "/top_left_camera/image_rect_color"/>
+<node name="rqt_gui" pkg="rqt_gui" type="rqt_gui"/>
+
+
+<!-- Carla Simulator -->
+<!-- <arg name = "pathToRosbag"  default = "/media/tiago/Elements/bag_files/carla_session1.bag" />
+<remap from = "/top_camera_right/image_raw" to = "/top_right_camera/image_raw" />
+<remap from = "/top_camera_right_camera_nodelet_manager/bond" to = "/top_right_camera_nodelet_manager/bond"/>
+<remap from = "/carla/ego_vehicle/camera/rgb/top_right_camera/camera_info" to = "/top_right_camera/camera_info"/>
+<remap from = "/carla/ego_vehicle/camera/rgb/top_right_camera/image_color" to = "/top_right_camera/image_rect_color"/>
+<remap from = "/top_camera_left/image_raw" to = "/top_left_camera/image_raw" />
+<remap from = "/top_camera_left_camera_nodelet_manager/bond" to = "/top_left_camera_nodelet_manager/bond"/>
+<remap from = "/carla/ego_vehicle/camera/rgb/top_left_camera/camera_info" to = "/top_left_camera/camera_info"/>
+<remap from = "/carla/ego_vehicle/camera/rgb/top_left_camera/image_color" to = "/top_left_camera/image_rect_color"/> -->
+
+
+
 
 <node pkg  = "rosbag"
       type = "play"
       name = "player"
       args = "$(arg pathToRosbag)"/>
 </launch>
+

@@ -37,5 +37,20 @@
         <arg name="write-results_left" value="$(arg write-results_left)"/>
     </include>
 
+
+    <node pkg="tf" type="static_transform_publisher" name="tf_top_right_camera" args="-17.7217972603514	780.398987989879	1798.90322883126	-1.58683126505267	0.0114432071771162	3.08517033374988 moving_axis top_right_camera 100" />
+
+
+
+
+
+    <node pkg="tf" type="static_transform_publisher" name="tf_top_left_camera" args="300.321464816853	713.849641574408	1890.67115420697	-1.60435715276337	0.0108160149890114	3.09315055757511 moving_axis top_left_camera 100" />
+
+
+
+
+
+
+
     <!-- <node type="rviz" name="rviz" pkg="rviz"/> -->
 </launch>
