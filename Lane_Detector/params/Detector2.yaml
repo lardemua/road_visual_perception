@@ -1,3 +1,7 @@
-ipmLeft: 0
-ipmRight: 320
-tracking_dist_threshold: 60.0
+# ipmLeft: 0
+# ipmRight: 320
+# tracking_dist_threshold: 60.0
+
+ipmTop: 420
+impBottom: 725
+tracking_dist_threshold: 55.0

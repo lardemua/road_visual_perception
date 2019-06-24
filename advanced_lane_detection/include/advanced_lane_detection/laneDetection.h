@@ -12,7 +12,6 @@ class laneDetection
 {
 private:
     Mat perspectiveMatrix;
-    Mat used_image;
     Mat oriImage; //The original input image.
     Mat edgeImage; // The result of applying canny edge detection.
     Mat warpEdgeImage;
@@ -52,7 +51,7 @@ private:
     bool laneCoefEstimate();
     void laneFitting();
 public:
-    laneDetection(Mat _used_image, Mat _oriImage, Mat _perspectiveMatrix);
+    laneDetection(Mat _oriImage, Mat _perspectiveMatrix);
     ~laneDetection();
     void laneDetctAlgo();
     Mat getEdgeDetectResult();

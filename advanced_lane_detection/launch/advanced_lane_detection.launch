@@ -7,8 +7,8 @@
         <remap from="/camera/image_rect_color" to="/top_left_camera/image_rect_color" />
         <remap from="/advanced_algorithm/polygon" to="/top_left_camera/advanced_algorithm/polygon"/>
         <remap from="/advanced_algorithm/finalResult" to="/top_left_camera/advanced_algorithm/finalResult"/>
-        <param name="~cols_resize" type= "int" value="320"/>
-        <param name="~rows_resize" type= "int" value="240"/>
+        <param name="~cols_resize" type= "int" value="964"/>
+        <param name="~rows_resize" type= "int" value="720"/>
     </node>
 
     <!-- Node to top_righ_camera -->
@@ -16,7 +16,7 @@
         <remap from="/camera/image_rect_color" to="/top_right_camera/image_rect_color" />
         <remap from="/advanced_algorithm/polygon" to="/top_right_camera/advanced_algorithm/polygon"/>
         <remap from="/advanced_algorithm/finalResult" to="/top_right_camera/advanced_algorithm/finalResult"/>
-        <param name="~cols_resize" type= "int" value="320"/>
-        <param name="~rows_resize" type= "int" value="240"/>
+        <param name="~cols_resize" type= "int" value="964"/>
+        <param name="~rows_resize" type= "int" value="720"/>
     </node>
 </launch>

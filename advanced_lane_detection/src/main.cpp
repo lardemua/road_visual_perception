@@ -26,6 +26,7 @@
 
 #include <iostream>
 #include <string>
+
 #include "advanced_lane_detection/laneDetection.h"
 
 /*Namesapaces*/
@@ -35,7 +36,7 @@ using namespace cv;
 
 //Global Variables
 //Img size 964*724:
-// Point2f perspectiveSrc[] = {Point2f(225, 362), Point2f(739, 362), Point2f(88, 700), Point2f(858, 700)};
+// Point2f perspectiveSrc[] = {Point2f( 340, 412), Point2f(535, 412), Point2f(88, 700), Point2f(858, 700)};
 // Point2f perspectiveDst[] = {Point2f(226, 0), Point2f(737, 0), Point2f(226, 724), Point2f(737, 724)};
 //Img size 640*480
 // Point2f perspectiveSrc[] = {Point2f(125, 262), Point2f(400, 262), Point2f(44, 453), Point2f(550, 453)};
@@ -45,8 +46,11 @@ using namespace cv;
 // Point2f perspectiveDst[] = {Point2f(63, 0), Point2f(263, 0), Point2f(63, 240), Point2f(263, 240)};
 
 //Onboard Atlas
-Point2f perspectiveSrc[] = {Point2f(130, 135), Point2f(160, 135), Point2f(60, 220), Point2f(310, 220)};
-Point2f perspectiveDst[] = {Point2f(63, 0), Point2f(263, 0), Point2f(63, 240), Point2f(263, 240)};
+Point2f perspectiveSrc[] = {Point2f( 370, 412), Point2f(535, 412), Point2f(88, 700), Point2f(858, 700)};
+Point2f perspectiveDst[] = {Point2f(226, 0), Point2f(737, 0), Point2f(226, 724), Point2f(737, 724)};
+
+// Point2f perspectiveSrc[] = {Point2f(130, 135), Point2f(160, 135), Point2f(60, 220), Point2f(310, 220)};
+// Point2f perspectiveDst[] = {Point2f(63, 0), Point2f(263, 0), Point2f(63, 240), Point2f(263, 240)};
 
 
 class alg2
@@ -177,25 +181,25 @@ void alg2::processFrames()
     Mat init_img = current_image->image;
     resize(init_img, init_img, size_img);
     perspectiveMatrix = getPerspectiveTransform(perspectiveSrc, perspectiveDst);
-    Mat _used_img=init_img.clone();
+    Mat _used_img=init_img.clone();  
     
 
     // draw the roi (for perspective transform)
-    line(init_img, perspectiveSrc[0], perspectiveSrc[1], Scalar(0, 0, 255), 0.01);
-    line(init_img, perspectiveSrc[1], perspectiveSrc[3], Scalar(0, 0, 255), 0.01);
-    line(init_img, perspectiveSrc[3], perspectiveSrc[2], Scalar(0, 0, 255), 0.01);
-    line(init_img, perspectiveSrc[2], perspectiveSrc[0], Scalar(0, 0, 255), 0.01);
-    circle(init_img, perspectiveSrc[0], 0.01, Scalar(0, 0, 255), CV_FILLED);
-    circle(init_img, perspectiveSrc[1], 0.01, Scalar(0, 0, 255), CV_FILLED);
-    circle(init_img, perspectiveSrc[2], 0.01, Scalar(0, 0, 255), CV_FILLED);
-    circle(init_img, perspectiveSrc[3], 0.01, Scalar(0, 0, 255), CV_FILLED);
+    // line(init_img, perspectiveSrc[0], perspectiveSrc[1], Scalar(0, 0, 255), 0.01);
+    // line(init_img, perspectiveSrc[1], perspectiveSrc[3], Scalar(0, 0, 255), 0.01);
+    // line(init_img, perspectiveSrc[3], perspectiveSrc[2], Scalar(0, 0, 255), 0.01);
+    // line(init_img, perspectiveSrc[2], perspectiveSrc[0], Scalar(0, 0, 255), 0.01);
+    // circle(init_img, perspectiveSrc[0], 0.01, Scalar(0, 0, 255), CV_FILLED);
+    // circle(init_img, perspectiveSrc[1], 0.01, Scalar(0, 0, 255), CV_FILLED);
+    // circle(init_img, perspectiveSrc[2], 0.01, Scalar(0, 0, 255), CV_FILLED);
+    // circle(init_img, perspectiveSrc[3], 0.01, Scalar(0, 0, 255), CV_FILLED);
     //frameSize = init_img.size();
     
     
 
     
     //Applying lane detection algorithm
-    laneDetection LaneAlgo(_used_img, init_img, perspectiveMatrix);
+    laneDetection LaneAlgo(init_img, perspectiveMatrix);
     LaneAlgo.laneDetctAlgo();
 
     warpEdge = LaneAlgo.getWarpEdgeDetectResult().clone();
@@ -220,13 +224,17 @@ void alg2::processFrames()
 
 int main(int argc, char **argv)
 {
+    
     ros::init(argc, argv,"advanced_algorithm_node" );
+    
     alg2 processImage;
+    ros::Rate loop_rate(8);
 
     while (ros::ok())
     {
         processImage.Looping();
         ros::spinOnce();
+        loop_rate.sleep();
     }
 
     return 0;

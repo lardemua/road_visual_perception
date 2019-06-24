@@ -1,4 +1,6 @@
 <launch>
+    <param name="use_sim_time" value="true" />
+
     <arg name="with-advanced_algorithm" default="true"/>
     <arg name="with-nsteel_algorithm" default="true"/>
     <arg name="topics_left" default="/top_left_camera/draw_poly/poly_alg1,/top_left_camera/draw_poly/poly_alg2,/top_left_camera/advanced_algorithm/polygon"/>
@@ -7,6 +9,11 @@
     <arg name="top_right_camera" default="true"/>
     <arg name="write-results_right" default="false"/>
     <arg name="write-results_left" default="false"/>
+    <arg name="multi_cameras_combination" default="true"/>
+    <arg name="topics_maps" default="/top_left_camera/calc_prob_map/image_map,/top_right_camera/calc_prob_map/image_map"/>
+    
+    <node pkg="tf" type="static_transform_publisher" name="tf_top_right_camera" args="-780.3990	-17.2118  1798.90322883126   -1.58683126505267	0.0114432071771162	-1.6272 moving_axis top_right_camera 1" />
+    <node pkg="tf" type="static_transform_publisher" name="tf_top_left_camera" args="-713.8496	300.3215 1890.7	-1.60435715276337	0.0108160149890114	-1.6192 moving_axis top_left_camera 1" />
 
     <!-- To launch the nsteel algorithm node -->
     <include file="$(find lane_detector)/launch/algorithm1.launch" if="$(arg with-nsteel_algorithm)">
@@ -35,17 +42,12 @@
         <arg name="top_right_camera" value="$(arg top_right_camera)"/>
         <arg name="write-results_right" value="$(arg write-results_right)"/>
         <arg name="write-results_left" value="$(arg write-results_left)"/>
+        <arg name="multi_cameras_combination" value="$(arg multi_cameras_combination)"/>
+        <arg name="topics_maps" value="$(arg topics_maps)" if="$(arg multi_cameras_combination)"/>
     </include>
 
 
-    <node pkg="tf" type="static_transform_publisher" name="tf_top_right_camera" args="-17.7217972603514	780.398987989879	1798.90322883126	-1.58683126505267	0.0114432071771162	3.08517033374988 moving_axis top_right_camera 100" />
-
-
-
-
-
-    <node pkg="tf" type="static_transform_publisher" name="tf_top_left_camera" args="300.321464816853	713.849641574408	1890.67115420697	-1.60435715276337	0.0108160149890114	3.09315055757511 moving_axis top_left_camera 100" />
-
+  
 
 
 

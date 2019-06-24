@@ -239,6 +239,7 @@ void mcvGetHVLines(const CvMat *inImage, vector<Line> *lines, vector<FLOAT> *lin
   int maxLoc;
   double max;
 // TODO: put the ignore in conf
+
 #define MAX_IGNORE 0  //(int(smoothWidth/2.)+1)
 #define LOCAL_MAX_IGNORE (int(MAX_IGNORE / 4))
   mcvGetVectorMax(&sumLines, &max, &maxLoc, MAX_IGNORE);
@@ -252,6 +253,10 @@ void mcvGetHVLines(const CvMat *inImage, vector<Line> *lines, vector<FLOAT> *lin
       // get that value
       FLOAT val = CV_MAT_ELEM(sumLines, FLOAT_MAT_ELEM_TYPE, i, 0);
       // check if local maximum
+
+
+
+
       if ((val > CV_MAT_ELEM(sumLines, FLOAT_MAT_ELEM_TYPE, i - 1, 0)) &&
           (val > CV_MAT_ELEM(sumLines, FLOAT_MAT_ELEM_TYPE, i + 1, 0))
           //		&& (i != maxLoc)
@@ -269,7 +274,7 @@ void mcvGetHVLines(const CvMat *inImage, vector<Line> *lines, vector<FLOAT> *lin
       }
     }
   }
-
+  
   // check if didnt find local maxima
   if (sumLinesMax.size() == 0 && max > detectionThreshold)
   {

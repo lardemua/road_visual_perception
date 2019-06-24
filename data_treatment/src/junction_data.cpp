@@ -1,4 +1,14 @@
-// #include <initializer_list>
+/**
+ * @file junction_data.cpp
+ * @author Tiago Almeida (tm.almeida@ua.pt)
+ * @brief Combine muitple algorithms' outputs
+ * @version 0.1
+ * @date 2019-04-02
+ *
+ * @copyright Copyright (c) 2019
+ *
+ */
+
 #include <vector>
 #include <memory>
 #include <functional>
@@ -25,12 +35,11 @@
 #include <image_transport/image_transport.h>
 #include <cv_bridge/cv_bridge.h>
 #include "ros/ros.h"
+#include <tf/transform_listener.h>
 
 /*write a file*/
 #include <iostream>
 #include <fstream>
-
-
 
 struct image_info
 {
@@ -47,10 +56,10 @@ struct image_info
 void writeResults2CSVfile(std::string frame_id, int sequence, float area_ponderada, float area_comum, float area_tot, float indicador1, float indicador2, int kernel_size)
 {
     std::ofstream output;
-    const std::string outFileName = "two_cameras_advanced_algorithm_25*25.csv";
-    output.open(outFileName,std::ios::app);
+    const std::string outFileName = "1_cam_2_algs_51_51.csv";
+    output.open(outFileName, std::ios::app);
 
-    output << frame_id << "," <<sequence<<","<< area_ponderada << "," << area_comum << "," << area_tot << "," << indicador1 << "," << indicador2 <<","<< kernel_size << std::endl;
+    output << frame_id << "," << sequence << "," << area_ponderada << "," << area_comum << "," << area_tot << "," << indicador1 << "," << indicador2 << "," << kernel_size << std::endl;
     output.close();
 }
 
@@ -148,7 +157,7 @@ junction_data::junction_data(const std::vector<std::string> &image_topics, param
     _images.reserve(image_topics.size());
     for (int i = 0; i < image_topics.size(); i++)
     {
-        auto img = std::make_shared<cv::Mat>(_params.width, _params.height, CV_8UC3);
+        auto img = std::make_shared<cv::Mat>( _params.height, _params.width,CV_8UC3);
         _images.push_back(img);
     }
 }
@@ -176,9 +185,9 @@ void junction_data::img_callback(const sensor_msgs::ImageConstPtr &img_msg, int 
     duration_image = ros::Time::now() - t_img;
     _images_durations.push_back(duration_image.toSec());
     indiv_img_data.image_delay = _images_durations.back();
-    ROS_INFO_STREAM("Time to process: " << duration_image.toSec());
+    // ROS_INFO_STREAM("Time to process: " << duration_image.toSec());
 
-    ROS_INFO("received image from algorithm %d", alg_idx);
+    // ROS_INFO("received image from algorithm %d", alg_idx);
     images_data_vect.push_back(indiv_img_data);
     process(alg_idx);
 }
@@ -197,7 +206,6 @@ void junction_data::process(int alg_idx)
     double delta_timer;
     double time_seconds;
     // verificar se as 3 images estão set
-
     for (auto is_updated : _image_updates)
     {
         if (!is_updated)
@@ -270,6 +278,9 @@ void junction_data::probabilitiesMapImage(cv::Mat &image_intersection, cv::Mat &
     float area_common = 0;
     bool write_results_right = 0;
     bool write_results_left = 0;
+
+
+
     // float area_probabilistica_ponderada=0;
 
     ros::param::get("/dynamicParameters/kernel_size", _params.kernel_size);
@@ -290,7 +301,7 @@ void junction_data::probabilitiesMapImage(cv::Mat &image_intersection, cv::Mat &
     img_filt.convertTo(img_filt, CV_8UC1);
 
     //-----------------------------------------------------------------------------------------------------
-        //-------------------------------------------------------------------
+    //-------------------------------------------------------------------
     //Writing to a file
     ros::param::get("/top_right_camera/calc_prob_map_node/writing_results", write_results_right);
     ros::param::get("/top_left_camera/calc_prob_map_node/writing_results", write_results_left);
@@ -313,12 +324,11 @@ void junction_data::probabilitiesMapImage(cv::Mat &image_intersection, cv::Mat &
             }
         }
 
-    //Cálculos dos indicadores:
-    auto I_1 = area_probabilistica_ponderada / area_total;
-    auto I_2 = area_common / area_total;
+        //Cálculos dos indicadores:
+        auto I_1 = area_probabilistica_ponderada / area_total;
+        auto I_2 = area_common / area_total;
 
-
-        writeResults2CSVfile(_images_headers[0].frame_id,_images_headers[0].seq, area_probabilistica_ponderada, area_common, area_total, I_1, I_2, _params.kernel_size);
+        writeResults2CSVfile(_images_headers[0].frame_id, _images_headers[0].seq, area_probabilistica_ponderada, area_common, area_total, I_1, I_2, _params.kernel_size);
     }
 
     //GridMap:-----------------------------------------------------

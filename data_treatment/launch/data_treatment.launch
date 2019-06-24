@@ -3,9 +3,12 @@
     <arg name="top_right_camera" default="true"/>
     <arg name ="write-results_right" doc="enables to write the results (right camera) about the indicators in a csv file"/>
     <arg name ="write-results_left" doc="enables to write the results (left camera) about the indicators in a csv file"/>
+    <arg name="multi_cameras_combination" doc="enables the combination of two probabilistic maps from two different cameras"/>
+
+
     <!-- Node that calculate and launches the probabilistic map -->
     <!-- Top left camera -->
-    <arg name = "topics_left" doc="topics that enters on the architechture"/>
+    <arg name = "topics_left" doc="topics that that represents the polygons to the left camera"/>
     <node pkg="data_treatment" name="calc_prob_map_node" type="junction_data" output="screen" ns="top_left_camera" if="$(arg top_left_camera)">
         <remap from="calc_prob_map/summed_img" to="/top_left_camera/calc_prob_map/summed_img"/>
         <remap from="calc_prob_map/intersect_img" to="/top_left_camera/calc_prob_map/intersect_img"/>
@@ -16,14 +19,13 @@
         <!-- <remap from="~camera" to="world"/> -->
         <param name="~topics_polygons" type="string" value="$(arg topics_left)"/>
         <param name="~cols_img_big" type= "double" value="964"/>
-        <param name="~cols_img_small" type= "double" value="320"/>
-        <param name="~rows_img_small" type= "double" value="240"/>
+        <param name="~cols_img_small" type= "double" value="964"/>
+        <param name="~rows_img_small" type= "double" value="720"/>
         <param name="~writing_results" value="$(arg write-results_left)"/>
     </node>
 
     <!-- Top right camera -->
-    <arg name = "topics_right" doc="topics that enters on the architechture"/>
-
+    <arg name = "topics_right" doc="topics that represents the polygons to the right camera"/>
     <node pkg="data_treatment" name="calc_prob_map_node" type="junction_data" output="screen" ns="top_right_camera" if="$(arg top_right_camera)">
         <!-- <remap from="~camera" to="world"/> -->
         <remap from="calc_prob_map/summed_img" to="/top_right_camera/calc_prob_map/summed_img"/>
@@ -34,11 +36,18 @@
         <remap from="/camera/camera_info" to="/top_right_camera/camera_info" />
         <param name="~topics_polygons" type="string" value="$(arg topics_right)"/>
         <param name="~cols_img_big" type= "double" value="964"/>
-        <param name="~cols_img_small" type= "double" value="320"/>
-        <param name="~rows_img_small" type= "double" value="240"/>
+        <param name="~cols_img_small" type= "double" value="964"/>
+        <param name="~rows_img_small" type= "double" value="720"/>
         <param name="~writing_results" value="$(arg write-results_right)"/>
     </node>
 
+    <!-- Launching the combination of two cameras -->
+    <arg name = "topics_maps" doc="topics that represents the maps of each camera"/>
+    <node pkg="data_treatment" name="combine_multi_cams_node" type="two_cameras_combination" output="screen" if="$(arg multi_cameras_combination)">
+        <param name="~topics_maps" type="string" value="$(arg topics_maps)"/>
+        <param name="~cols_img_small" type= "double" value="964"/>
+        <param name="~rows_img_small" type= "double" value="720"/>
+    </node>
 
     <node pkg="data_treatment" name="dynamicParameters" type="dynamicParameters" output="screen"/>
 

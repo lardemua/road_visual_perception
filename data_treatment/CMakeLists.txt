@@ -17,9 +17,10 @@ find_package(catkin REQUIRED COMPONENTS
   dynamic_reconfigure
   grid_map_ros
   grid_map_cv
+  tf_conversions
 )
 
-# find_package(Eigen REQUIRED)
+find_package(Eigen3 REQUIRED)
 find_package(OpenCV 3.2.0 REQUIRED)
 
 ## System dependencies are found with CMake's conventions
@@ -115,7 +116,7 @@ generate_dynamic_reconfigure_options(
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES data_treatment
-  CATKIN_DEPENDS roscpp rospy std_msgs lane_detector dynamic_reconfigure
+  CATKIN_DEPENDS roscpp rospy std_msgs lane_detector dynamic_reconfigure 
 #  DEPENDS system_lib
 
 )
@@ -149,6 +150,7 @@ include_directories(
 add_executable(subscriber src/subscriber.cpp)
 add_executable(subscriber2 src/subscriber.cpp)
 add_executable(junction_data src/junction_data.cpp)
+add_executable(two_cameras_combination src/two_cameras_combination.cpp)
 add_executable(dynamicParameters src/dynamicParameters.cpp)
 
 
@@ -169,7 +171,8 @@ add_dependencies(dynamicParameters ${PROJECT_NAME}_gencfg)
 # )
 target_link_libraries(subscriber ${catkin_LIBRARIES} ${OpenCV_LIBRARIES}) 
 target_link_libraries(subscriber2 ${catkin_LIBRARIES} ${OpenCV_LIBRARIES}) 
-target_link_libraries(junction_data ${catkin_LIBRARIES} ${OpenCV_LIBRARIES}) 
+target_link_libraries(junction_data ${catkin_LIBRARIES} ${OpenCV_LIBRARIES})
+target_link_libraries(two_cameras_combination ${catkin_LIBRARIES} ${OpenCV_LIBRARIES} Eigen3::Eigen) 
 target_link_libraries(dynamicParameters ${catkin_LIBRARIES})
 #############
 ## Install ##

@@ -1,14 +1,10 @@
 <launch>
-<arg name = "pathToRosbag"  default = "/media/2cams.bag" />
+<arg name = "pathToRosbag"  default = "/home/tmr-algorithms/bagfiles/2cams.bag" />
 <remap from = "/top_camera_right/image_raw" to = "/top_right_camera/image_raw" />
 <remap from = "/top_camera_right_camera_nodelet_manager/bond" to = "/top_right_camera_nodelet_manager/bond"/>
 <remap from = "/top_camera_right/camera_info" to = "/top_right_camera/camera_info"/>
 <remap from = "/top_camera_right/image_rect_color" to = "/top_right_camera/image_rect_color"/>
-<remap from = "/top_camera_left/image_raw" to = "/top_left_camera/image_raw" />
-<remap from = "/top_camera_left_camera_nodelet_manager/bond" to = "/top_left_camera_nodelet_manager/bond"/>
-<remap from = "/top_camera_left/camera_info" to = "/top_left_camera/camera_info"/>
-<remap from = "/top_camera_left/image_rect_color" to = "/top_left_camera/image_rect_color"/>
-<node name="rqt_gui" pkg="rqt_gui" type="rqt_gui"/>
+<!-- <node name="rqt_gui" pkg="rqt_gui" type="rqt_gui"/> -->
 
 
 <!-- Carla Simulator -->
@@ -28,6 +24,6 @@
 <node pkg  = "rosbag"
       type = "play"
       name = "player"
-      args = "$(arg pathToRosbag)"/>
+      args = "$(arg pathToRosbag) --clock"/>
 </launch>
 
