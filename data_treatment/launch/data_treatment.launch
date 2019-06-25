@@ -20,7 +20,7 @@
         <param name="~topics_polygons" type="string" value="$(arg topics_left)"/>
         <param name="~cols_img_big" type= "double" value="964"/>
         <param name="~cols_img_small" type= "double" value="964"/>
-        <param name="~rows_img_small" type= "double" value="720"/>
+        <param name="~rows_img_small" type= "double" value="724"/>
         <param name="~writing_results" value="$(arg write-results_left)"/>
     </node>
 
@@ -37,8 +37,9 @@
         <param name="~topics_polygons" type="string" value="$(arg topics_right)"/>
         <param name="~cols_img_big" type= "double" value="964"/>
         <param name="~cols_img_small" type= "double" value="964"/>
-        <param name="~rows_img_small" type= "double" value="720"/>
+        <param name="~rows_img_small" type= "double" value="724"/>
         <param name="~writing_results" value="$(arg write-results_right)"/>
+        <param name="~cams_combination" value="$(arg multi_cameras_combination)"/>
     </node>
 
     <!-- Launching the combination of two cameras -->
@@ -46,7 +47,7 @@
     <node pkg="data_treatment" name="combine_multi_cams_node" type="two_cameras_combination" output="screen" if="$(arg multi_cameras_combination)">
         <param name="~topics_maps" type="string" value="$(arg topics_maps)"/>
         <param name="~cols_img_small" type= "double" value="964"/>
-        <param name="~rows_img_small" type= "double" value="720"/>
+        <param name="~rows_img_small" type= "double" value="724"/>
     </node>
 
     <node pkg="data_treatment" name="dynamicParameters" type="dynamicParameters" output="screen"/>

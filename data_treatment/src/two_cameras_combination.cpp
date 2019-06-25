@@ -28,11 +28,38 @@
 #include <opencv2/core/eigen.hpp>
 #include <tf/transform_listener.h>
 
+/*write a file*/
+#include <fstream>
+#include <iostream>
+
+
+/**
+ * @brief Function that enables to write the result in a csv file
+ *
+ */
+
+void writeResults2CSVfile(int sequence,
+                          float area_ponderada, float area_comum,
+                          float area_tot, float indicador1, float indicador2,
+                          int kernel_size) {
+  std::ofstream output;
+  const std::string outFileName = "2_cam_lane_detector_51_51.csv";
+  output.open(outFileName, std::ios::app);
+
+  output << sequence << "," << area_ponderada << ","
+         << area_comum << "," << area_tot << "," << indicador1 << ","
+         << indicador2 << "," << kernel_size << std::endl;
+  output.close();
+}
+
+
+
 class combineMaps {
 public:
   struct params {
     int width;
     int height;
+    int kernel_size;
   };
   combineMaps(std::vector<std::string> &maps_topics, params params);
   void mapCallback(const sensor_msgs::ImageConstPtr &map1, int map_idx);
@@ -125,7 +152,7 @@ void combineMaps::mapCallback(const sensor_msgs::ImageConstPtr &img_msg,
 }
 
 /**
- * @brief Function that warps the maps of n cameras
+ * @brief Function that shows the warped maps
  *
  * @param int map_idx
  */
@@ -160,28 +187,28 @@ void combineMaps::warpMap(int map_idx) {
   tf::matrixTFToEigen(rotation_matrix, rotation_matrix_eigen);
   // cv::eigen2cv(rotation_matrix_eigen, perspectiveMatrix);
 
-  /////////////////////////////////////////////////////////////////////////////////
-  /////////////////////////////////////////////////////////////////////////////////
-  cv::Point2f perspectiveSrc[] = {cv::Point2f(370, 412), cv::Point2f(535, 412),
-                                  cv::Point2f(88, 700), cv::Point2f(858, 700)};
-  cv::Point2f perspectiveDst[] = {cv::Point2f(226, 0), cv::Point2f(737, 0),
-                                  cv::Point2f(226, 724), cv::Point2f(737, 724)};
-  perspectiveMatrix =
-      cv::getPerspectiveTransform(perspectiveSrc, perspectiveDst);
-  /////////////////////////////////////////////////////////////////////////////////
-  /////////////////////////////////////////////////////////////////////////////////
+  // /////////////////////////////////////////////////////////////////////////////////
+  // /////////////////////////////////////////////////////////////////////////////////
+  // cv::Point2f perspectiveSrc[] = {cv::Point2f(370, 412), cv::Point2f(535, 412),
+  //                                 cv::Point2f(88, 700), cv::Point2f(858, 700)};
+  // cv::Point2f perspectiveDst[] = {cv::Point2f(226, 0), cv::Point2f(737, 0),
+  //                                 cv::Point2f(226, 724), cv::Point2f(737, 724)};
+  // perspectiveMatrix =
+  //     cv::getPerspectiveTransform(perspectiveSrc, perspectiveDst);
+  // /////////////////////////////////////////////////////////////////////////////////
+  // /////////////////////////////////////////////////////////////////////////////////
 
-  cv::warpPerspective(*_images[map_idx], *_warped_images[map_idx],
-                      perspectiveMatrix, map_size);
+  // cv::warpPerspective(*_images[map_idx], *_warped_images[map_idx],
+  //                     perspectiveMatrix, map_size);
 
-  auto warp_map1 =
-      cv_bridge::CvImage{_maps_headers[1], "mono8", *_warped_images[0]}
-          .toImageMsg();
-  auto warp_map2 =
-      cv_bridge::CvImage{_maps_headers[1], "mono8", *_warped_images[1]}
-          .toImageMsg();
-  _warp_map1.publish(warp_map1);
-  _warp_map2.publish(warp_map2);
+  // auto warp_map1 =
+  //     cv_bridge::CvImage{_maps_headers[1], "mono8", *_warped_images[0]}
+  //         .toImageMsg();
+  // auto warp_map2 =
+  //     cv_bridge::CvImage{_maps_headers[1], "mono8", *_warped_images[1]}
+  //         .toImageMsg();
+  // _warp_map1.publish(warp_map1);
+  // _warp_map2.publish(warp_map2);
 
   buildMap();
 }
@@ -197,7 +224,7 @@ void combineMaps::buildMap() {
   //  auto buffer_warp_maps = std::make_shared<cv::Mat>( _params.height,
   //  _params.width,CV_8UC1); buffer_warp_maps=_warped_images[0];
   cv::Mat buffer_warp_maps;
-  _warped_images[0]->copyTo(buffer_warp_maps);
+  _images[0]->copyTo(buffer_warp_maps);
 
   for (auto is_updated : _maps_updates) {
     if (!is_updated) {
@@ -205,14 +232,41 @@ void combineMaps::buildMap() {
     }
   }
 
-  for (auto i = 1; i < _warped_images.size(); i++) {
-    cv::addWeighted(buffer_warp_maps, 0.5, *_warped_images[i], 0.5, 0,
+  for (auto i = 1; i < _images.size(); i++) {
+    cv::addWeighted(buffer_warp_maps, 0.5, *_images[i], 0.5, 0,
                     buffer_warp_maps);
   }
   auto final_map =
       cv_bridge::CvImage{_maps_headers[1], "mono8", buffer_warp_maps}
           .toImageMsg();
   _image_map.publish(final_map);
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  ros::param::get("/dynamicParameters/kernel_size", _params.kernel_size);
+
+  //Cálculo dos parâmetros:
+    auto area_probabilistica_ponderada = cv::sum(buffer_warp_maps)[0] / (float)255;
+    auto area_total = cv::countNonZero(buffer_warp_maps);
+    float area_common=0;
+
+    for (int x = 0; x < buffer_warp_maps.rows; x++) {
+      for (int y = 0; y < buffer_warp_maps.cols; y++) {
+
+        if (buffer_warp_maps.at<uchar>(x, y) == 255) {
+          area_common++;
+        }
+      }
+    }
+
+    // Cálculos dos indicadores:
+    auto I_1 = area_probabilistica_ponderada / area_total;
+    auto I_2 = area_common / area_total;
+
+
+
+   writeResults2CSVfile(_maps_headers[1].seq,
+                         area_probabilistica_ponderada, area_common, area_total,
+                         I_1, I_2, _params.kernel_size);
 }
 
 /**

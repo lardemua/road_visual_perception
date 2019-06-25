@@ -13,7 +13,7 @@
     <remap from="lane_detector/result" to="/top_left_camera/lane_detector/result"/>
     <remap from="lane_detector/driving_orientation" to="/top_left_camera/lane_detector/driving_orientation"/>
     <param name="~cols_resize" type= "int" value="964"/>
-    <param name="~rows_resize" type= "int" value="720"/>
+    <param name="~rows_resize" type= "int" value="724"/>
   </node>
 
   <node pkg="lane_detector" type="lane_detector" name="lane_detector_node" output="screen" ns="top_right_camera" if="$(arg top_right_camera)">
@@ -26,10 +26,10 @@
     <remap from="lane_detector/result" to="/top_right_camera/lane_detector/result"/>
     <remap from="lane_detector/driving_orientation" to="/top_right_camera/lane_detector/driving_orientation"/>
     <param name="~cols_resize" type= "int" value="964"/>
-    <param name="~rows_resize" type= "int" value="720"/>
+    <param name="~rows_resize" type= "int" value="724"/>
   </node>
 
-  <node pkg="lane_detector" type="lane_detector" name="lane_detector2_node" output="screen" ns="top_left_camera" if="$(arg top_left_camera)">
+  <!-- <node pkg="lane_detector" type="lane_detector" name="lane_detector2_node" output="screen" ns="top_left_camera" if="$(arg top_left_camera)">
     <remap from="camera_info" to="/top_left_camera/camera_info" />
     <remap from="/image" to="/top_left_camera/image_rect_color" />
     <param name="images_from_folder" value="$(arg load_images_from_folder)" />
@@ -39,7 +39,7 @@
     <remap from="lane_detector/result" to="/top_left_camera/lane_detector2/result"/>
     <remap from="lane_detector/driving_orientation" to="/top_left_camera/lane_detector2/driving_orientation"/>
     <param name="~cols_resize" type= "int" value="964"/>
-    <param name="~rows_resize" type= "int" value="720"/>
+    <param name="~rows_resize" type= "int" value="724"/>
     <rosparam command="load" file="$(find lane_detector)/params/Detector2.yaml"/>
   </node>
 
@@ -53,8 +53,8 @@
     <remap from="lane_detector/result" to="/top_right_camera/lane_detector2/result"/>
     <remap from="lane_detector/driving_orientation" to="/top_right_camera/lane_detector2/driving_orientation"/>
     <param name="~cols_resize" type= "int" value="964"/>
-    <param name="~rows_resize" type= "int" value="720"/>
+    <param name="~rows_resize" type= "int" value="724"/>
     <rosparam command="load" file="$(find lane_detector)/params/Detector2.yaml"/>
-  </node>
+  </node> -->
 
 </launch>

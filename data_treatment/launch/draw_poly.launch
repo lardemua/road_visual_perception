@@ -8,7 +8,7 @@
         <remap from="draw_poly/poly_alg1" to="/top_left_camera/draw_poly/poly_alg1"/>
         <remap from="camera/image_raw" to="/top_left_camera/image_raw"/>
         <param name="~cols_resize" type= "int" value="964"/>
-        <param name="~rows_resize" type= "int" value="720"/>
+        <param name="~rows_resize" type= "int" value="724"/>
         <!-- </Para visualização dos poligonos com áreas pintadas> -->
         <!-- <param name="~R_channel" type= "int" value="255"/>
             <param name="~G_channel" type= "int" value="0"/>
@@ -21,7 +21,7 @@
         <remap from="draw_poly/poly_alg1" to="/top_right_camera/draw_poly/poly_alg1"/>
         <remap from="camera/image_raw" to="/top_right_camera/image_raw"/>
         <param name="~cols_resize" type= "int" value="964"/>
-        <param name="~rows_resize" type= "int" value="720"/>
+        <param name="~rows_resize" type= "int" value="724"/>
         <!-- </Para visualização dos poligonos com áreas pintadas> -->
         <!-- <param name="~R_channel" type= "int" value="255"/>
             <param name="~G_channel" type= "int" value="0"/>
@@ -34,7 +34,7 @@
         <remap from="draw_poly/poly_alg1" to="/top_left_camera/draw_poly/poly_alg2"/>
         <remap from="camera/image_raw" to="/top_left_camera/image_raw"/>
         <param name="~cols_resize" type= "int" value="964"/>
-        <param name="~rows_resize" type= "int" value="720"/>
+        <param name="~rows_resize" type= "int" value="724"/>
         <!-- <param name="~R_channel" type= "int" value="0"/>
             <param name="~G_channel" type= "int" value="0"/>
             <param name="~B_channel" type= "int" value="255"/> -->
@@ -46,7 +46,7 @@
         <remap from="draw_poly/poly_alg1" to="/top_right_camera/draw_poly/poly_alg2"/>
         <remap from="camera/image_raw" to="/top_right_camera/image_raw"/>
         <param name="~cols_resize" type= "int" value="964"/>
-        <param name="~rows_resize" type= "int" value="720"/>
+        <param name="~rows_resize" type= "int" value="724"/>
         <!-- </Para visualização dos poligonos com áreas pintadas> -->
         <!-- <param name="~R_channel" type= "int" value="255"/>
             <param name="~G_channel" type= "int" value="0"/>
