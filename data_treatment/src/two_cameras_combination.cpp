@@ -43,7 +43,7 @@ void writeResults2CSVfile(int sequence,
                           float area_tot, float indicador1, float indicador2,
                           int kernel_size) {
   std::ofstream output;
-  const std::string outFileName = "2_cam_lane_detector_51_51.csv";
+  const std::string outFileName = "2_cam_2algs_51_51.csv";
   output.open(outFileName, std::ios::app);
 
   output << sequence << "," << area_ponderada << ","
@@ -264,9 +264,9 @@ void combineMaps::buildMap() {
 
 
 
-   writeResults2CSVfile(_maps_headers[1].seq,
-                         area_probabilistica_ponderada, area_common, area_total,
-                         I_1, I_2, _params.kernel_size);
+  //  writeResults2CSVfile(_maps_headers[1].seq,
+  //                        area_probabilistica_ponderada, area_common, area_total,
+  //                        I_1, I_2, _params.kernel_size);
 }
 
 /**

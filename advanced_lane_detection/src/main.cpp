@@ -223,7 +223,7 @@ int main(int argc, char **argv) {
   ros::init(argc, argv, "advanced_algorithm_node");
 
   alg2 processImage;
-  ros::Rate loop_rate(15);
+  ros::Rate loop_rate(8.2);
 
   while (ros::ok()) {
     processImage.Looping();

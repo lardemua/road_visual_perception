@@ -58,7 +58,7 @@ void writeResults2CSVfile(std::string frame_id, int sequence,
                           float area_tot, float indicador1, float indicador2,
                           int kernel_size) {
   std::ofstream output;
-  const std::string outFileName = "1_cam_2_algs_23_23.csv";
+  const std::string outFileName = "1_cam_2_algs_3_3.csv";
   output.open(outFileName, std::ios::app);
 
   output << frame_id << "," << sequence << "," << area_ponderada << ","
@@ -74,7 +74,7 @@ public:
     int height;
     int kernel_size;
     bool combine_cams;
-    float alpha_x_camera;
+    float f_x_camera;
   };
   /*Important variables*/
   double fx, pace, scale_factor, cols_img_big, cols_img_small;
@@ -149,8 +149,7 @@ junction_data::junction_data(const std::vector<std::string> &image_topics,
       "/camera/camera_info", _nh /*, ros::Duration(10)*/);
   k_matrix = CamInfo->K;
   fx = k_matrix[0];
-  physical_length = 8;                           // mm
-  _params.alpha_x_camera = fx / physical_length; // pixel/mm
+  _params.f_x_camera = fx; // pixel/mm
   pace = (1 / (fx)) *
          (cols_img_big /
           cols_img_small); // cada lado da celula correponde a este valor em m
@@ -215,8 +214,10 @@ void junction_data::process(int alg_idx) {
   cv::Mat image_ref;
   cv::Mat image_nonint;
   cv::Mat perspectiveMatrix;
-  int rect_side, center_image, distance_between_lines, lim_min, lim_max;
+  int rect_side, center_image, distance_between_lines, dist_between_cams_pix,
+      lim_min, lim_max;
 
+  float xs_zs, alt_virtual_cam, dist_between_cams;
   double delta_timer;
   double time_seconds;
   // verificar se as 3 images estão set
@@ -233,31 +234,43 @@ void junction_data::process(int alg_idx) {
   cv::threshold(image_int, image_int, 0, 255,
                 cv::THRESH_BINARY | cv::THRESH_OTSU);
 
+  // if (_params.combine_cams == true) {
+
   // Calculation side IPM-----------------------------------------
+  dist_between_cams = 215;
   distance_between_lines = 3500; // mm
-  rect_side =
-      (_params.alpha_x_camera * distance_between_lines) / (_params.height);
-  center_image = _params.width / 2;
+  alt_virtual_cam = 5794.04;
+  xs_zs = (float)(distance_between_lines / alt_virtual_cam);
+  rect_side = (_params.f_x_camera * xs_zs);
+
+  if (_images_headers[alg_idx].frame_id == "top_left_camera") {
+    dist_between_cams_pix =
+        _params.f_x_camera * ((float)(dist_between_cams / alt_virtual_cam));
+    center_image = _params.width / 2 - dist_between_cams_pix;
+
+  } else if (_images_headers[alg_idx].frame_id == "top_right_camera") {
+    center_image = _params.width / 2;
+  }
   lim_min = (center_image - rect_side / 2);
   lim_max = (center_image + rect_side / 2);
-
   //-------------------------------------------------------------
 
   cv::Point2f perspectiveSrc[] = {cv::Point2f(370, 412), cv::Point2f(535, 412),
                                   cv::Point2f(88, 700), cv::Point2f(858, 700)};
-  cv::Point2f perspectiveDst[] = {
-      cv::Point2f(lim_min, 0), cv::Point2f(lim_max, 0),
-      cv::Point2f(lim_min, 724), cv::Point2f(lim_max, 724)};
+
+  cv::Point2f perspectiveDst[] = {cv::Point2f(lim_min, 0),
+                                  cv::Point2f(lim_max, 0),
+                                  cv::Point2f(lim_min, _params.height),
+                                  cv::Point2f(lim_max, _params.height)};
+
   ros::param::get("/top_right_camera/calc_prob_map_node/cams_combination",
                   _params.combine_cams);
 
-  if (_params.combine_cams == true) {
-
-    perspectiveMatrix =
-        cv::getPerspectiveTransform(perspectiveSrc, perspectiveDst);
-    cv::warpPerspective(image_int, image_int, perspectiveMatrix,
-                        image_int.size());
-  }
+  perspectiveMatrix =
+      cv::getPerspectiveTransform(perspectiveSrc, perspectiveDst);
+  cv::warpPerspective(image_int, image_int, perspectiveMatrix,
+                      image_int.size());
+  //}
   for (int i = 1; i < images_data_vect.size(); i++) {
     // Too many time of processing? Don't count to the probabilistic map
     // if (images_data_vect.at(i).image_delay > 0.6)
@@ -326,22 +339,31 @@ void junction_data::probabilitiesMapImage(cv::Mat &image_intersection,
   float prob = 0.0;
   float prob_non_intersect = 0.0;
   int thresh_non_intersect =
-      1; // valore acrescentado para termos a probabilidade das secções que nao
-         // se intersectam
+      0; // valor subtraído para termos a probabilidade das secções que nao
+         // se intersectam (threshold)
   float area_common = 0;
   bool write_results_right = 0;
   bool write_results_left = 0;
+  int least_probabilit = 0;
+  int remainder = 0;
+  float least_probability = 0;
+  int kernel_size = 0;
   /// Initialize arguments for the filter
   anchor = cv::Point(-1, -1);
   delta = 0;
   ddepth = -1;
 
   ros::param::get("/dynamicParameters/kernel_size", _params.kernel_size);
+  least_probabilit = _params.kernel_size / 2;
+  remainder = _params.kernel_size % 2;
+  kernel_size = _params.kernel_size * _params.kernel_size;
+  least_probability =
+      (float)(least_probabilit + remainder) / (float)(kernel_size);
 
   image_intersection.convertTo(image_intersection, CV_32F);
   image_nonintersection.convertTo(image_nonintersection, CV_32F);
-  image_nonintersection = image_nonintersection /
-                          (float)(_params.kernel_size + thresh_non_intersect);
+  image_nonintersection =
+      image_nonintersection * (float)(least_probability - thresh_non_intersect);
 
   kernel = cv::Mat::ones(_params.kernel_size, _params.kernel_size, CV_32F) /
            (float)(_params.kernel_size * _params.kernel_size);

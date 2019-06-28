@@ -4,7 +4,7 @@
 <remap from = "/top_camera_right_camera_nodelet_manager/bond" to = "/top_right_camera_nodelet_manager/bond"/>
 <remap from = "/top_camera_right/camera_info" to = "/top_right_camera/camera_info"/>
 <remap from = "/top_camera_right/image_rect_color" to = "/top_right_camera/image_rect_color"/>
-<!-- <node name="rqt_gui" pkg="rqt_gui" type="rqt_gui"/> -->
+<node name="rqt_gui" pkg="rqt_gui" type="rqt_gui"/>
 
 
 <!-- Carla Simulator -->
@@ -24,6 +24,6 @@
 <node pkg  = "rosbag"
       type = "play"
       name = "player"
-      args = "$(arg pathToRosbag) --clock"/>
+      args = "-l $(arg pathToRosbag) --clock"/>
 </launch>
 
