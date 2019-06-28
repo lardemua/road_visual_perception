@@ -234,7 +234,7 @@ void junction_data::process(int alg_idx) {
   cv::threshold(image_int, image_int, 0, 255,
                 cv::THRESH_BINARY | cv::THRESH_OTSU);
 
-  // if (_params.combine_cams == true) {
+  if (_params.combine_cams == true) {
 
   // Calculation side IPM-----------------------------------------
   dist_between_cams = 215;
@@ -270,7 +270,7 @@ void junction_data::process(int alg_idx) {
       cv::getPerspectiveTransform(perspectiveSrc, perspectiveDst);
   cv::warpPerspective(image_int, image_int, perspectiveMatrix,
                       image_int.size());
-  //}
+  }
   for (int i = 1; i < images_data_vect.size(); i++) {
     // Too many time of processing? Don't count to the probabilistic map
     // if (images_data_vect.at(i).image_delay > 0.6)
