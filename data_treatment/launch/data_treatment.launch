@@ -48,6 +48,7 @@
         <param name="~topics_maps" type="string" value="$(arg topics_maps)"/>
         <param name="~cols_img_small" type= "double" value="964"/>
         <param name="~rows_img_small" type= "double" value="724"/>
+         <remap from="/camera/camera_info" to="/top_right_camera/camera_info" />
     </node>
 
     <node pkg="data_treatment" name="dynamicParameters" type="dynamicParameters" output="screen"/>

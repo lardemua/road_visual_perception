@@ -32,27 +32,23 @@
 #include <fstream>
 #include <iostream>
 
-
 /**
  * @brief Function that enables to write the result in a csv file
  *
  */
 
-void writeResults2CSVfile(int sequence,
-                          float area_ponderada, float area_comum,
+void writeResults2CSVfile(int sequence, float area_ponderada, float area_comum,
                           float area_tot, float indicador1, float indicador2,
                           int kernel_size) {
   std::ofstream output;
   const std::string outFileName = "2_cam_2algs_51_51.csv";
   output.open(outFileName, std::ios::app);
 
-  output << sequence << "," << area_ponderada << ","
-         << area_comum << "," << area_tot << "," << indicador1 << ","
-         << indicador2 << "," << kernel_size << std::endl;
+  output << sequence << "," << area_ponderada << "," << area_comum << ","
+         << area_tot << "," << indicador1 << "," << indicador2 << ","
+         << kernel_size << std::endl;
   output.close();
 }
-
-
 
 class combineMaps {
 public:
@@ -83,6 +79,7 @@ private:
   std::vector<std_msgs::Header> _maps_headers;
   std::vector<tf::StampedTransform> _transformations_vector;
   std::vector<bool> _maps_updates;
+  sensor_msgs::CameraInfo::_K_type k_matrix;
 };
 
 /**
@@ -123,6 +120,10 @@ combineMaps::combineMaps(std::vector<std::string> &maps_topics, params params)
     _images.push_back(img);
     _warped_images.push_back(warped_img);
   }
+  sensor_msgs::CameraInfoConstPtr CamInfo;
+  CamInfo = ros::topic::waitForMessage<sensor_msgs::CameraInfo>(
+      "/camera/camera_info", _nh /*, ros::Duration(10)*/);
+  k_matrix = CamInfo->K;
 }
 
 /**
@@ -160,10 +161,16 @@ void combineMaps::mapCallback(const sensor_msgs::ImageConstPtr &img_msg,
 void combineMaps::warpMap(int map_idx) {
   cv::Mat map_warped;
   cv::Mat perspectiveMatrix;
+  cv::Mat extrinsicMatrix;
+  cv::Mat rotationMatrix;
+  cv::Mat translationMatrix;
+  cv::Mat intrinsicMatrix(3, 3, CV_32F);
 
   tf::Quaternion q;
   tf::Matrix3x3 rotation_matrix;
+  tf::Vector3 traslation;
   Eigen::Matrix3d rotation_matrix_eigen;
+  Eigen::Vector3d translation_vector_eigen;
   cv::Size map_size(_params.width, _params.height);
 
   // Are all the maps already updated?
@@ -181,25 +188,48 @@ void combineMaps::warpMap(int map_idx) {
   _image_publisher_map1.publish(initial_map1);
   _image_publisher_map2.publish(initial_map2);
 
+  // Rotation
   q = _transformations_vector[map_idx].getRotation();
   tf::Matrix3x3 inverse_transform(q);
   rotation_matrix = inverse_transform.inverse();
   tf::matrixTFToEigen(rotation_matrix, rotation_matrix_eigen);
-  // cv::eigen2cv(rotation_matrix_eigen, perspectiveMatrix);
+  cv::eigen2cv(rotation_matrix_eigen, rotationMatrix);
 
-  // /////////////////////////////////////////////////////////////////////////////////
-  // /////////////////////////////////////////////////////////////////////////////////
-  // cv::Point2f perspectiveSrc[] = {cv::Point2f(370, 412), cv::Point2f(535, 412),
-  //                                 cv::Point2f(88, 700), cv::Point2f(858, 700)};
-  // cv::Point2f perspectiveDst[] = {cv::Point2f(226, 0), cv::Point2f(737, 0),
-  //                                 cv::Point2f(226, 724), cv::Point2f(737, 724)};
-  // perspectiveMatrix =
-  //     cv::getPerspectiveTransform(perspectiveSrc, perspectiveDst);
-  // /////////////////////////////////////////////////////////////////////////////////
-  // /////////////////////////////////////////////////////////////////////////////////
+  // Translation
+  traslation = tf::Vector3(_transformations_vector[map_idx].getOrigin().x(),
+                           _transformations_vector[map_idx].getOrigin().y(),
+                           _transformations_vector[map_idx].getOrigin().z());
+  tf::vectorTFToEigen(traslation, translation_vector_eigen);
+  cv::eigen2cv(translation_vector_eigen, translationMatrix);
+  cv::hconcat(rotationMatrix, translationMatrix, extrinsicMatrix);
+
+  // Intrisic Matrix
+  intrinsicMatrix.at<float>(0, 0) = k_matrix[0];
+  intrinsicMatrix.at<float>(1, 1) = k_matrix[4];
+  intrinsicMatrix.at<float>(0, 2) = k_matrix[2];
+  intrinsicMatrix.at<float>(1, 2) = k_matrix[5];
+  intrinsicMatrix.at<float>(2, 2) = k_matrix[8];
+  intrinsicMatrix.at<float>(1, 0) = 0;
+  intrinsicMatrix.at<float>(2, 0) = 0;
+  intrinsicMatrix.at<float>(2, 1) = 0;
+  intrinsicMatrix.at<float>(0, 1) = 0;
+
+  std::cout << "------------------------------" << std::endl;
+  std::cout << "Matriz Extrinseca: " << extrinsicMatrix << std::endl;
+  std::cout << "------------------------------" << std::endl;
+  std::cout << "Matriz Intrinseca: "<<intrinsicMatrix << std::endl;
+  extrinsicMatrix.convertTo(extrinsicMatrix,CV_32F);
+  perspectiveMatrix=intrinsicMatrix*extrinsicMatrix;
+  std::cout << "------------------------------" << std::endl;
+  std::cout << "Matriz Perspectiva: "<<perspectiveMatrix << std::endl;
+  cv::Mat A1 = (cv::Mat<float>(4,3) <<
+        1,              0,              -_params.width/2,
+        0,              1,              -_params.height/2,
+        0,              0,              1,
+        0,              0,              1);
 
   // cv::warpPerspective(*_images[map_idx], *_warped_images[map_idx],
-  //                     perspectiveMatrix, map_size);
+  //                      perspectiveMatrix, map_size);
 
   // auto warp_map1 =
   //     cv_bridge::CvImage{_maps_headers[1], "mono8", *_warped_images[0]}
@@ -241,32 +271,31 @@ void combineMaps::buildMap() {
           .toImageMsg();
   _image_map.publish(final_map);
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   ros::param::get("/dynamicParameters/kernel_size", _params.kernel_size);
 
-  //Cálculo dos parâmetros:
-    auto area_probabilistica_ponderada = cv::sum(buffer_warp_maps)[0] / (float)255;
-    auto area_total = cv::countNonZero(buffer_warp_maps);
-    float area_common=0;
+  // Cálculo dos parâmetros:
+  auto area_probabilistica_ponderada =
+      cv::sum(buffer_warp_maps)[0] / (float)255;
+  auto area_total = cv::countNonZero(buffer_warp_maps);
+  float area_common = 0;
 
-    for (int x = 0; x < buffer_warp_maps.rows; x++) {
-      for (int y = 0; y < buffer_warp_maps.cols; y++) {
+  for (int x = 0; x < buffer_warp_maps.rows; x++) {
+    for (int y = 0; y < buffer_warp_maps.cols; y++) {
 
-        if (buffer_warp_maps.at<uchar>(x, y) == 255) {
-          area_common++;
-        }
+      if (buffer_warp_maps.at<uchar>(x, y) == 255) {
+        area_common++;
       }
     }
+  }
 
-    // Cálculos dos indicadores:
-    auto I_1 = area_probabilistica_ponderada / area_total;
-    auto I_2 = area_common / area_total;
-
-
+  // Cálculos dos indicadores:
+  auto I_1 = area_probabilistica_ponderada / area_total;
+  auto I_2 = area_common / area_total;
 
   //  writeResults2CSVfile(_maps_headers[1].seq,
-  //                        area_probabilistica_ponderada, area_common, area_total,
-  //                        I_1, I_2, _params.kernel_size);
+  //                        area_probabilistica_ponderada, area_common,
+  //                        area_total, I_1, I_2, _params.kernel_size);
 }
 
 /**
@@ -289,8 +318,6 @@ int main(int argc, char *argv[]) {
   ros::param::get("~topics_maps", topic_names_str);
   boost::split(topic_names, topic_names_str, boost::is_any_of(","));
   combineMaps maps_combination(topic_names, params);
-
-  // Listening the tranformation to moving_axis:
 
   while (ros::ok()) {
     ros::spinOnce();

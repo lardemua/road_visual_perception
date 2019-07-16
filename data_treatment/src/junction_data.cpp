@@ -58,7 +58,7 @@ void writeResults2CSVfile(std::string frame_id, int sequence,
                           float area_tot, float indicador1, float indicador2,
                           int kernel_size) {
   std::ofstream output;
-  const std::string outFileName = "1_cam_2_algs_3_3.csv";
+  const std::string outFileName = "2_cams_2_algs_3_3.csv";
   output.open(outFileName, std::ios::app);
 
   output << frame_id << "," << sequence << "," << area_ponderada << ","
@@ -234,42 +234,43 @@ void junction_data::process(int alg_idx) {
   cv::threshold(image_int, image_int, 0, 255,
                 cv::THRESH_BINARY | cv::THRESH_OTSU);
 
-  if (_params.combine_cams == true) {
-
-  // Calculation side IPM-----------------------------------------
-  dist_between_cams = 215;
-  distance_between_lines = 3500; // mm
-  alt_virtual_cam = 5794.04;
-  xs_zs = (float)(distance_between_lines / alt_virtual_cam);
-  rect_side = (_params.f_x_camera * xs_zs);
-
-  if (_images_headers[alg_idx].frame_id == "top_left_camera") {
-    dist_between_cams_pix =
-        _params.f_x_camera * ((float)(dist_between_cams / alt_virtual_cam));
-    center_image = _params.width / 2 - dist_between_cams_pix;
-
-  } else if (_images_headers[alg_idx].frame_id == "top_right_camera") {
-    center_image = _params.width / 2;
-  }
-  lim_min = (center_image - rect_side / 2);
-  lim_max = (center_image + rect_side / 2);
-  //-------------------------------------------------------------
-
-  cv::Point2f perspectiveSrc[] = {cv::Point2f(370, 412), cv::Point2f(535, 412),
-                                  cv::Point2f(88, 700), cv::Point2f(858, 700)};
-
-  cv::Point2f perspectiveDst[] = {cv::Point2f(lim_min, 0),
-                                  cv::Point2f(lim_max, 0),
-                                  cv::Point2f(lim_min, _params.height),
-                                  cv::Point2f(lim_max, _params.height)};
-
   ros::param::get("/top_right_camera/calc_prob_map_node/cams_combination",
                   _params.combine_cams);
 
-  perspectiveMatrix =
-      cv::getPerspectiveTransform(perspectiveSrc, perspectiveDst);
-  cv::warpPerspective(image_int, image_int, perspectiveMatrix,
-                      image_int.size());
+  if (_params.combine_cams == true) {
+
+    // Calculation side IPM-----------------------------------------
+    dist_between_cams = 215;
+    distance_between_lines = 3500; // mm
+    alt_virtual_cam = 5794.04;
+    xs_zs = (float)(distance_between_lines / alt_virtual_cam);
+    rect_side = (_params.f_x_camera * xs_zs);
+
+    if (_images_headers[alg_idx].frame_id == "top_left_camera") {
+      dist_between_cams_pix =
+          _params.f_x_camera * ((float)(dist_between_cams / alt_virtual_cam));
+      center_image = _params.width / 2 - dist_between_cams_pix;
+
+    } else if (_images_headers[alg_idx].frame_id == "top_right_camera") {
+      center_image = _params.width / 2;
+    }
+    lim_min = (center_image - rect_side / 2);
+    lim_max = (center_image + rect_side / 2);
+    //-------------------------------------------------------------
+
+    cv::Point2f perspectiveSrc[] = {cv::Point2f(370, 412),
+                                    cv::Point2f(535, 412), cv::Point2f(88, 700),
+                                    cv::Point2f(858, 700)};
+
+    cv::Point2f perspectiveDst[] = {cv::Point2f(lim_min, 0),
+                                    cv::Point2f(lim_max, 0),
+                                    cv::Point2f(lim_min, _params.height),
+                                    cv::Point2f(lim_max, _params.height)};
+
+    perspectiveMatrix =
+        cv::getPerspectiveTransform(perspectiveSrc, perspectiveDst);
+    cv::warpPerspective(image_int, image_int, perspectiveMatrix,
+                        image_int.size());
   }
   for (int i = 1; i < images_data_vect.size(); i++) {
     // Too many time of processing? Don't count to the probabilistic map
