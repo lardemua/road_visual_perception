@@ -34,8 +34,9 @@ Hardware:
 
 After all the prerequisites are installed, the first step is to calibrate the cameras in order to get the intrinsics parameters. This was based in this [Tutorial](http://wiki.ros.org/camera_calibration).
 
+To run the camera_calibrator package to stereo calibration:
 ```
-To run the camera_calibrator package:rosrun camera_calibration cameracalibrator.py --approximate 0.1 --size 8x6 --square 0.105 right:=/top_right_camera/image_raw left:=/top_left_camera/image_raw right_camera:=/top_right_camera left_camera:=/top_left_camera
+rosrun camera_calibration cameracalibrator.py --approximate 0.1 --size 8x6 --square 0.105 right:=/top_right_camera/image_raw left:=/top_left_camera/image_raw right_camera:=/top_right_camera left_camera:=/top_left_camera
 ```
 
 To get the undistorted image (this step is already included on the my camera_driver launch file):
